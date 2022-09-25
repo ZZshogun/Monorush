@@ -22,7 +22,7 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vec
 	vbo.Delete();
 	ebo.Delete();
 
-	std::cout << "Mesh ID " << handle.handle << " created\n";
+	MagiaLog::Create("Mesh", handle.handle);
 }
 
 void Mesh::Draw(Shader& shader) {
@@ -46,7 +46,7 @@ void Mesh::Delete() {
 	handle.Delete();
 
 	disposed = true;
-	std::cout << "Mesh ID " << handle.handle << " deleted\n";
+	MagiaLog::Delete("Mesh", handle.handle);
 }
 
 Mesh::~Mesh() {

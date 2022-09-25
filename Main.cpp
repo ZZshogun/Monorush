@@ -17,7 +17,7 @@ int main() {
 
 	GLFWwindow* window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Window", NULL, NULL);
 	if (!window) {
-		std::cout << "Window is null\n";
+		MagiaLog::Error("WINDOW", (int)window);
 		glfwTerminate();
 		return -1;
 	}

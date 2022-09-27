@@ -6,7 +6,6 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "MagiaLog.h"
 
 std::string Read_from_file(const char* filepath);
 

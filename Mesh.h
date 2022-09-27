@@ -9,15 +9,19 @@
 #include "VBO.h"
 #include "EBO.h"
 
-class Mesh : public Transform {
+class Mesh {
 	bool disposed = false;
 
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;
 	std::vector<Texture> textures;
 public:
+	Transform transform;
 	VAO handle;
+
+	Mesh();
 	Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture>& textures);
+	void SetMesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture>& textures);
 	void Draw(Shader& shader);
 	~Mesh();
 	void Delete();

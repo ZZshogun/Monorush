@@ -1,11 +1,18 @@
 
 #include "Mesh.h"
+#include "Square.h"
 #include "Camera.h"
 
 int WIN_WIDTH = 1280;
 int WIN_HEIGHT = 720;
 
-void PlayerInputs(GLFWwindow*, Mesh&, float);
+void PlayerInputs(GLFWwindow*, Square&, float);
+
+void OnResizeWindow(GLFWwindow* window, int w, int h) {
+	//WIN_WIDTH = w;
+	//WIN_HEIGHT = h;
+	glViewport(0, 0, w, h);
+}
 
 int main() {
 
@@ -13,11 +20,11 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 	GLFWwindow* window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Window", NULL, NULL);
 	if (!window) {
-		MagiaLog::Error("WINDOW", (int)window);
+		std::cout << "ERROR Window " << window << "\n";
 		glfwTerminate();
 		return -1;
 	}
@@ -27,39 +34,22 @@ int main() {
 	GLFWvidmode mode = *glfwGetVideoMode(glfwGetPrimaryMonitor());
 	glfwSetWindowPos(window, (mode.width - WIN_WIDTH) / 2, (mode.height - WIN_HEIGHT) / 2);
 
+	glfwSetWindowSizeCallback(window, OnResizeWindow);
+
 	Shader defaultShader("default.vert", "default.frag");
-
-	std::vector<GLuint> indices = {
-		0, 3, 1,
-		1, 3, 2
-	};
-
-	std::vector<Vertex> verticesBG = {
-		{glm::vec3{-WIN_WIDTH, -WIN_WIDTH, 0}, glm::vec4{1, 1, 1, 1}, glm::vec2{0, 0}},
-		{glm::vec3{-WIN_WIDTH, WIN_WIDTH, 0}, glm::vec4{1, 1, 1, 1}, glm::vec2{0, 10}},
-		{glm::vec3{WIN_WIDTH, WIN_WIDTH, 0}, glm::vec4{1, 1, 1, 1}, glm::vec2{10, 10}},
-		{glm::vec3{WIN_WIDTH, -WIN_WIDTH, 0}, glm::vec4{1, 1, 1, 1}, glm::vec2{10, 0}},
-	};
 
 	std::vector<Texture> texturesBG = {
 		Texture("texture/tile.png", 0)
-	};
-
-	std::vector<Vertex> vertices = {
-		{glm::vec3{-100, -100, 0}, glm::vec4{1, 1, 1, 1}, glm::vec2{0, 0}},
-		{glm::vec3{-100, 100, 0}, glm::vec4{1, 1, 1, 1}, glm::vec2{0, 1}},
-		{glm::vec3{100, 100, 0}, glm::vec4{1, 1, 1, 1}, glm::vec2{1, 1}},
-		{glm::vec3{100, -100, 0}, glm::vec4{1, 1, 1, 1}, glm::vec2{1, 0}},
 	};
 
 	std::vector<Texture> textures = {
 		Texture("texture/man.png", 0)
 	};
 
-	Mesh BG(verticesBG, indices, texturesBG);
-	Mesh man(vertices, indices, textures);
+	Square BG(2048, 2048, texturesBG, 3);
+	Square man(200, 200, textures);
 
-	Camera camera(glm::vec3(0));
+	Camera camera;
 
 	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
 	glEnable(GL_BLEND);
@@ -82,6 +72,7 @@ int main() {
 		BG.Draw(defaultShader);
 
 		PlayerInputs(window, man, deltaTime);
+		camera.transform.position = man.transform.position;
 		man.Draw(defaultShader);
 
 		glfwSwapBuffers(window);
@@ -95,17 +86,22 @@ int main() {
 
 float playerSpeed = 300;
 
-void PlayerInputs(GLFWwindow* window, Mesh& player, float dTime) {
+void PlayerInputs(GLFWwindow* window, Square& player, float dTime) {
+
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+		player.transform.rotation.z += playerSpeed * dTime;
+	}
+
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		player.position.y += playerSpeed * dTime;
+		player.transform.position.y += playerSpeed * dTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		player.position.y -= playerSpeed * dTime;
+		player.transform.position.y -= playerSpeed * dTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		player.position.x += playerSpeed * dTime;
+		player.transform.position.x += playerSpeed * dTime;
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		player.position.x -= playerSpeed * dTime;
+		player.transform.position.x -= playerSpeed * dTime;
 	}
 }

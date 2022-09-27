@@ -28,7 +28,7 @@ Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 	glGetShaderiv(vert, GL_COMPILE_STATUS, &ret);
 	if (!ret) {
 		glGetShaderInfoLog(vert, 512, 0, log);
-		MagiaLog::Error("VERTEX", vert, log);
+		std::cout << "ERROR VERTEX " << vert << " | " << log << "\n";
 	}
 
 	std::string fragC = Read_from_file(fragmentfile);
@@ -41,7 +41,7 @@ Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 	glGetShaderiv(frag, GL_COMPILE_STATUS, &ret);
 	if (!ret) {
 		glGetShaderInfoLog(frag, 512, 0, log);
-		MagiaLog::Error("FRAGMENT", frag, log);
+		std::cout << "ERROR FRAGMENT " << frag << " | " << log << "\n";
 	}
 
 	handle = glCreateProgram();
@@ -55,7 +55,7 @@ Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 	glDeleteShader(vert);
 	glDeleteShader(frag);
 
-	MagiaLog::Create("Shader", handle);
+	std::cout << "CREATE Shader " << handle << "\n";
 }
 
 void Shader::Bind() {
@@ -69,7 +69,7 @@ Shader::~Shader() {
 void Shader::Delete() {
 	if (disposed) return;
 
-	MagiaLog::Delete("Shader", handle);
+	std::cout << "DELETE Shader " << handle << "\n";
 	glDeleteProgram(handle);
 	disposed = true;
 }

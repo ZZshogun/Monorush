@@ -33,7 +33,7 @@ Texture::Texture(const char* file, GLuint slot) {
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	MagiaLog::Create("Texture", handle, file);
+	std::cout << "CREATE Texture " << handle << " " << file << "\n";
 
 	stbi_image_free(bytes);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -58,6 +58,6 @@ void Texture::Delete() {
 	if (disposed) return;
 
 	disposed = true;
-	MagiaLog::Delete("Texture", handle);
+	std::cout << "CREATE Texture " << handle << "\n";
 	glDeleteTextures(1, &handle);
 }

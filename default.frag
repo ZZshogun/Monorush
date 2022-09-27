@@ -1,6 +1,5 @@
 #version 330 core
 
-in vec3 fPos;
 in vec4 fColor;
 in vec2 fTexCoord;
 

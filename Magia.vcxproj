@@ -139,28 +139,33 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="EBO.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="Square.cpp" />
+    <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="stb.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Time.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="VAO.cpp" />
     <ClCompile Include="VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="BG.vert" />
     <None Include="default.frag" />
     <None Include="default.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EBO.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Shader.h" />
-    <ClInclude Include="Square.h" />
+    <ClInclude Include="Sprite.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="Time.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="VAO.h" />
     <ClInclude Include="VBO.h" />

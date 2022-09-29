@@ -4,6 +4,10 @@ VAO::VAO() {
 	glGenVertexArrays(1, &handle);
 }
 
+VAO::~VAO() {
+	Delete();
+}
+
 void VAO::LinkAttrib(VBO& vbo, GLuint layout, int size, GLenum type, int stride, void* pointer) {
 	vbo.Bind();
 	glVertexAttribPointer(layout, size, type, GL_FALSE, stride, pointer);
@@ -17,10 +21,6 @@ void VAO::Bind() {
 
 void VAO::Unbind() {
 	glBindVertexArray(0);
-}
-
-VAO::~VAO() {
-	Delete();
 }
 
 void VAO::Delete() {

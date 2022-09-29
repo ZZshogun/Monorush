@@ -1,19 +1,9 @@
 #include "Mesh.h"
 
-Mesh::Mesh() {
-	std::cout << "CREATE Mesh(Empty) " << handle.handle << "\n";
-}
-
 Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture>& textures) {
-	SetMesh(vertices, indices, textures);
-	std::cout << "CREATE Mesh " << handle.handle << "\n";
-}
-
-void Mesh::SetMesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture>& textures) {
-
 	this->vertices = vertices;
 	this->indices = indices;
-	this->textures = textures;
+	this->textures = std::move(textures);
 
 	handle.Bind();
 
@@ -30,18 +20,20 @@ void Mesh::SetMesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, 
 
 	vbo.Delete();
 	ebo.Delete();
+
+	std::cout << "CREATE Mesh " << handle.handle << "\n";
 }
 
-void Mesh::Draw(Shader& shader) {
-	shader.Bind();
+void Mesh::Draw(Shader* shader) {
+	shader->Bind();
 	handle.Bind();
 
 	for (int i = 0; i < textures.size(); i++) {
-		textures[i].TexUnit(shader, ("tex" + std::to_string(i)).c_str(), i);
+		textures[i].TexUnit(*shader, "tex" + i, i);
 		textures[i].Bind();
 	}
 
-	glUniformMatrix4fv(glGetUniformLocation(shader.handle, "model"), 1, GL_FALSE, glm::value_ptr(transform.Model()));
+	glUniformMatrix4fv(glGetUniformLocation(shader->handle, "model"), 1, GL_FALSE, glm::value_ptr(transform.Model()));
 
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }

@@ -9,9 +9,11 @@ public:
 
 	Transform transform;
 
-	float orthoSize = 2;
+	int width = 1280;
+	int height = 720;
 
-	void Update(Shader& shader, int scr_w, int scr_h);
+	void Update(Shader* shader);
+	void Set(int width, int height);
 };
 
 

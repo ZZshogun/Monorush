@@ -58,6 +58,6 @@ void Texture::Delete() {
 	if (disposed) return;
 
 	disposed = true;
-	std::cout << "CREATE Texture " << handle << "\n";
+	std::cout << "DELETE Texture " << handle << "\n";
 	glDeleteTextures(1, &handle);
 }

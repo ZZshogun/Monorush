@@ -15,12 +15,15 @@ struct Vertex {
 
 class VBO {
 	bool disposed = false;
+
+
 public:
 	GLuint handle;
 	VBO(std::vector<Vertex>& vertices);
 	void Bind();
 	void Unbind();
 	void Delete();
+	~VBO();
 };
 
 #endif

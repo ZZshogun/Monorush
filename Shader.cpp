@@ -13,6 +13,10 @@ std::string Read_from_file(const char* filepath) {
 	return ret;
 }
 
+Shader::Shader() {
+	handle = NULL;
+}
+
 Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 
 	std::string vertex = Read_from_file(vertexfile);

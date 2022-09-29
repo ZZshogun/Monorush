@@ -20,3 +20,7 @@ void VBO::Delete() {
 	disposed = true;
 	glDeleteBuffers(1, &handle);
 }
+
+VBO::~VBO() {
+	Delete();
+}

@@ -1,107 +1,69 @@
 
-#include "Mesh.h"
-#include "Square.h"
-#include "Camera.h"
+#include "Game.h"
 
-int WIN_WIDTH = 1280;
-int WIN_HEIGHT = 720;
+void Start(GameInfo& info);
+void Update(GameInfo& info);
+void Render(GameInfo& info);
 
-void PlayerInputs(GLFWwindow*, Square&, float);
-
-void OnResizeWindow(GLFWwindow* window, int w, int h) {
-	//WIN_WIDTH = w;
-	//WIN_HEIGHT = h;
-	glViewport(0, 0, w, h);
-}
-
-int main() {
-
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
-	GLFWwindow* window = glfwCreateWindow(WIN_WIDTH, WIN_HEIGHT, "Window", NULL, NULL);
-	if (!window) {
-		std::cout << "ERROR Window " << window << "\n";
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
-	gladLoadGL();
-
-	GLFWvidmode mode = *glfwGetVideoMode(glfwGetPrimaryMonitor());
-	glfwSetWindowPos(window, (mode.width - WIN_WIDTH) / 2, (mode.height - WIN_HEIGHT) / 2);
-
-	glfwSetWindowSizeCallback(window, OnResizeWindow);
-
-	Shader defaultShader("default.vert", "default.frag");
-
-	std::vector<Texture> texturesBG = {
-		Texture("texture/tile.png", 0)
-	};
-
-	std::vector<Texture> textures = {
-		Texture("texture/man.png", 0)
-	};
-
-	Square BG(2048, 2048, texturesBG, 3);
-	Square man(200, 200, textures);
-
-	Camera camera;
-
-	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	float deltaTime = 0;
-	float prevTime = 0;
-	float currTime = glfwGetTime();
-
-	while (!glfwWindowShouldClose(window)) {
-		glClearColor(0.45, 0.67, 0.89, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
-
-		prevTime = currTime;
-		currTime = glfwGetTime();
-		deltaTime = currTime - prevTime;
-
-		camera.Update(defaultShader, WIN_WIDTH, WIN_HEIGHT);
-
-		BG.Draw(defaultShader);
-
-		PlayerInputs(window, man, deltaTime);
-		camera.transform.position = man.transform.position;
-		man.Draw(defaultShader);
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
-
-	glfwDestroyWindow(window);
-	glfwTerminate();
-	return 0;
-}
+int WIN_WIDTH = 1600;
+int WIN_HEIGHT = 900;
 
 float playerSpeed = 300;
 
-void PlayerInputs(GLFWwindow* window, Square& player, float dTime) {
+Game game;
+std::unique_ptr<Shader> defaultShader;
+std::unique_ptr<Shader> BGshader;
+std::unique_ptr<Sprite> BG;
+std::unique_ptr<Sprite> man;
+Camera camera;
 
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
-		player.transform.rotation.z += playerSpeed * dTime;
-	}
+glm::vec2 offset = glm::vec2(0);
+float speed = 1;
 
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		player.transform.position.y += playerSpeed * dTime;
-	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		player.transform.position.y -= playerSpeed * dTime;
-	}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-		player.transform.position.x += playerSpeed * dTime;
-	}
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		player.transform.position.x -= playerSpeed * dTime;
-	}
+void Start(GameInfo& info) {
+	camera.Set(info.screenWidth, info.screenHeight);
+
+	defaultShader = std::make_unique<Shader>("default.vert", "default.frag");
+	BGshader = std::make_unique<Shader>("BG.vert", "default.frag");
+
+	int maxL = std::max(info.screenHeight, info.screenWidth);
+
+	std::vector<Texture> texturesBG = { Texture("texture/tile.png", 0) };
+	BG = std::make_unique<Sprite>(maxL, maxL, texturesBG, 4);
+
+	std::vector<Texture> textures = { Texture("texture/man.png", 0) };
+	man = std::make_unique<Sprite>(100, 100, textures);
+}
+
+void Update(GameInfo& info) {
+	camera.Update(BGshader.get());
+	camera.Update(defaultShader.get());
+
+	glm::vec2 dir = glm::vec2(0);
+	if (glfwGetKey(info.window, GLFW_KEY_W) == GLFW_PRESS) dir.y += 1;
+	if (glfwGetKey(info.window, GLFW_KEY_S) == GLFW_PRESS) dir.y -= 1;
+	if (glfwGetKey(info.window, GLFW_KEY_A) == GLFW_PRESS) dir.x -= 1;
+	if (glfwGetKey(info.window, GLFW_KEY_D) == GLFW_PRESS) dir.x += 1;
+
+	man->transform.position += glm::vec3(dir * speed * Time::deltaTime, 0);
+	BG->transform.position = man->transform.position;
+	camera.transform.position = man->transform.position;
+
+	offset += dir * speed * Time::deltaTime;
+
+}
+
+void Render(GameInfo& info) {
+	BGshader->Bind();
+	glUniform2f(glGetUniformLocation(BGshader->handle, "offset"), offset.x, offset.y);
+	BG->Draw(BGshader.get());
+	man->Draw(defaultShader.get());
+}
+
+
+int main() {
+	game.Set(WIN_WIDTH, WIN_HEIGHT);
+	game.Run(Start, Update, Render);
+
+	return 0;
 }

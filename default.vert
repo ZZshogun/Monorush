@@ -9,13 +9,15 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
 
+uniform vec2 offset;
+
 out vec4 fColor;
 out vec2 fTexCoord;
 
 void main() {
 
 	fColor = aColor;
-	fTexCoord = aTexCoord;
+	fTexCoord = aTexCoord + offset;
 
 	gl_Position = proj * view * model * vec4(aPos, 1);
 

@@ -39,6 +39,10 @@ Texture::Texture(const char* file, GLuint slot) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+Ref<Texture> Texture::Create(const char* file, GLuint slot) {
+	return std::make_shared<Texture>(file, slot);
+}
+
 void Texture::TexUnit(Shader& shader, const char* uniform, GLuint unit) {
 	shader.Bind();
 	int location = glGetUniformLocation(shader.handle, uniform);
@@ -60,4 +64,8 @@ void Texture::Delete() {
 	disposed = true;
 	std::cout << "DELETE Texture " << handle << "\n";
 	glDeleteTextures(1, &handle);
+}
+
+Texture::~Texture() {
+	Delete();
 }

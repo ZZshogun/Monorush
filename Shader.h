@@ -6,19 +6,20 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include "Core.h"
 
 std::string Read_from_file(const char* filepath);
 
 class Shader {
 	bool disposed = false;
 
+	Shader();
 
 public:
 	int handle;
 
-	Shader();
 	Shader(const char* vertexCode, const char* fragmentCode);
-	static std::unique_ptr<Shader> Create(const char* vertexCode, const char* fragmentCode);
+	static Ref<Shader> Create(const char* vertexCode, const char* fragmentCode);
 	void Bind();
 	void Delete();
 	~Shader();

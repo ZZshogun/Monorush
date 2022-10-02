@@ -11,6 +11,8 @@ public:
 	GLuint handle;
 	GLuint unit;
 	Texture(const char* file, GLuint slot);
+	~Texture();
+	static Ref<Texture> Create(const char* file, GLuint slot);
 	void TexUnit(Shader& shader, const char* uniform, GLuint unit);
 	void Bind();
 	void Unbind();

@@ -14,14 +14,15 @@ class Mesh {
 
 	std::vector<Vertex> vertices;
 	std::vector<GLuint> indices;
-	std::vector<Texture> textures;
+	std::vector<Ref<Texture>> textures;
 
 public:
 	Transform transform;
+	glm::vec2 texOffset = glm::vec2(0);
 	VAO handle;
 
-	Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture>& texture);
-	static std::unique_ptr<Mesh> Create(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture>& texture);
+	Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Ref<Texture>>& texture);
+	static Ref<Mesh> Create(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Ref<Texture>>& texture);
 	void Draw(Shader* shader);
 	void Delete();
 	~Mesh();

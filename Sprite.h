@@ -1,6 +1,7 @@
 #ifndef SPRITE_CLASS_H
 #define SPRITE_CLASS_H
 
+#include "Core.h"
 #include "Mesh.h"
 
 class Sprite {
@@ -14,17 +15,16 @@ class Sprite {
 
 public:
 
-	Mesh* mesh;
-	Texture* texture;
+	Ref<Mesh> mesh;
+	std::vector<Ref<Texture>> textures;
 	Transform transform;
 
 	Sprite();
-	Sprite(int width, int height, const char* textures, int UVLimit = 1);
-	static std::unique_ptr<Sprite> Create();
-	static std::unique_ptr<Sprite> Create(int width, int height, const char* texture, int UVLimit = 1);
+	Sprite(int width, int height, Ref<Texture>& texture, int UVLimit = 1);
+	static Ref<Sprite> Create();
+	static Ref<Sprite> Create(int width, int height, Ref<Texture>& texture, int UVLimit = 1);
 
 	void Draw(Shader* shader);
-	~Sprite();
 };
 
 #endif

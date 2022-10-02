@@ -9,13 +9,11 @@ void Game::Set(int width, int height) {
 	scr_w = width;
 	scr_h = height;
 	info = { width, height, window };
-
-	if (!_Setup()) return;
-
-	std::cout << "CREATE Game " << width << "x" << height << "\n";
 }
 
 bool Game::_Setup() {
+	if (initialised) return true;
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -40,17 +38,20 @@ bool Game::_Setup() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	std::cout << "CREATE Game " << scr_w << "x" << scr_h << "\n";
 	return initialised = true;
 }
 
 void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), void (*Render)(GameInfo& info)) {
-	if (!initialised) {
-		if (!_Setup()) return;
-	}
+	if (!_Setup()) return;
 
+	std::cout << "------------------ SETUP ------------------\n";
 	_UpdateInfo();
+	mainCamera.Set(info.screenWidth, info.screenHeight);
+	shaders.push_back(Shader::Create("default.vert", "default.frag"));
 
 	Start(info);
+	std::cout << "--------------- END SETUP -----------------\n";
 
 	float prevTime = 0;
 	float currentTime = (float)glfwGetTime();
@@ -67,18 +68,37 @@ void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), vo
 
 		_UpdateInfo();
 
+		for(int i = 0; i < shaders.size(); i++)
+			mainCamera.Update(shaders[i].get());
+
 		Update(info);
 		Render(info);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
-
+	std::cout << "---------------- CLEAN UP -----------------\n";
 	glfwDestroyWindow(window);
 	glfwTerminate();
-	std::cout << "DELETE Game\n";
 	return;
 }
+
+void Game::Draw(Sprite* sprite, int shaderID) {
+	sprite->Draw(shaders[shaderID].get());
+}
+
+void Game::Draw(Mesh* mesh, int shaderID) {
+	mesh->Draw(shaders[shaderID].get());
+}
+
+void Game::Draw(Ref<Sprite>& sprite, int shaderID) {
+	Draw(sprite.get());
+}
+
+void Game::Draw(Ref<Mesh>& mesh, int shaderID) {
+	Draw(mesh.get());
+}
+
 
 void Game::_UpdateInfo() {
 	info.screenHeight = scr_h;

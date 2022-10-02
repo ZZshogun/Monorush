@@ -17,8 +17,8 @@ Shader::Shader() {
 	handle = NULL;
 }
 
-std::unique_ptr<Shader> Shader::Create(const char* vertexCode, const char* fragmentCode) {
-	return std::make_unique<Shader>(vertexCode, fragmentCode);
+Ref<Shader> Shader::Create(const char* vertexCode, const char* fragmentCode) {
+	return std::make_shared<Shader>(vertexCode, fragmentCode);
 }
 
 Shader::Shader(const char* vertexfile, const char* fragmentfile) {
@@ -63,7 +63,7 @@ Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 	glDeleteShader(vert);
 	glDeleteShader(frag);
 
-	std::cout << "CREATE Shader " << handle << "\n";
+	std::cout << "CREATE Shader " << handle << " " << vertexfile << " " << fragmentfile << "\n";
 }
 
 void Shader::Bind() {

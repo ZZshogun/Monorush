@@ -18,42 +18,35 @@ std::vector<Vertex> Sprite::_GetVertices(int UVLimit) {
 
 Sprite::Sprite() {
 
-	std::vector<Texture> textures = { Texture("texture/sprite_default.png", 0) };
+	textures = {
+		Texture::Create("texture/sprite_default.png", 0),
+	};
 
 	std::vector<Vertex> vertices = _GetVertices(1);
 
-	mesh = new Mesh(vertices, __indices, textures);
+	mesh = Mesh::Create(vertices, __indices, textures);
 }
 
-Sprite::Sprite(int width, int height, const char* textures, int UVLimit) {
+Sprite::Sprite(int width, int height, Ref<Texture>& texture, int UVLimit) {
 
 	this->width = width;
 	this->height = height;
 
 	std::vector<Vertex> vertices = _GetVertices(UVLimit);
 
-	texture = new Texture(textures, 0);
+	textures = { texture };
 
-	std::vector<Texture> texs = {
-		*texture,
-	};
-
-	mesh = new Mesh(vertices, __indices, texs);
+	mesh = Mesh::Create(vertices, __indices, textures);
 }
 
-std::unique_ptr<Sprite> Sprite::Create() {
-	return std::make_unique<Sprite>();
+Ref<Sprite> Sprite::Create() {
+	return std::make_shared<Sprite>();
 }
-std::unique_ptr<Sprite> Sprite::Create(int width, int height, const char* textures, int UVLimit) {
-	return std::make_unique<Sprite>(width, height, textures, UVLimit);
+Ref<Sprite> Sprite::Create(int width, int height, Ref<Texture>& texture, int UVLimit) {
+	return std::make_shared<Sprite>(width, height, texture, UVLimit);
 }
 
 void Sprite::Draw(Shader* shader) {
 	mesh->transform = transform;
 	mesh->Draw(shader);
-}
-
-Sprite::~Sprite() {
-	delete mesh;
-	delete texture;
 }

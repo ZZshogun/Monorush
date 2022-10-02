@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture>& textures) {
+Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Ref<Texture>>& textures) {
 	this->vertices = vertices;
 	this->indices = indices;
 	this->textures = std::move(textures);
@@ -24,8 +24,8 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vec
 	std::cout << "CREATE Mesh " << handle.handle << "\n";
 }
 
-std::unique_ptr<Mesh> Create(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture>& texture) {
-	return std::make_unique<Mesh>(vertices, indices, texture);
+Ref<Mesh> Mesh::Create(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Ref<Texture>>& texture) {
+	return std::make_shared<Mesh>(vertices, indices, texture);
 }
 
 void Mesh::Draw(Shader* shader) {
@@ -33,20 +33,18 @@ void Mesh::Draw(Shader* shader) {
 	handle.Bind();
 
 	for (int i = 0; i < textures.size(); i++) {
-		textures[i].TexUnit(*shader, "tex" + i, i);
-		textures[i].Bind();
+		textures[i]->TexUnit(*shader, "tex" + i, i);
+		textures[i]->Bind();
 	}
 
 	glUniformMatrix4fv(glGetUniformLocation(shader->handle, "model"), 1, GL_FALSE, glm::value_ptr(transform.Model()));
+	glUniform2f(glGetUniformLocation(shader->handle, "offset"), texOffset.x, texOffset.y);
 
 	glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
 }
 
 void Mesh::Delete() {
 	if (disposed) return;
-
-	for (int i = 0; i < textures.size(); i++) textures[i].Delete();
-	handle.Delete();
 
 	disposed = true;
 	std::cout << "DELETE Mesh " << handle.handle << "\n";

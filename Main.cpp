@@ -23,16 +23,12 @@ float speed = 1;
 void Start(GameInfo& info) {
 	camera.Set(info.screenWidth, info.screenHeight);
 
-	defaultShader = std::make_unique<Shader>("default.vert", "default.frag");
-	BGshader = std::make_unique<Shader>("BG.vert", "default.frag");
+	defaultShader = Shader::Create("default.vert", "default.frag");
+	BGshader = Shader::Create("BG.vert", "default.frag");
 
 	int maxL = std::max(info.screenHeight, info.screenWidth);
-
-	std::vector<Texture> texturesBG = { Texture("texture/tile.png", 0) };
-	BG = std::make_unique<Sprite>(maxL, maxL, texturesBG, 4);
-
-	std::vector<Texture> textures = { Texture("texture/man.png", 0) };
-	man = std::make_unique<Sprite>(100, 100, textures);
+	BG = Sprite::Create(maxL, maxL, "texture/tile.png", 4);
+	man = Sprite::Create(100, 100, "texture/man.png");
 }
 
 void Update(GameInfo& info) {
@@ -45,12 +41,13 @@ void Update(GameInfo& info) {
 	if (glfwGetKey(info.window, GLFW_KEY_A) == GLFW_PRESS) dir.x -= 1;
 	if (glfwGetKey(info.window, GLFW_KEY_D) == GLFW_PRESS) dir.x += 1;
 
-	man->transform.position += glm::vec3(dir * speed * Time::deltaTime, 0);
+	dir *= speed * Time::deltaTime;
+	if (dir.x && dir.y) dir *= (1 / sqrt(2));
+	offset += dir;
+
+	man->transform.position += glm::vec3(dir, 0);
 	BG->transform.position = man->transform.position;
 	camera.transform.position = man->transform.position;
-
-	offset += dir * speed * Time::deltaTime;
-
 }
 
 void Render(GameInfo& info) {

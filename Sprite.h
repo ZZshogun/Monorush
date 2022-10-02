@@ -5,8 +5,8 @@
 
 class Sprite {
 
-	int width = 512;
-	int height = 512;
+	int width = 128;
+	int height = 128;
 
 	std::vector<Vertex> _GetVertices(int UVLimit);
 	static std::vector<GLuint> __indices;
@@ -15,10 +15,13 @@ class Sprite {
 public:
 
 	Mesh* mesh;
+	Texture* texture;
 	Transform transform;
 
 	Sprite();
-	Sprite(int width, int height, std::vector<Texture>& textures, int UVLimit = 1);
+	Sprite(int width, int height, const char* textures, int UVLimit = 1);
+	static std::unique_ptr<Sprite> Create();
+	static std::unique_ptr<Sprite> Create(int width, int height, const char* texture, int UVLimit = 1);
 
 	void Draw(Shader* shader);
 	~Sprite();

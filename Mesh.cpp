@@ -24,6 +24,10 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vec
 	std::cout << "CREATE Mesh " << handle.handle << "\n";
 }
 
+std::unique_ptr<Mesh> Create(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture>& texture) {
+	return std::make_unique<Mesh>(vertices, indices, texture);
+}
+
 void Mesh::Draw(Shader* shader) {
 	shader->Bind();
 	handle.Bind();
@@ -35,7 +39,7 @@ void Mesh::Draw(Shader* shader) {
 
 	glUniformMatrix4fv(glGetUniformLocation(shader->handle, "model"), 1, GL_FALSE, glm::value_ptr(transform.Model()));
 
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
 }
 
 void Mesh::Delete() {

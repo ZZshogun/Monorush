@@ -53,14 +53,14 @@ void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), vo
 	Start(info);
 
 	float prevTime = 0;
-	float currentTime = glfwGetTime();
+	float currentTime = (float)glfwGetTime();
 
 	while (!glfwWindowShouldClose(window)) {
-		glClearColor(0.45, 0.67, 0.89, 1);
+		glClearColor(0.45f, 0.67f, 0.89f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		
 		prevTime = currentTime;
-		currentTime = glfwGetTime();
+		currentTime = (float)glfwGetTime();
 		float deltaTime = currentTime - prevTime;
 		Time::unscaledDeltaTime = deltaTime;
 		Time::deltaTime = Time::timeScale * deltaTime;

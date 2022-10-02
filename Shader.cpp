@@ -17,6 +17,10 @@ Shader::Shader() {
 	handle = NULL;
 }
 
+std::unique_ptr<Shader> Shader::Create(const char* vertexCode, const char* fragmentCode) {
+	return std::make_unique<Shader>(vertexCode, fragmentCode);
+}
+
 Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 
 	std::string vertex = Read_from_file(vertexfile);

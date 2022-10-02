@@ -25,14 +25,27 @@ Sprite::Sprite() {
 	mesh = new Mesh(vertices, __indices, textures);
 }
 
-Sprite::Sprite(int width, int height, std::vector<Texture>& textures, int UVLimit) {
+Sprite::Sprite(int width, int height, const char* textures, int UVLimit) {
 
 	this->width = width;
 	this->height = height;
 
 	std::vector<Vertex> vertices = _GetVertices(UVLimit);
 
-	mesh = new Mesh(vertices, __indices, textures);
+	texture = new Texture(textures, 0);
+
+	std::vector<Texture> texs = {
+		*texture,
+	};
+
+	mesh = new Mesh(vertices, __indices, texs);
+}
+
+std::unique_ptr<Sprite> Sprite::Create() {
+	return std::make_unique<Sprite>();
+}
+std::unique_ptr<Sprite> Sprite::Create(int width, int height, const char* textures, int UVLimit) {
+	return std::make_unique<Sprite>(width, height, textures, UVLimit);
 }
 
 void Sprite::Draw(Shader* shader) {
@@ -42,4 +55,5 @@ void Sprite::Draw(Shader* shader) {
 
 Sprite::~Sprite() {
 	delete mesh;
+	delete texture;
 }

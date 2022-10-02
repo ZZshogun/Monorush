@@ -18,6 +18,7 @@ public:
 
 	Shader();
 	Shader(const char* vertexCode, const char* fragmentCode);
+	static std::unique_ptr<Shader> Create(const char* vertexCode, const char* fragmentCode);
 	void Bind();
 	void Delete();
 	~Shader();

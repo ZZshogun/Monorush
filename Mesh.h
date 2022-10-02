@@ -21,6 +21,7 @@ public:
 	VAO handle;
 
 	Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture>& texture);
+	static std::unique_ptr<Mesh> Create(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Texture>& texture);
 	void Draw(Shader* shader);
 	void Delete();
 	~Mesh();

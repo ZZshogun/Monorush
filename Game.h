@@ -5,6 +5,7 @@
 #include "Sprite.h"
 #include "Camera.h"
 #include "Time.h"
+#include "Input.h"
 
 struct GameInfo {
 	int screenWidth;

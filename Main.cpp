@@ -27,11 +27,7 @@ void Start(GameInfo& info) {
 
 void Update(GameInfo& info) {
 
-	glm::vec2 dir = glm::vec2(0);
-	if (glfwGetKey(info.window, GLFW_KEY_W) == GLFW_PRESS) dir.y += 1;
-	if (glfwGetKey(info.window, GLFW_KEY_S) == GLFW_PRESS) dir.y -= 1;
-	if (glfwGetKey(info.window, GLFW_KEY_A) == GLFW_PRESS) dir.x -= 1;
-	if (glfwGetKey(info.window, GLFW_KEY_D) == GLFW_PRESS) dir.x += 1;
+	glm::vec2 dir = Input::WASDAxis();
 
 	dir *= speed * Time::deltaTime;
 	if (dir.x && dir.y) dir *= (1 / sqrt(2));

@@ -33,10 +33,13 @@ bool Game::_Setup() {
 	glfwSetWindowPos(window, (mode.width - scr_w) / 2, (mode.height - scr_h) / 2);
 
 	//glfwSetWindowSizeCallback(window, OnResizeWindow);
+	//glfwSetKeyCallback(window, Input::ScanKey);
 
 	glViewport(0, 0, scr_w, scr_h);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	Input::SetWindowInput(window);
 
 	std::cout << "CREATE Game " << scr_w << "x" << scr_h << "\n";
 	return initialised = true;
@@ -67,6 +70,8 @@ void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), vo
 		Time::deltaTime = Time::timeScale * deltaTime;
 
 		_UpdateInfo();
+		Input::ScanKey(window);
+		Input::ScanMouse(window);
 
 		for(int i = 0; i < shaders.size(); i++)
 			mainCamera.Update(shaders[i].get());

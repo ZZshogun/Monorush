@@ -1,0 +1,41 @@
+#ifndef INPUT_CLASS_H
+#define INPUT_CLASS_H
+
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <iostream>
+
+class Input {
+
+	enum KeyState {
+		KEY_RELEASE,
+		KEY_DOWN,
+		KEY_STAY,
+		KEY_UP,
+	};
+
+	static GLFWwindow* mainWindow;
+
+	static GLuint keyCode[GLFW_KEY_LAST + 1];
+	static GLuint mouseCode[GLFW_MOUSE_BUTTON_LAST + 1];
+
+public:
+	static void SetWindowInput(GLFWwindow* window);
+	static void ScanKey(GLFWwindow* window);
+	static void ScanMouse(GLFWwindow* window);
+
+	static bool GetKey(GLenum GLFW_KEY);
+	static bool GetKeyDown(GLenum GLFW_KEY);
+	static bool GetKeyUp(GLenum GLFW_KEY);
+
+	static glm::vec2 MousePosition();
+	static bool GetMouse(GLenum GLFW_MOUSE_BUTTON);
+	static bool GetMouseDown(GLenum GLFW_MOUSE_BUTTON);
+	static bool GetMouseUp(GLenum GLFW_MOUSE_BUTTON);
+
+	static glm::vec2 WASDAxis();
+};
+
+
+#endif

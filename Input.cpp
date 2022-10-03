@@ -3,6 +3,7 @@
 GLFWwindow* Input::mainWindow = NULL;
 GLuint Input::keyCode[GLFW_KEY_LAST + 1] = { Input::KeyState::KEY_RELEASE };
 GLuint Input::mouseCode[GLFW_MOUSE_BUTTON_LAST + 1] = { Input::KeyState::KEY_RELEASE };
+glm::vec2 Input::mouseScrollDelta = glm::vec2(0, 0);
 
 void Input::SetWindowInput(GLFWwindow* window) {
 	mainWindow = window;
@@ -50,6 +51,18 @@ void Input::ScanMouse(GLFWwindow* window) {
 	}
 }
 
+void Input::ScanMouseScroll(GLFWwindow* window, double xoffset, double yoffset) {
+	SetWindowInput(window);
+
+	mouseScrollDelta += glm::vec2(xoffset, yoffset);
+}
+
+void Input::ClearInputBuffer() {
+	if (!mainWindow) return;
+
+	mouseScrollDelta = glm::vec2(0, 0);
+}
+
 bool Input::GetKey(GLenum GLFW_KEY) {
 	if (!mainWindow || GLFW_KEY == GLFW_KEY_UNKNOWN) return false;
 	return keyCode[GLFW_KEY] == KeyState::KEY_STAY || keyCode[GLFW_KEY] == KeyState::KEY_DOWN;
@@ -71,6 +84,11 @@ glm::vec2 Input::MousePosition() {
 	double x, y;
 	glfwGetCursorPos(mainWindow, &x, &y);
 	return glm::vec2((float)x, (float)y);
+}
+
+glm::vec2 Input::MouseScrollDelta() {
+	if (!mainWindow) return glm::vec2(-1, -1);
+	return mouseScrollDelta;
 }
 
 bool Input::GetMouse(GLenum GLFW_MOUSE_BUTTON) {

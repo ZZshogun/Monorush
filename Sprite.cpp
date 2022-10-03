@@ -5,7 +5,7 @@ std::vector<GLuint> Sprite::__indices = {
 		1, 3, 2
 };
 
-std::vector<Vertex> Sprite::_GetVertices(int UVLimit) {
+std::vector<Vertex> Sprite::_GetVertices(float UVLimit) {
 	std::vector<Vertex> vertices = {
 		{glm::vec3{-width / 2.0, -height / 2.0, 0}, glm::vec4{1, 1, 1, 1}, glm::vec2{0, 0}},
 		{glm::vec3{-width / 2.0, height / 2.0, 0}, glm::vec4{1, 1, 1, 1}, glm::vec2{0, UVLimit}},
@@ -27,7 +27,7 @@ Sprite::Sprite() {
 	mesh = Mesh::Create(vertices, __indices, textures);
 }
 
-Sprite::Sprite(int width, int height, Ref<Texture>& texture, int UVLimit) {
+Sprite::Sprite(int width, int height, Ref<Texture>& texture, float UVLimit) {
 
 	this->width = width;
 	this->height = height;
@@ -42,7 +42,7 @@ Sprite::Sprite(int width, int height, Ref<Texture>& texture, int UVLimit) {
 Ref<Sprite> Sprite::Create() {
 	return std::make_shared<Sprite>();
 }
-Ref<Sprite> Sprite::Create(int width, int height, Ref<Texture>& texture, int UVLimit) {
+Ref<Sprite> Sprite::Create(int width, int height, Ref<Texture>& texture, float UVLimit) {
 	return std::make_shared<Sprite>(width, height, texture, UVLimit);
 }
 

@@ -9,7 +9,7 @@ class Sprite {
 	int width = 128;
 	int height = 128;
 
-	std::vector<Vertex> _GetVertices(int UVLimit);
+	std::vector<Vertex> _GetVertices(float UVLimit);
 	static std::vector<GLuint> __indices;
 
 
@@ -20,9 +20,9 @@ public:
 	Transform transform;
 
 	Sprite();
-	Sprite(int width, int height, Ref<Texture>& texture, int UVLimit = 1);
+	Sprite(int width, int height, Ref<Texture>& texture, float UVLimit = 1);
 	static Ref<Sprite> Create();
-	static Ref<Sprite> Create(int width, int height, Ref<Texture>& texture, int UVLimit = 1);
+	static Ref<Sprite> Create(int width, int height, Ref<Texture>& texture, float UVLimit = 1);
 
 	void Draw(Shader* shader);
 };

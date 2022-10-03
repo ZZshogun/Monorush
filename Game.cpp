@@ -8,6 +8,8 @@ Game::Game() {
 void Game::Set(int width, int height) {
 	scr_w = width;
 	scr_h = height;
+	_scr_w = width;
+	_scr_h = height;
 	info = { width, height, window };
 }
 
@@ -34,6 +36,7 @@ bool Game::_Setup() {
 
 	//glfwSetWindowSizeCallback(window, OnResizeWindow);
 	//glfwSetKeyCallback(window, Input::ScanKey);
+	glfwSetScrollCallback(window, Input::ScanMouseScroll);
 
 	glViewport(0, 0, scr_w, scr_h);
 	glEnable(GL_BLEND);
@@ -41,7 +44,7 @@ bool Game::_Setup() {
 
 	Input::SetWindowInput(window);
 
-	std::cout << "CREATE Game " << scr_w << "x" << scr_h << "\n";
+	std::cout << "START Game " << scr_w << "x" << scr_h << "\n";
 	return initialised = true;
 }
 
@@ -50,7 +53,7 @@ void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), vo
 
 	std::cout << "------------------ SETUP ------------------\n";
 	_UpdateInfo();
-	mainCamera.Set(info.screenWidth, info.screenHeight);
+	mainCamera.Set(1600, 900);
 	shaders.push_back(Shader::Create("default.vert", "default.frag"));
 
 	Start(info);
@@ -69,15 +72,18 @@ void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), vo
 		Time::unscaledDeltaTime = deltaTime;
 		Time::deltaTime = Time::timeScale * deltaTime;
 
-		_UpdateInfo();
 		Input::ScanKey(window);
 		Input::ScanMouse(window);
+		_DefaultKeyBind();
+		_UpdateInfo();
 
 		for(int i = 0; i < shaders.size(); i++)
 			mainCamera.Update(shaders[i].get());
 
 		Update(info);
 		Render(info);
+
+		Input::ClearInputBuffer();
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -86,6 +92,52 @@ void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), vo
 	glfwDestroyWindow(window);
 	glfwTerminate();
 	return;
+}
+
+void Game::_SetFullscreen(bool status) {
+	fullScreen = status;
+
+	GLFWmonitor* monitor = NULL;
+	GLFWmonitor* cur = glfwGetPrimaryMonitor();
+	GLFWvidmode mode = *glfwGetVideoMode(cur);
+	glm::vec2 pos = {0, 0};
+
+	if (fullScreen) {
+
+		int max_h = (int)(mode.width / 16.0f * 9);
+		int max_w = (int)(mode.height / 9.0f * 16);
+
+		if (max_h <= mode.height) {
+			scr_h = max_h;
+			scr_w = mode.width;
+		}
+		else {
+			scr_w = max_w;
+			scr_h = mode.height;
+		}
+		monitor = cur;
+	}
+	else {
+		scr_h = _scr_h;
+		scr_w = _scr_w;
+	}
+
+	pos.x = (float)mode.width - scr_w;
+	pos.y = (float)mode.height - scr_h;
+	pos /= 2;
+
+	glViewport(0, 0, scr_w, scr_h);
+	glfwSetWindowMonitor(window, monitor, (int)pos.x, (int)pos.y, scr_w, scr_h, GLFW_DONT_CARE);
+}
+
+void Game::_DefaultKeyBind() {
+
+	if (Input::GetKey(GLFW_KEY_LEFT_ALT)) {
+		mainCamera.zoomLevel -= Input::MouseScrollDelta().y * Time::deltaTime * 10;
+		if (Input::GetKeyDown(GLFW_KEY_ENTER)) _SetFullscreen(!fullScreen);
+		if (Input::GetKeyDown(GLFW_KEY_V)) mainCamera.zoomLevel = 1;
+		if (Input::GetKeyDown(GLFW_KEY_Q)) Stop();
+	}
 }
 
 void Game::Draw(Sprite* sprite, int shaderID) {
@@ -104,9 +156,13 @@ void Game::Draw(Ref<Mesh>& mesh, int shaderID) {
 	Draw(mesh.get());
 }
 
-
 void Game::_UpdateInfo() {
 	info.screenHeight = scr_h;
 	info.screenWidth = scr_w;
 	info.window = window;
+}
+
+void Game::Stop() {
+	glfwSetWindowShouldClose(window, GL_TRUE);
+	std::cout << "STOP Game\n";
 }

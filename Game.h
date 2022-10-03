@@ -17,8 +17,14 @@ class Game {
 
 	GLFWwindow* window;
 	bool initialised = false;
+	bool fullScreen = false;
+
 	bool _Setup();
 	void _UpdateInfo();
+	void _SetFullscreen(bool status);
+	void _DefaultKeyBind();
+
+	int _scr_w = 1280, _scr_h = 720;
 
 public:
 	GameInfo info;
@@ -31,7 +37,8 @@ public:
 	Game();
 	void Set(int width, int height);
 	void Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), void (*Render)(GameInfo& info));
-	
+	void Stop();
+
 	void Draw(Sprite* sprite, int shaderID = 0);
 	void Draw(Mesh* sprite, int shaderID = 0);
 	void Draw(Ref<Sprite>& sprite, int shaderID = 0);

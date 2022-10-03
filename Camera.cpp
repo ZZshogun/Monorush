@@ -6,10 +6,16 @@ void Camera::Update(Shader* shader) {
 
 	glm::mat4 view = glm::mat4(1.0f);
 
-	float h_width = (float)width / 2;
-	float h_height = (float)height / 2;
-
-	projection = glm::ortho<float>(-h_width, h_width, -h_height, h_height, -1000, 1000);
+	zoomLevel = glm::clamp(zoomLevel, 0.15f, 2.0f);
+	glm::vec2 resolution = glm::vec2(width, height) * zoomLevel / 2.0f;
+	projection = glm::ortho<float>(
+		-resolution.x,
+		resolution.x,
+		-resolution.y,
+		resolution.y,
+		-1000,
+		1000
+	);
 
 	view = glm::translate(view, -transform.position);
 

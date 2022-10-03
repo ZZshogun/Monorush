@@ -8,8 +8,7 @@
 #include "Input.h"
 
 struct GameInfo {
-	int screenWidth;
-	int screenHeight;
+	glm::vec2 screenResolution;
 	GLFWwindow* window;
 };
 
@@ -24,7 +23,8 @@ class Game {
 	void _SetFullscreen(bool status);
 	void _DefaultKeyBind();
 
-	int _scr_w = 1280, _scr_h = 720;
+	glm::vec2 _ScreenResolution = {1280, 720};
+	glm::vec2 _CameraResolution = {16, 9};
 
 public:
 	GameInfo info;
@@ -32,10 +32,10 @@ public:
 
 	Camera mainCamera;
 
-	int scr_w = 1280, scr_h = 720;
+	glm::vec2 ScreenResolution = { 1280, 720 };
 
 	Game();
-	void Set(int width, int height);
+	void Set(glm::vec2 screen_resolution, glm::vec2 render_resolution = {16, 9});
 	void Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), void (*Render)(GameInfo& info));
 	void Stop();
 

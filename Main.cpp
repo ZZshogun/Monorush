@@ -15,23 +15,23 @@ Ref<Sprite> BG;
 Ref<Sprite> man;
 Ref<Sprite> chest;
 
-float speed = 300;
-float squareSize = 320;
+float speed = 5;
+float squareSize = 4;
 glm::vec2 prevOffset{ 0, 0 };
 glm::vec2 curOffset{ 0, 0 };
 
 void Start(GameInfo& info) {
 
 	Ref<Texture> BG_tex = Texture::Create("texture/tile.png");
-	float maxL = std::max(game.mainCamera.width, game.mainCamera.height);
+	float maxL = std::max(game.mainCamera.width, game.mainCamera.height) + 1;
 	BG = Sprite::Create(maxL, maxL, BG_tex, maxL / squareSize);
 
 	Ref<Texture> man_tex = Texture::Create("texture/man.png");
-	man = Sprite::Create(100, 100, man_tex);
+	man = Sprite::Create(1, 1, man_tex);
 
 	Ref<Texture> chest_tex = Texture::Create("texture/chest.png");
-	chest = Sprite::Create(100, 100, chest_tex);
-	chest->transform.position.x = 220;
+	chest = Sprite::Create(1, 1, chest_tex);
+	chest->transform.position.x = 2;
 }
 
 void Update(GameInfo& info) {
@@ -55,7 +55,7 @@ void Render(GameInfo& info) {
 
 
 int main() {
-	game.Set(WIN_WIDTH, WIN_HEIGHT);
+	game.Set({ WIN_WIDTH, WIN_HEIGHT });
 	game.Run(Start, Update, Render);
 
 	return 0;

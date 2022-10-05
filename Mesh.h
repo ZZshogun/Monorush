@@ -23,7 +23,7 @@ public:
 
 	Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Ref<Texture>>& texture);
 	static Ref<Mesh> Create(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Ref<Texture>>& texture);
-	void Draw(Shader* shader);
+	void Draw(Ref<Shader>& shader);
 	void Delete();
 	~Mesh();
 };

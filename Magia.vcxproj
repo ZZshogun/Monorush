@@ -164,9 +164,8 @@
     <ClCompile Include="VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="BG.vert" />
-    <None Include="default.frag" />
-    <None Include="default.vert" />
+    <None Include="unlit.frag" />
+    <None Include="unlit.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />

@@ -64,7 +64,7 @@ Ref<Sprite> Sprite::Create(glm::vec2 size, Ref<Texture>& texture, float UVLimit)
 	return std::make_shared<Sprite>(size, texture, UVLimit);
 }
 
-void Sprite::Draw(Shader* shader) {
+void Sprite::Draw(Ref<Shader> shader) {
 	mesh->transform = transform;
 	mesh->Draw(shader);
 }

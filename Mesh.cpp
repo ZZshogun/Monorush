@@ -28,7 +28,7 @@ Ref<Mesh> Mesh::Create(std::vector<Vertex>& vertices, std::vector<GLuint>& indic
 	return std::make_shared<Mesh>(vertices, indices, texture);
 }
 
-void Mesh::Draw(Shader* shader) {
+void Mesh::Draw(Ref<Shader>& shader) {
 	shader->Bind();
 	handle.Bind();
 

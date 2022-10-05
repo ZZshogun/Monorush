@@ -68,8 +68,8 @@ void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), vo
 	std::cout << "------------------ SETUP ------------------\n";
 	_UpdateInfo();
 	mainCamera.Set(_CameraResolution);
-	shaders.push_back(Shader::Create("default.vert", "default.frag"));
-	mainCamera.cameraShader = shaders[0];
+	shaderLUT["unlit"] = Shader::Create("unlit.vert", "unlit.frag");
+	mainCamera.cameraShader = shaderLUT["unlit"];
 
 	Start(info);
 	std::cout << "--------------- END SETUP -----------------\n";
@@ -95,8 +95,8 @@ void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), vo
 
 		Update(info);
 
-		for(int i = 0; i < shaders.size(); i++)
-			mainCamera.Update(shaders[i].get());
+		for(auto it = shaderLUT.begin(); it != shaderLUT.end(); it++)
+			mainCamera.Update(it->second);
 
 		Render(info);
 
@@ -156,20 +156,14 @@ void Game::_DefaultKeyBind() {
 	}
 }
 
-void Game::Draw(Sprite* sprite, int shaderID) {
-	sprite->Draw(shaders[shaderID].get());
+void Game::Draw(Ref<Sprite>& sprite, std::string shaderName) {
+	if (shaderLUT.find(shaderName) != shaderLUT.end())
+		sprite->Draw(shaderLUT[shaderName]);
 }
 
-void Game::Draw(Mesh* mesh, int shaderID) {
-	mesh->Draw(shaders[shaderID].get());
-}
-
-void Game::Draw(Ref<Sprite>& sprite, int shaderID) {
-	Draw(sprite.get());
-}
-
-void Game::Draw(Ref<Mesh>& mesh, int shaderID) {
-	Draw(mesh.get());
+void Game::Draw(Ref<Mesh>& mesh, std::string shaderName) {
+	if (shaderLUT.find(shaderName) != shaderLUT.end())
+		mesh->Draw(shaderLUT[shaderName]);
 }
 
 void Game::_UpdateInfo() {

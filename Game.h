@@ -1,6 +1,8 @@
 #ifndef GAME_CLASS_H
 #define GAME_CLASS_H
 
+#include <map>
+
 #include "Mesh.h"
 #include "Sprite.h"
 #include "Camera.h"
@@ -29,7 +31,7 @@ class Game {
 
 public:
 	GameInfo info;
-	std::vector<Ref<Shader>> shaders;
+	std::map<std::string, Ref<Shader>> shaderLUT;
 
 	Camera mainCamera;
 
@@ -40,10 +42,8 @@ public:
 	void Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), void (*Render)(GameInfo& info));
 	void Stop();
 
-	void Draw(Sprite* sprite, int shaderID = 0);
-	void Draw(Mesh* sprite, int shaderID = 0);
-	void Draw(Ref<Sprite>& sprite, int shaderID = 0);
-	void Draw(Ref<Mesh>& sprite, int shaderID = 0);
+	void Draw(Ref<Sprite>& sprite, std::string shaderName = "unlit");
+	void Draw(Ref<Mesh>& sprite, std::string shaderName = "unlit");
 };
 
 #endif

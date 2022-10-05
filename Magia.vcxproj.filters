@@ -68,13 +68,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="default.vert">
+    <None Include="unlit.vert">
       <Filter>Resource Files\Shaders</Filter>
     </None>
-    <None Include="default.frag">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="BG.vert">
+    <None Include="unlit.frag">
       <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>

@@ -26,7 +26,7 @@ public:
 	static Ref<Sprite> Create(glm::vec2 size, Ref<Texture>& texture, float UVLimit = 1);
 	void SetSpriteSize(glm::vec2 size);
 
-	void Draw(Shader* shader);
+	void Draw(Ref<Shader> shader);
 };
 
 #endif

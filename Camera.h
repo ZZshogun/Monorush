@@ -23,11 +23,11 @@ public:
 	glm::vec2 resolution = { 16, 9 };
 
 	void Draw();
-	void Update(Shader* shader);
+	void Update(Ref<Shader>& shader);
 	void Set(glm::vec2 resolution);
 
 	void SetBackgroundMode(CameraBackgroundMode mode);
-	void SetBackground(Ref<Texture>& texture, int repeatUV = 4);
+	void SetBackground(Ref<Texture>& texture, float repeatUV = 1);
 	void OffsetBackground(glm::vec2 addition);
 };
 

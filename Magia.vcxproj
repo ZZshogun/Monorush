@@ -173,6 +173,7 @@
     <ClInclude Include="Core.h" />
     <ClInclude Include="EBO.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="HelperGLM.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Shader.h" />

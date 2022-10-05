@@ -6,6 +6,7 @@
 #include "Camera.h"
 #include "Time.h"
 #include "Input.h"
+#include "HelperGLM.h"
 
 struct GameInfo {
 	glm::vec2 screenResolution;
@@ -35,7 +36,7 @@ public:
 	glm::vec2 ScreenResolution = { 1280, 720 };
 
 	Game();
-	void Set(glm::vec2 screen_resolution, glm::vec2 render_resolution = {16, 9});
+	void Set(glm::vec2 screen_resolution, bool fullScreen = false, glm::vec2 render_resolution = {16, 9});
 	void Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), void (*Render)(GameInfo& info));
 	void Stop();
 

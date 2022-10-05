@@ -118,6 +118,9 @@
     <ClInclude Include="Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HelperGLM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="texture\tile.png">

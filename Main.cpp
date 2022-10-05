@@ -23,14 +23,14 @@ glm::vec2 curOffset{ 0, 0 };
 void Start(GameInfo& info) {
 
 	Ref<Texture> BG_tex = Texture::Create("texture/tile.png");
-	float maxL = std::max(game.mainCamera.width, game.mainCamera.height) + 1;
-	BG = Sprite::Create(maxL, maxL, BG_tex, maxL / squareSize);
+	game.mainCamera.SetBackgroundMode(CameraBackgroundMode::TexBackground);
+	game.mainCamera.SetBackground(BG_tex, squareSize);
 
 	Ref<Texture> man_tex = Texture::Create("texture/man.png");
-	man = Sprite::Create(1, 1, man_tex);
+	man = Sprite::Create({ 1, 1 }, man_tex);
 
 	Ref<Texture> chest_tex = Texture::Create("texture/chest.png");
-	chest = Sprite::Create(1, 1, chest_tex);
+	chest = Sprite::Create({ 1, 1 }, chest_tex);
 	chest->transform.position.x = 2;
 }
 
@@ -41,18 +41,15 @@ void Update(GameInfo& info) {
 	dir *= speed * Time::deltaTime;
 	if (dir.x && dir.y) dir *= (1 / sqrt(2));
 
-	BG->mesh->texOffset += dir / squareSize;
 	man->transform.position += glm::vec3(dir, 0);
-	BG->transform.position = man->transform.position;
 	game.mainCamera.transform.position = man->transform.position;
+	game.mainCamera.OffsetBackground(dir / squareSize);
 }
 
 void Render(GameInfo& info) {
-	game.Draw(BG);
 	game.Draw(man);
 	game.Draw(chest);
 }
-
 
 int main() {
 	game.Set({ WIN_WIDTH, WIN_HEIGHT });

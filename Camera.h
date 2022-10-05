@@ -2,20 +2,33 @@
 #define CAMERA_CLASS_H
 
 #include "Shader.h"
+#include "Sprite.h"
 #include "Transform.h"
+#include "HelperGLM.h"
+
+enum CameraBackgroundMode {
+	SolidColor,
+	TexBackground,
+};
 
 class Camera {
+	Ref<Sprite> spriteBackground;
+	CameraBackgroundMode currentMode = SolidColor;
+
 public:
-
 	Transform transform;
+	Ref<Shader> cameraShader;
 
-	int width = 1280;
-	int height = 720;
+	glm::vec4 solidColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glm::vec2 resolution = { 16, 9 };
 
-	float zoomLevel = 1;
-
+	void Draw();
 	void Update(Shader* shader);
-	void Set(int width, int height);
+	void Set(glm::vec2 resolution);
+
+	void SetBackgroundMode(CameraBackgroundMode mode);
+	void SetBackground(Ref<Texture>& texture, int repeatUV = 4);
+	void OffsetBackground(glm::vec2 addition);
 };
 
 

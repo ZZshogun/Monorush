@@ -5,10 +5,11 @@ Game::Game() {
 	info = { ScreenResolution, window };
 }
 
-void Game::Set(glm::vec2 screen_resolution, glm::vec2 render_resolution) {
+void Game::Set(glm::vec2 screen_resolution, bool fullScreen, glm::vec2 render_resolution) {
 	_ScreenResolution = screen_resolution;
 	ScreenResolution = _ScreenResolution;
 	_CameraResolution = render_resolution;
+	this->fullScreen = fullScreen;
 	info = { ScreenResolution, window };
 }
 
@@ -21,7 +22,17 @@ bool Game::_Setup() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	window = glfwCreateWindow(ScreenResolution.x, ScreenResolution.y, "Game", NULL, NULL);
+	GLFWmonitor* monitor = NULL;
+	if (fullScreen) monitor = glfwGetPrimaryMonitor();
+
+	window = 
+		glfwCreateWindow(
+			(int)ScreenResolution.x, 
+			(int)ScreenResolution.y, 
+			"Game", 
+			monitor, 
+			NULL
+		);
 	if (!window) {
 		std::cout << "ERROR Window " << window << "\n";
 		glfwTerminate();
@@ -31,13 +42,17 @@ bool Game::_Setup() {
 	gladLoadGL();
 
 	GLFWvidmode mode = *glfwGetVideoMode(glfwGetPrimaryMonitor());
-	glfwSetWindowPos(window, (mode.width - ScreenResolution.x) / 2, (mode.height - ScreenResolution.y) / 2);
+	glfwSetWindowPos(
+		window, 
+		(int)(mode.width - ScreenResolution.x) / 2, 
+		(int)(mode.height - ScreenResolution.y) / 2
+	);
 
 	//glfwSetWindowSizeCallback(window, OnResizeWindow);
 	//glfwSetKeyCallback(window, Input::ScanKey);
 	glfwSetScrollCallback(window, Input::ScanMouseScroll);
 
-	glViewport(0, 0, ScreenResolution.x, ScreenResolution.y);
+	glViewport(0, 0, (int)ScreenResolution.x, (int)ScreenResolution.y);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -52,8 +67,9 @@ void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), vo
 
 	std::cout << "------------------ SETUP ------------------\n";
 	_UpdateInfo();
-	mainCamera.Set(_CameraResolution.x, _CameraResolution.y);
+	mainCamera.Set(_CameraResolution);
 	shaders.push_back(Shader::Create("default.vert", "default.frag"));
+	mainCamera.cameraShader = shaders[0];
 
 	Start(info);
 	std::cout << "--------------- END SETUP -----------------\n";
@@ -62,8 +78,9 @@ void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), vo
 	float currentTime = (float)glfwGetTime();
 
 	while (!glfwWindowShouldClose(window)) {
-		glClearColor(0.45f, 0.67f, 0.89f, 1.0f);
+		//glClearColor(0.45f, 0.67f, 0.89f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+		mainCamera.Draw();
 		
 		prevTime = currentTime;
 		currentTime = (float)glfwGetTime();
@@ -104,8 +121,8 @@ void Game::_SetFullscreen(bool status) {
 
 	if (fullScreen) {
 
-		int max_h = (int)(mode.width / 16.0f * 9);
-		int max_w = (int)(mode.height / 9.0f * 16);
+		float max_h = mode.width / 16.0f * 9;
+		float max_w = mode.height / 9.0f * 16;
 
 		if (max_h <= mode.height) 
 			ScreenResolution = { mode.width, max_h };
@@ -115,20 +132,26 @@ void Game::_SetFullscreen(bool status) {
 	}
 	else ScreenResolution = _ScreenResolution;
 
-	pos.x = (float)mode.width - ScreenResolution.x;
-	pos.y = (float)mode.height - ScreenResolution.y;
+	pos.x = mode.width - ScreenResolution.x;
+	pos.y = mode.height - ScreenResolution.y;
 	pos /= 2;
 
-	glViewport(0, 0, ScreenResolution.x, ScreenResolution.y);
-	glfwSetWindowMonitor(window, monitor, (int)pos.x, (int)pos.y, (int)ScreenResolution.x, (int)ScreenResolution.y, GLFW_DONT_CARE);
+	glViewport(0, 0, (int)ScreenResolution.x, (int)ScreenResolution.y);
+	glfwSetWindowMonitor(
+		window, 
+		monitor, 
+		(int)pos.x, 
+		(int)pos.y, 
+		(int)ScreenResolution.x, 
+		(int)ScreenResolution.y, 
+		GLFW_DONT_CARE
+	);
 }
 
 void Game::_DefaultKeyBind() {
 
 	if (Input::GetKey(GLFW_KEY_LEFT_ALT)) {
-		mainCamera.zoomLevel -= Input::MouseScrollDelta().y * Time::deltaTime * 10;
 		if (Input::GetKeyDown(GLFW_KEY_ENTER)) _SetFullscreen(!fullScreen);
-		if (Input::GetKeyDown(GLFW_KEY_V)) mainCamera.zoomLevel = 1;
 		if (Input::GetKeyDown(GLFW_KEY_Q)) Stop();
 	}
 }

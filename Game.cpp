@@ -6,11 +6,11 @@ Game::Game() {
 }
 
 void Game::Set(glm::vec2 screen_resolution, bool fullScreen, glm::vec2 render_resolution) {
+	this->fullScreen = fullScreen;
 	_ScreenResolution = screen_resolution;
 	ScreenResolution = _ScreenResolution;
-	_CameraResolution = render_resolution;
-	this->fullScreen = fullScreen;
 	info = { ScreenResolution, window };
+	mainCamera.Set(render_resolution);
 }
 
 bool Game::_Setup() {
@@ -24,7 +24,6 @@ bool Game::_Setup() {
 
 	GLFWmonitor* monitor = NULL;
 	if (fullScreen) monitor = glfwGetPrimaryMonitor();
-
 	window = 
 		glfwCreateWindow(
 			(int)ScreenResolution.x, 
@@ -38,6 +37,7 @@ bool Game::_Setup() {
 		glfwTerminate();
 		return false;
 	}
+
 	glfwMakeContextCurrent(window);
 	gladLoadGL();
 
@@ -48,18 +48,16 @@ bool Game::_Setup() {
 		(int)(mode.height - ScreenResolution.y) / 2
 	);
 
-	//glfwSetWindowSizeCallback(window, OnResizeWindow);
-	//glfwSetKeyCallback(window, Input::ScanKey);
 	glfwSetScrollCallback(window, Input::ScanMouseScroll);
+	Input::SetWindowInput(window);
 
 	glViewport(0, 0, (int)ScreenResolution.x, (int)ScreenResolution.y);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	Input::SetWindowInput(window);
-
 	std::cout << "START Game " << ScreenResolution.x << "x" << ScreenResolution.y << "\n";
-	return initialised = true;
+	initialised = true;
+	return true;
 }
 
 void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), void (*Render)(GameInfo& info)) {
@@ -67,7 +65,6 @@ void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), vo
 
 	std::cout << "------------------ SETUP ------------------\n";
 	_UpdateInfo();
-	mainCamera.Set(_CameraResolution);
 	shaderLUT["unlit"] = Shader::Create("unlit.vert", "unlit.frag");
 	mainCamera.cameraShader = shaderLUT["unlit"];
 
@@ -152,18 +149,8 @@ void Game::_DefaultKeyBind() {
 
 	if (Input::GetKey(GLFW_KEY_LEFT_ALT)) {
 		if (Input::GetKeyDown(GLFW_KEY_ENTER)) _SetFullscreen(!fullScreen);
-		if (Input::GetKeyDown(GLFW_KEY_Q)) Stop();
+		if (Input::GetKeyDown(GLFW_KEY_ESCAPE)) Stop();
 	}
-}
-
-void Game::Draw(Ref<Sprite>& sprite, std::string shaderName) {
-	if (shaderLUT.find(shaderName) != shaderLUT.end())
-		sprite->Draw(shaderLUT[shaderName]);
-}
-
-void Game::Draw(Ref<Mesh>& mesh, std::string shaderName) {
-	if (shaderLUT.find(shaderName) != shaderLUT.end())
-		mesh->Draw(shaderLUT[shaderName]);
 }
 
 void Game::_UpdateInfo() {

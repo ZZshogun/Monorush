@@ -30,7 +30,7 @@ void Camera::Update(Ref<Shader>& shader) {
 void Camera::Draw() {
 	if (currentMode == TexBackground && cameraShader.get() && spriteBackground.get()) {
 		Update(cameraShader);
-		spriteBackground->Draw(cameraShader);
+		spriteBackground->Draw();
 	}
 	else if (currentMode == SolidColor) {
 		glClearColor(solidColor.r, solidColor.g, solidColor.b, solidColor.a);
@@ -45,9 +45,9 @@ void Camera::SetBackgroundMode(CameraBackgroundMode mode) {
 	this->currentMode = mode;
 }
 
-void Camera::SetBackground(Ref<Texture>& texture, float repeatUV) {
+void Camera::SetBackground(Material& material, float repeatUV) {
 	float max_w = glm::max(resolution);
-	spriteBackground = Sprite::Create({ max_w, max_w }, texture, repeatUV);
+	spriteBackground = Sprite::Create({ max_w, max_w }, material, repeatUV);
 }
 
 void Camera::OffsetBackground(glm::vec2 addition) {

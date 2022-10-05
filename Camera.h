@@ -25,7 +25,7 @@ public:
 	void Set(glm::vec2 resolution);
 
 	void SetBackgroundMode(CameraBackgroundMode mode);
-	void SetBackground(Ref<Texture>& texture, float repeatUV = 1);
+	void SetBackground(Material& material, float repeatUV = 1);
 	void OffsetBackground(glm::vec2 addition);
 };
 

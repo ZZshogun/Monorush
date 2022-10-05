@@ -1,9 +1,22 @@
 #include "Mesh.h"
 
-Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Ref<Texture>>& textures) {
+Material Material::Create(Ref<Shader>& shader, Ref<Texture>& texture, glm::vec4 color) {
+	Material mat;
+	mat.shader = shader;
+	mat.texture = texture;
+	mat.color = color;
+	return mat;
+}
+
+Material Material::Create(Ref<Shader>& shader, glm::vec4 color) {
+	Ref<Texture> tex = Texture::Create();
+	return Create(shader, tex, color);
+}
+
+Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, Material& material) {
 	this->vertices = vertices;
 	this->indices = indices;
-	this->textures = std::move(textures);
+	this->material = material;
 
 	handle.Bind();
 
@@ -11,8 +24,7 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vec
 	EBO ebo(indices);
 
 	handle.LinkAttrib(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
-	handle.LinkAttrib(vbo, 1, 4, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
-	handle.LinkAttrib(vbo, 2, 2, GL_FLOAT, sizeof(Vertex), (void*)(7 * sizeof(float)));
+	handle.LinkAttrib(vbo, 1, 2, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
 
 	handle.Unbind();
 	vbo.Unbind();
@@ -24,21 +36,30 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vec
 	std::cout << "CREATE Mesh " << handle.handle << "\n";
 }
 
-Ref<Mesh> Mesh::Create(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, std::vector<Ref<Texture>>& texture) {
-	return std::make_shared<Mesh>(vertices, indices, texture);
+Ref<Mesh> Mesh::Create(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, Material& material) {
+	return std::make_shared<Mesh>(vertices, indices, material);
 }
 
-void Mesh::Draw(Ref<Shader>& shader) {
-	shader->Bind();
+void Mesh::Draw() {
+ 	material.shader->Bind();
 	handle.Bind();
 
-	for (int i = 0; i < textures.size(); i++) {
-		textures[i]->TexUnit(*shader, "tex" + i, i);
-		textures[i]->Bind();
-	}
+	material.texture->TexUnit(material.shader, "tex0", 0);
+	material.texture->Bind();
 
-	glUniformMatrix4fv(glGetUniformLocation(shader->handle, "model"), 1, GL_FALSE, glm::value_ptr(transform.Model()));
-	glUniform2f(glGetUniformLocation(shader->handle, "offset"), texOffset.x, texOffset.y);
+	glUniformMatrix4fv(glGetUniformLocation(material.shader->handle, "model"), 
+		1, 
+		GL_FALSE, 
+		glm::value_ptr(transform.Model())
+	);
+	glUniform2f(glGetUniformLocation(material.shader->handle, "offset"), texOffset.x, texOffset.y);
+
+	glUniform4f(glGetUniformLocation(material.shader->handle, "color"),
+		material.color.r,
+		material.color.g,
+		material.color.b,
+		material.color.a
+	);
 
 	glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, 0);
 }

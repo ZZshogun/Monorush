@@ -5,32 +5,28 @@ void Start(GameInfo& info);
 void Update(GameInfo& info);
 void Render(GameInfo& info);
 
-int WIN_WIDTH = 1600;
-int WIN_HEIGHT = 900;
-
-float playerSpeed = 300;
-
 Game game;
 Ref<Sprite> BG;
 Ref<Sprite> man;
 Ref<Sprite> chest;
 
-float speed = 5;
+float speed = 4;
 float squareSize = 4;
-glm::vec2 prevOffset{ 0, 0 };
-glm::vec2 curOffset{ 0, 0 };
 
 void Start(GameInfo& info) {
 
-	Ref<Texture> BG_tex = Texture::Create("texture/tile.png");
 	game.mainCamera.SetBackgroundMode(CameraBackgroundMode::TexBackground);
-	game.mainCamera.SetBackground(BG_tex, squareSize);
+	Ref<Texture> BG_tex = Texture::Create("texture/tile.png");
+	Material BG_mat = Material::Create(game.shaderLUT["unlit"], BG_tex);
+	game.mainCamera.SetBackground(BG_mat, squareSize);
 
 	Ref<Texture> man_tex = Texture::Create("texture/man.png");
-	man = Sprite::Create({ 1, 1 }, man_tex);
+	Material man_mat = Material::Create(game.shaderLUT["unlit"], man_tex);
+	man = Sprite::Create({ 1, 1 }, man_mat);
 
 	Ref<Texture> chest_tex = Texture::Create("texture/chest.png");
-	chest = Sprite::Create({ 1, 1 }, chest_tex);
+	Material chest_mat = Material::Create(game.shaderLUT["unlit"], chest_tex);
+	chest = Sprite::Create({ 1, 1 }, chest_mat);
 	chest->transform.position.x = 2;
 }
 
@@ -47,12 +43,12 @@ void Update(GameInfo& info) {
 }
 
 void Render(GameInfo& info) {
-	game.Draw(man);
-	game.Draw(chest);
+	man->Draw();
+	chest->Draw();
 }
 
 int main() {
-	game.Set({ WIN_WIDTH, WIN_HEIGHT });
+	game.Set({ 1600, 900 });
 	game.Run(Start, Update, Render);
 
 	return 0;

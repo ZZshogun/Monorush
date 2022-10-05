@@ -5,7 +5,6 @@
 
 struct Vertex {
 	glm::vec3 vertice;
-	glm::vec4 color;
 	glm::vec2 normal;
 };
 

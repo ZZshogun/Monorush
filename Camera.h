@@ -1,10 +1,8 @@
 #ifndef CAMERA_CLASS_H
 #define CAMERA_CLASS_H
 
-#include "Shader.h"
+#include "Core.h"
 #include "Sprite.h"
-#include "Transform.h"
-#include "HelperGLM.h"
 
 enum CameraBackgroundMode {
 	SolidColor,

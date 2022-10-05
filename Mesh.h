@@ -1,12 +1,10 @@
 #ifndef MESH_CLASS_H
 #define MESH_CLASS_H
 
-#include <glm/glm.hpp>
+#include "Core.h"
 #include "Transform.h"
 #include "Texture.h"
-#include "Shader.h"
 #include "VAO.h"
-#include "VBO.h"
 #include "EBO.h"
 
 class Mesh {

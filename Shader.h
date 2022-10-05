@@ -1,11 +1,6 @@
 #ifndef SHADER_CLASS_H
 #define SHADER_CLASS_H
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <string>
-#include <iostream>
-#include <fstream>
 #include "Core.h"
 
 std::string Read_from_file(const char* filepath);

@@ -1,14 +1,10 @@
 #ifndef GAME_CLASS_H
 #define GAME_CLASS_H
 
-#include <map>
-
-#include "Mesh.h"
-#include "Sprite.h"
+#include "Core.h"
 #include "Camera.h"
 #include "Time.h"
 #include "Input.h"
-#include "HelperGLM.h"
 
 struct GameInfo {
 	glm::vec2 screenResolution;

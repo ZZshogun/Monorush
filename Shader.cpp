@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+std::map<std::string, Ref<Shader>> Shader::LUT;
+
 std::string Read_from_file(const char* filepath) {
 	std::string ret = "";
 	std::ifstream file(filepath);
@@ -66,6 +68,14 @@ Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 	std::cout << "CREATE Shader " << handle << " " << vertexfile << " " << fragmentfile << "\n";
 }
 
+void Shader::CompileAll() {
+	LUT["unlit"] = Create("unlit.vert", "unlit.frag");
+}
+
+Ref<Shader>& Shader::Get(std::string shader) {
+	return LUT[shader];
+}
+
 void Shader::Bind() {
 	glUseProgram(handle);
 }
@@ -80,4 +90,12 @@ void Shader::Delete() {
 	std::cout << "DELETE Shader " << handle << "\n";
 	glDeleteProgram(handle);
 	disposed = true;
+}
+
+std::map<std::string, Ref<Shader>>::iterator Shader::Begin() {
+	return LUT.begin();
+}
+
+std::map<std::string, Ref<Shader>>::iterator Shader::End() {
+	return LUT.end();
 }

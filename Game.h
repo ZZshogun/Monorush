@@ -3,6 +3,7 @@
 
 #include "Core.h"
 #include "Camera.h"
+#include "SpriteSheet.h"
 #include "Time.h"
 #include "Input.h"
 
@@ -28,8 +29,6 @@ public:
 	glm::vec2 ScreenResolution = { 1280, 720 };
 
 	GameInfo info;
-	std::map<std::string, Ref<Shader>> shaderLUT;
-
 	Camera mainCamera;
 
 	Game();

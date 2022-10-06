@@ -11,7 +11,6 @@ class Sprite {
 	std::vector<Vertex> _GetVertices(float UVLimit);
 	static std::vector<GLuint> __indices;
 
-
 public:
 
 	Ref<Mesh> mesh;

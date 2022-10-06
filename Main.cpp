@@ -7,7 +7,7 @@ void Render(GameInfo& info);
 
 Game game;
 Ref<Sprite> BG;
-Ref<Sprite> man;
+Ref<SpriteSheet> man;
 Ref<Sprite> chest;
 
 float speed = 4;
@@ -17,15 +17,15 @@ void Start(GameInfo& info) {
 
 	game.mainCamera.SetBackgroundMode(CameraBackgroundMode::TexBackground);
 	Ref<Texture> BG_tex = Texture::Create("texture/tile.png");
-	Material BG_mat = Material::Create(game.shaderLUT["unlit"], BG_tex);
+	Material BG_mat = Material::Create(Shader::Get("unlit"), BG_tex);
 	game.mainCamera.SetBackground(BG_mat, squareSize);
 
-	Ref<Texture> man_tex = Texture::Create("texture/man.png");
-	Material man_mat = Material::Create(game.shaderLUT["unlit"], man_tex);
-	man = Sprite::Create({ 1, 1 }, man_mat);
+	Ref<Texture> man_tex = Texture::Create("texture/man-sheet.png");
+	Material man_mat = Material::Create(Shader::Get("unlit"), man_tex);
+	man = SpriteSheet::Create({ 1, 1 }, {3, 1}, man_mat);
 
 	Ref<Texture> chest_tex = Texture::Create("texture/chest.png");
-	Material chest_mat = Material::Create(game.shaderLUT["unlit"], chest_tex);
+	Material chest_mat = Material::Create(Shader::Get("unlit"), chest_tex);
 	chest = Sprite::Create({ 1, 1 }, chest_mat);
 	chest->transform.position.x = 2;
 }
@@ -43,7 +43,7 @@ void Update(GameInfo& info) {
 }
 
 void Render(GameInfo& info) {
-	man->Draw();
+	man->Draw({1, 0});
 	chest->Draw();
 }
 

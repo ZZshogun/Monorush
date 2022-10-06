@@ -65,8 +65,9 @@ void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), vo
 
 	std::cout << "------------------ SETUP ------------------\n";
 	_UpdateInfo();
-	shaderLUT["unlit"] = Shader::Create("unlit.vert", "unlit.frag");
-	mainCamera.cameraShader = shaderLUT["unlit"];
+
+	Shader::CompileAll();
+	mainCamera.cameraShader = Shader::Get("unlit");
 
 	Start(info);
 	std::cout << "--------------- END SETUP -----------------\n";
@@ -92,7 +93,7 @@ void Game::Run(void (*Start)(GameInfo& info), void (*Update)(GameInfo& info), vo
 
 		Update(info);
 
-		for(auto it = shaderLUT.begin(); it != shaderLUT.end(); it++)
+		for (auto it = Shader::Begin(); it != Shader::End(); it++)
 			mainCamera.Update(it->second);
 
 		Render(info);

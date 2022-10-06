@@ -33,7 +33,7 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, Material
 	vbo.Delete();
 	ebo.Delete();
 
-	std::cout << "CREATE Mesh " << handle.handle << "\n";
+	//std::cout << "CREATE Mesh " << handle.handle << "\n";
 }
 
 Ref<Mesh> Mesh::Create(std::vector<Vertex>& vertices, std::vector<GLuint>& indices, Material& material) {
@@ -68,7 +68,7 @@ void Mesh::Delete() {
 	if (disposed) return;
 
 	disposed = true;
-	std::cout << "DELETE Mesh " << handle.handle << "\n";
+	//std::cout << "DELETE Mesh " << handle.handle << "\n";
 }
 
 Mesh::~Mesh() {

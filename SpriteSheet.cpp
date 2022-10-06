@@ -41,3 +41,7 @@ void SpriteSheet::Draw(glm::vec2 index) {
 Ref<SpriteSheet> SpriteSheet::Create(glm::vec2 sizePerIMG, glm::vec2 IMGcount, Material& material) {
 	return std::make_shared<SpriteSheet>(sizePerIMG, IMGcount, material);
 }
+
+glm::vec2 SpriteSheet::size() {
+	return IMGcount;
+}

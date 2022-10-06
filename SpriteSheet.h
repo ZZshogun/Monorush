@@ -19,6 +19,7 @@ public:
 	SpriteSheet(glm::vec2 sizePerIMG, glm::vec2 IMGcount, Material& material);
 	static Ref<SpriteSheet> Create(glm::vec2 sizePerIMG, glm::vec2 IMGcount, Material& material);
 	void Draw(glm::vec2 index);
+	glm::vec2 size();
 };
 
 #endif

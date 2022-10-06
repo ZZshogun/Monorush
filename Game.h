@@ -3,7 +3,7 @@
 
 #include "Core.h"
 #include "Camera.h"
-#include "SpriteSheet.h"
+#include "Animation.h"
 #include "Time.h"
 #include "Input.h"
 

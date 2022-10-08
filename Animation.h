@@ -19,7 +19,6 @@ public:
 	static Ref<AnimatedSprite> Create(float timeStep = 100);
 	void SetTimeStep(float timeStep);
 	void Add(Ref<SpriteSheet>& animationSheet);
-	void Draw(int animationIndex, float deltaTime);
 };
 
 #endif

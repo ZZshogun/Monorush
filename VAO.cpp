@@ -4,6 +4,10 @@ VAO::VAO() {
 	glGenVertexArrays(1, &handle);
 }
 
+Ref<VAO> VAO::Create() {
+	return std::make_shared<VAO>();
+}
+
 VAO::~VAO() {
 	Delete();
 }

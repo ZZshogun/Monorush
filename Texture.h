@@ -7,6 +7,9 @@
 class Texture {
 	bool disposed = false;
 public:
+
+	static Ref<Texture> defaultTex;
+
 	GLuint handle;
 	GLuint unit;
 	Texture(const char* file, GLuint slot);

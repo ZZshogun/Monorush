@@ -21,6 +21,8 @@
 #include <glm/gtx/vector_angle.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include <EnTT/entt.hpp>
+
 #include "HelperGLM.h"
 
 template<typename T>

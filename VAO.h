@@ -6,10 +6,10 @@
 class VAO {
 	bool disposed = false;
 
-
 public:
 	GLuint handle;
 	VAO();
+	static Ref<VAO> Create();
 	void Delete();
 	void Bind();
 	void Unbind();

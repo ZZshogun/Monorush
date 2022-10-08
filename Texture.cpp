@@ -1,5 +1,7 @@
 #include "Texture.h"
 
+Ref<Texture> Texture::defaultTex;
+
 Texture::Texture(const char* file, GLuint slot) {
 	this->unit = slot;
 
@@ -40,7 +42,7 @@ Texture::Texture(const char* file, GLuint slot) {
 }
 
 Ref<Texture> Texture::Create() {
-	return std::make_shared<Texture>("texture/sprite_default.png", 0);
+	return defaultTex;
 }
 
 Ref<Texture> Texture::Create(const char* file, GLuint slot) {

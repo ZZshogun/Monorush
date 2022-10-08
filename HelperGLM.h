@@ -1,7 +1,7 @@
 #ifndef HELPER_GLM_H
 #define HELPER_GLM_H
 
-#include "Core.h"
+#include <glm/glm.hpp>
 
 namespace glm {
 	constexpr float max(vec2 vec) {

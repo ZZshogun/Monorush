@@ -17,36 +17,56 @@ Ref<Scene> Scene::Create() {
 
 Entity Scene::CreateEntity(std::string name) {
 	Entity entity = { this->scene_registry.create(), &(this->scene_registry) };
+	entity.AddComponent<TagComponent>().tag = name.empty() ? "Unnamed Entity" : name;
 	entity.AddComponent<TransformComponent>();
-	entity.name = name.empty() ? "Unnamed Entity" : name;
 	return entity;
 }
 
-void Scene::OnUpdate(float deltaTime) {
-
-	auto cameraView = this->scene_registry.view<CameraComponent>();
-	for (entt::entity entity : cameraView) {
-		CameraComponent& camera = cameraView.get<CameraComponent>(entity);
-		if (!camera.active) continue;
-		TransformComponent& transform = this->scene_registry.get<TransformComponent>(entity);
-		Transform t = { transform.position, transform.rotation, transform.scale };
-		for (auto it = Shader::Begin(); it != Shader::End(); it++) {
-			Camera::Update(t, camera.resolution, it->second);
+void Scene::OnUpdate(Time time) {
+	
+	bool foundCamera = false;
+	{
+		auto cameraGroup = scene_registry.group<CameraComponent>(entt::get<TransformComponent>);
+		for (entt::entity entity : cameraGroup) {
+			auto [transform, camera] =
+				cameraGroup.get<TransformComponent, CameraComponent>(entity);
+			if (camera.primary) {
+				Transform t = { transform.position, transform.rotation, transform.scale };
+				for (auto& it : Shader::LUT)
+					Camera::Update(t, camera.resolution, it.second);
+				foundCamera = true;
+				break;
+			}
 		}
 	}
 
-	auto renderView = this->scene_registry.view<SpriteRendererComponent>();
-	for (entt::entity entity : renderView) {
-		SpriteRendererComponent& sprite = renderView.get<SpriteRendererComponent>(entity);
-		TransformComponent& transformC = this->scene_registry.get<TransformComponent>(entity);
-		Transform transform = { transformC.position, transformC.rotation, transformC.scale };
-		Renderer::DrawSprite(
-			sprite.handle, 
-			sprite.size, 
-			transform, 
-			sprite.material, 
-			sprite.textureOffset,
-			sprite.UVrepeat
-		);
+	{
+		scene_registry.view<NativeScriptComponent>().each([=](auto entity, auto& script) {
+			if (!script.instance) {
+				script.instance = script.InstantiateScript();
+				script.instance->entity = Entity{ entity, &scene_registry };
+				script.instance->OnCreate();
+			}
+			script.instance->OnUpdate(time);
+		});
+	}
+
+	{
+		if (foundCamera) {
+			auto renderGroup = scene_registry.group<SpriteRendererComponent>(entt::get<TransformComponent>);
+			for (entt::entity entity : renderGroup) {
+				auto [transformC, sprite] =
+					renderGroup.get<TransformComponent, SpriteRendererComponent>(entity);
+				Transform transform = { transformC.position, transformC.rotation, transformC.scale };
+				Renderer::DrawSprite(
+					sprite.handle,
+					sprite.size,
+					transform,
+					sprite.material,
+					sprite.textureOffset,
+					sprite.UVrepeat
+				);
+			}
+		}
 	}
 }

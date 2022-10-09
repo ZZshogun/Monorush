@@ -52,8 +52,6 @@ void Game::_Setup() {
 }
 
 void Game::_Loop() {
-	float prevTime = 0;
-	float currentTime = (float)glfwGetTime();
 
 	layer.OnAttach();
 
@@ -61,14 +59,12 @@ void Game::_Loop() {
 		glClearColor(0.07f, 0.07f, 0.09f, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 		
-		prevTime = currentTime;
-		currentTime = (float)glfwGetTime();
-		float deltaTime = currentTime - prevTime;
+		time._UpdateTime((float)glfwGetTime());
 
 		Input::ScanKey(window);
 		Input::ScanMouse(window);
 
-		layer.OnUpdate(deltaTime);
+		layer.OnUpdate(time);
 
 		Input::ClearInputBuffer();
 

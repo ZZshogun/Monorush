@@ -1,16 +1,16 @@
 #ifndef ENTITY_CLASS_H
 #define ENTITY_CLASS_H
 
-#include "Core.h"
+#include "Magia.h"
+
+class Scene;
 
 class Entity {
 
-	entt::entity handle = (entt::entity)0;
+	entt::entity handle = entt::null;
 	entt::registry* registry = NULL;
 
 public:
-	std::string name;
-
 	Entity();
 	Entity(entt::entity handle, entt::registry* registry);
 
@@ -35,5 +35,4 @@ public:
 	}
 
 };
-
 #endif

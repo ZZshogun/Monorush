@@ -3,7 +3,7 @@
 Material::Material(Ref<Texture>& texture, glm::vec4 color, const char* shaderName) {
 	this->color = color;
 	this->texture = texture;
-	this->shader = Shader::Get(shaderName);
+	this->shader = Shader::LUT[shaderName];
 }
 
 Ref<Material> Material::Create(Ref<Texture>& texture, glm::vec4 color, const char* shaderName) {

@@ -8,10 +8,10 @@ std::string Read_from_file(const char* filepath);
 class Shader {
 	bool disposed = false;
 
-	static std::map<std::string, Ref<Shader>> LUT;
 	Shader();
 
 public:
+	static std::map<std::string, Ref<Shader>> LUT;
 	int handle;
 
 	Shader(const char* vertexCode, const char* fragmentCode);
@@ -21,9 +21,6 @@ public:
 
 	static void CompileAll();
 	static Ref<Shader> Create(const char* vertexCode, const char* fragmentCode);
-	static Ref<Shader>& Get(std::string shader);
-	static std::map<std::string, Ref<Shader>>::iterator Begin();
-	static std::map<std::string, Ref<Shader>>::iterator End();
 };
 
 #endif

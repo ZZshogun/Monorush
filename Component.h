@@ -1,9 +1,12 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
-#include "Core.h"
-#include "Sprite.h"
-#include "Camera.h"
+#include "Magia.h"
+#include "ScriptableEntity.h"
+
+struct TagComponent {
+	std::string tag;
+};
 
 struct TransformComponent {
 	glm::vec3 position = {0, 0, 0 };
@@ -20,8 +23,21 @@ struct SpriteRendererComponent {
 };
 
 struct CameraComponent {
-	bool active = true;
 	glm::vec2 resolution = { 16, 9 };
+	bool primary = true;
+};
+
+struct NativeScriptComponent {
+	ScriptableEntity* instance = NULL;
+
+	ScriptableEntity*(*InstantiateScript)();
+	void(*DestroyScript)(NativeScriptComponent*);
+
+	template<typename T>
+	void Bind() {
+		InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
+		DestroyScript = [](NativeScriptComponent* script) { delete script->instance; script->instance = NULL; };
+	}
 };
 
 #endif

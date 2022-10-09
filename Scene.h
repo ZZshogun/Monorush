@@ -1,7 +1,6 @@
 #ifndef SCENE_CLASS_H
 #define SCENE_CLASS_H
 
-#include "Core.h"
 #include "Component.h"
 #include "Entity.h"
 #include "Renderer.h"
@@ -15,7 +14,7 @@ public:
 
 	Entity CreateEntity(std::string name = "");
 
-	void OnUpdate(float deltaTime);
+	void OnUpdate(Time time);
 };
 
 #endif

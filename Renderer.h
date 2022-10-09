@@ -1,9 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "Core.h"
-#include "Sprite.h"
-#include "Transform.h"
+#include "Magia.h"
 
 class Renderer {
 

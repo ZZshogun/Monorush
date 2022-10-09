@@ -2,7 +2,7 @@
 
 Layer::Layer() {
 	camera = scene->CreateEntity("Camera");
-	camera.AddComponent<CameraComponent>();
+	camera.AddComponent<CameraComponent>().primary;
 }
 
 void Layer::OnAttach() {
@@ -17,25 +17,12 @@ void Layer::OnAttach() {
 
 	BG = scene->CreateEntity("Background");
 	auto& BGcomponent = BG.AddComponent<SpriteRendererComponent>();
+	float maxL = glm::max(camera.GetComponent<CameraComponent>().resolution);
 	BGcomponent.material = BGmat;
-	int maxL = glm::max(camera.GetComponent<CameraComponent>().resolution);
 	BGcomponent.size = { maxL, maxL };
 	BGcomponent.UVrepeat = 4;
 }
 
-void Layer::OnUpdate(float deltaTime) {
-
-	// TODO : new delta time
-	glm::vec2 dir = Input::WASDAxis();
-	dir *= 4 * deltaTime;
-	if (dir.x && dir.y) dir /= glm::sqrt(2);
-
-	BG.GetComponent<SpriteRendererComponent>().textureOffset += dir / 4.0f;
-
-	auto& man_pos = man.GetComponent<TransformComponent>().position;
-	man_pos += glm::vec3(dir, 0);
-	BG.GetComponent<TransformComponent>().position = man_pos;
-	camera.GetComponent<TransformComponent>().position = man_pos;
-
-	scene->OnUpdate(deltaTime);
+void Layer::OnUpdate(Time time) {
+	scene->OnUpdate(time);
 }

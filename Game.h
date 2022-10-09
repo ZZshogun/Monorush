@@ -1,7 +1,7 @@
 #ifndef GAME_CLASS_H
 #define GAME_CLASS_H
 
-#include "Magia.h"
+#include "Layer.h"
 
 class Game {
 
@@ -12,6 +12,7 @@ class Game {
 
 private:
 	Layer layer;
+	Time time;
 
 public:
 	glm::vec2 ScreenResolution = { 1280, 720 };

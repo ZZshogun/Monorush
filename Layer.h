@@ -1,7 +1,6 @@
 #ifndef LAYER_CLASS_H
 #define LAYER_CLASS_H
 
-#include "Magia.h"
 #include "Scene.h"
 
 class Layer {
@@ -15,7 +14,7 @@ private:
 public:
 	Layer();
 	void OnAttach();
-	void OnUpdate(float deltaTime);
+	void OnUpdate(Time time);
 };
 
 #endif

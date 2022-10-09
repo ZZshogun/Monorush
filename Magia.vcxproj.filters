@@ -43,6 +43,9 @@
     <Filter Include="Source Files\Renderer">
       <UniqueIdentifier>{8f6f3653-9a66-406a-af43-aaf7dcebf550}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Ext">
+      <UniqueIdentifier>{89cd5403-d445-41f5-a665-09e41004ee9b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c">
@@ -180,6 +183,9 @@
     </ClInclude>
     <ClInclude Include="ScriptableEntity.h">
       <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerController.h">
+      <Filter>Header Files\Ext</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

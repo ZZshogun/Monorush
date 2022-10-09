@@ -188,6 +188,7 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Layer.h" />
     <ClInclude Include="Magia.h" />
+    <ClInclude Include="PlayerController.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ScriptableEntity.h" />
     <ClInclude Include="Sprite.h" />

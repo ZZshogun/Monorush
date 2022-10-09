@@ -9,8 +9,6 @@ private:
 	Ref<Scene> scene = Scene::Create();
 	Entity camera;
 
-	Entity man, BG;
-
 public:
 	Layer();
 	void OnAttach();

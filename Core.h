@@ -10,6 +10,7 @@
 #include <memory>
 #include <string>
 #include <map>
+#include <assert.h>
 
 #include <stb/stb_image.h>
 
@@ -24,6 +25,7 @@
 #include <EnTT/entt.hpp>
 
 #include "HelperGLM.h"
+#include "HelperMath.h"
 
 template<typename T>
 using Ref = std::shared_ptr<T>;

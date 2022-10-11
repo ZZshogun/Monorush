@@ -187,6 +187,12 @@
     <ClInclude Include="PlayerController.h">
       <Filter>Header Files\Ext</Filter>
     </ClInclude>
+    <ClInclude Include="EnemySpawner.h">
+      <Filter>Header Files\Ext</Filter>
+    </ClInclude>
+    <ClInclude Include="HelperMath.h">
+      <Filter>Header Files\Magia</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="texture\tile.png">

@@ -2,7 +2,8 @@
 #define COMPONENT_H
 
 #include "Magia.h"
-#include "ScriptableEntity.h"
+
+class ScriptableEntity;
 
 struct TagComponent {
 	std::string tag;
@@ -39,6 +40,13 @@ struct NativeScriptComponent {
 	void Bind() {
 		InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
 		DestroyScript = [](NativeScriptComponent* script) { delete script->instance; script->instance = NULL; };
+	
+		InstantiateScript();
+	}
+
+	template<typename T>
+	auto Get() {
+		return (static_cast<T*>(instance));
 	}
 };
 

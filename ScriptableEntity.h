@@ -22,6 +22,13 @@ public:
 	T& GetComponent() {
 		return this->entity.GetComponent<T>();
 	}
+
+	Entity Instantiate() {
+		Entity e = Entity{ entity.registry->create(), entity.registry };
+		e.AddComponent<TagComponent>().tag = "Unnamed Entity";
+		e.AddComponent<TransformComponent>();
+		return e;
+	}
 };
 
 

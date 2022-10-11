@@ -10,6 +10,8 @@ public:
 
 	static Ref<Texture> defaultTex;
 
+	static std::map <std::string, Ref<Texture>> library;
+
 	GLuint handle;
 	GLuint unit;
 	Texture(const char* file, GLuint slot);

@@ -9,7 +9,7 @@ Layer::Layer() {
 
 void Layer::OnAttach() {
 	Ref<Texture> BGtex = Texture::Create("texture/tile.png");
-	Ref<Texture> mantex = Texture::Create("texture/man.png");
+	Ref<Texture> mantex = Texture::Create("texture/man-sheet2.png");
 	Ref<Texture> chesttex = Texture::Create("texture/chest.png");
 
 	Entity BG = scene->CreateEntity("Background");
@@ -22,6 +22,7 @@ void Layer::OnAttach() {
 
 	man = scene->CreateEntity("Man");
 	man.AddComponent<SpriteRendererComponent>().material = Material::Create(mantex);
+	man.AddComponent<SpriteSheetComponent>().size = {2, 1};
 	man.AddComponent<NativeScriptComponent>().Bind<PlayerController>();
 	man.AddComponent<RigidbodyComponent>();
 	man.AddComponent<CollisionComponent>().size.x = 0.45f;
@@ -41,6 +42,15 @@ void Layer::OnAttach() {
 	//enemySpawner.AddComponent<NativeScriptComponent>().Bind<EnemySpawner>();
 }
 
+float elapsed = 0;
+float mElapsed = 0.15f;
+
 void Layer::OnUpdate(Time time) {
+	elapsed += time.deltaTime;
+	if (elapsed >= mElapsed) {
+		elapsed = 0;
+		man.GetComponent<SpriteSheetComponent>().drawIndex++;
+	}
+
 	scene->OnUpdate(time);
 }

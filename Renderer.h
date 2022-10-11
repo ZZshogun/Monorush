@@ -14,8 +14,7 @@ public:
 		glm::vec2 size,
 		Transform transform,
 		Ref<Material>& material,
-		glm::vec2 texOffset = { 0, 0 },
-		float UVrepeat = 1
+		glm::vec2 texOffset = { 0, 0 }
 	);
 
 };

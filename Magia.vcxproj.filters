@@ -63,9 +63,6 @@
     <ClCompile Include="Sprite.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="SpriteSheet.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Transform.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
@@ -140,9 +137,6 @@
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Sprite.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="SpriteSheet.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="HelperGLM.h">

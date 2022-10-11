@@ -6,12 +6,9 @@ void Renderer::DrawSprite(
 	glm::vec2 size, 
 	Transform transform, 
 	Ref<Material>& material, 
-	glm::vec2 texOffset,
-	float UVrepeat
+	glm::vec2 texOffset
 ) 
-{
-	Sprite::Resize(handle, size, UVrepeat);
-	
+{	
 	material->shader->Bind();
 	handle->Bind();
 

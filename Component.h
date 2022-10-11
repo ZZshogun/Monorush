@@ -19,7 +19,7 @@ struct TransformComponent {
 struct SpriteRendererComponent {
 	Ref<VAO> handle;
 	Ref<Material> material;
-	glm::vec2 size = {1, 1};
+	glm::vec2 size = { 1, 1 };
 	bool parallelTexture = false;
 	glm::vec2 textureOffset = { 0, 0 };
 	float UVrepeat = 1;
@@ -42,11 +42,17 @@ struct RigidbodyComponent {
 	glm::vec3 velocity = { 0, 0, 0 };
 };
 
+struct SpriteSheetComponent {
+	glm::vec2 size = { 1, 1 };
+	int sizePerSprite = 1;
+	int drawIndex = 0;
+};
+
 struct NativeScriptComponent {
 	ScriptableEntity* instance = NULL;
 
-	ScriptableEntity*(*InstantiateScript)();
-	void(*DestroyScript)(NativeScriptComponent*);
+	ScriptableEntity*(*InstantiateScript)() = NULL;
+	void(*DestroyScript)(NativeScriptComponent*) = NULL;
 
 	template<typename T>
 	void Bind() {

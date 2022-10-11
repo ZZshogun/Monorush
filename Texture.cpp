@@ -1,6 +1,7 @@
 #include "Texture.h"
 
 Ref<Texture> Texture::defaultTex;
+std::map <std::string, Ref<Texture>> Texture::library;
 
 Texture::Texture(const char* file, GLuint slot) {
 	this->unit = slot;
@@ -46,7 +47,9 @@ Ref<Texture> Texture::Create() {
 }
 
 Ref<Texture> Texture::Create(const char* file, GLuint slot) {
-	return std::make_shared<Texture>(file, slot);
+	Ref<Texture> tex = std::make_shared<Texture>(file, slot);
+	library[file] = tex;
+	return tex;
 }
 
 void Texture::TexUnit(Ref<Shader>& shader, const char* uniform, GLuint unit) {

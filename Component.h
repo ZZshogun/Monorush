@@ -2,7 +2,8 @@
 #define COMPONENT_H
 
 #include "Magia.h"
-#include "ScriptableEntity.h"
+
+class ScriptableEntity;
 
 struct TagComponent {
 	std::string tag;
@@ -29,6 +30,18 @@ struct CameraComponent {
 	bool primary = false;
 };
 
+struct CollisionComponent {
+	bool collision = true;
+	glm::vec2 origin = { 0, 0 };
+	glm::vec2 size = { 1, 1 };
+};
+
+struct RigidbodyComponent {
+	bool simulate = true;
+	glm::vec3 position = { 0, 0, 0 };
+	glm::vec3 velocity = { 0, 0, 0 };
+};
+
 struct NativeScriptComponent {
 	ScriptableEntity* instance = NULL;
 
@@ -39,6 +52,13 @@ struct NativeScriptComponent {
 	void Bind() {
 		InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
 		DestroyScript = [](NativeScriptComponent* script) { delete script->instance; script->instance = NULL; };
+	
+		InstantiateScript();
+	}
+
+	template<typename T>
+	auto Get() {
+		return (static_cast<T*>(instance));
 	}
 };
 

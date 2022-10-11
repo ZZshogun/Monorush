@@ -30,6 +30,18 @@ struct CameraComponent {
 	bool primary = false;
 };
 
+struct CollisionComponent {
+	bool collision = true;
+	glm::vec2 origin = { 0, 0 };
+	glm::vec2 size = { 1, 1 };
+};
+
+struct RigidbodyComponent {
+	bool simulate = true;
+	glm::vec3 position = { 0, 0, 0 };
+	glm::vec3 velocity = { 0, 0, 0 };
+};
+
 struct NativeScriptComponent {
 	ScriptableEntity* instance = NULL;
 

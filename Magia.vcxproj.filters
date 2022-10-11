@@ -108,6 +108,9 @@
     <ClCompile Include="Time.cpp">
       <Filter>Source Files\Magia</Filter>
     </ClCompile>
+    <ClCompile Include="Collision.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="unlit.vert">
@@ -192,6 +195,9 @@
     </ClInclude>
     <ClInclude Include="HelperMath.h">
       <Filter>Header Files\Magia</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
+      <Filter>Header Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

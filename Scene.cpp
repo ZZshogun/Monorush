@@ -7,8 +7,17 @@ void SpriteCreate(entt::registry& registry, entt::entity entity) {
 	Sprite::Create(sprite.handle, sprite.size, sprite.material);
 }
 
+void CollisionCreate(entt::registry& registry, entt::entity entity) {
+	glm::vec3 size = { 1, 1, 0 };
+	if (registry.any_of<SpriteRendererComponent>(entity))
+		size = glm::vec3(registry.get<SpriteRendererComponent>(entity).size, 0);
+	size *= registry.get<TransformComponent>(entity).scale;
+	registry.get<CollisionComponent>(entity).size = { size.x, size.y };
+}
+
 Scene::Scene() {
 	this->scene_registry.on_construct<SpriteRendererComponent>().connect<&SpriteCreate>();
+	this->scene_registry.on_construct<CollisionComponent>().connect<&CollisionCreate>();
 }
 
 Ref<Scene> Scene::Create() {
@@ -32,7 +41,38 @@ void Scene::OnUpdate(Time time) {
 		}
 		script.instance->OnUpdate(time);
 	});
-	
+
+	auto rigidGroup = 
+		scene_registry.group<RigidbodyComponent>(entt::get<TransformComponent, CollisionComponent>);
+	for (entt::entity entity : rigidGroup) {
+		auto [transform, rigidbody, collision] = 
+			rigidGroup.get<TransformComponent, RigidbodyComponent, CollisionComponent>(entity);
+		rigidbody.position = transform.position;
+
+		if (!rigidbody.simulate || !collision.collision) continue;
+
+		glm::vec3 vel = rigidbody.velocity;
+
+		CollisionPacket packet = Collision::Check(entity, scene_registry);
+		if (packet.count) {
+			for (glm::vec3 other : packet.positions) {
+				float dot = glm::dot(glm::vec3{0, 1, 0}, glm::normalize(transform.position - other));
+				const float cos45deg = 0.707107f;
+				if (glm::abs(dot) >= cos45deg) {
+					if (dot > 0 && vel.y < 0) vel.y = 0;
+					else if (dot < 0 && vel.y > 0) vel.y = 0;
+				}
+				else {
+					if (transform.position.x > other.x && vel.x < 0) vel.x = 0;
+					else if (transform.position.x < other.x && vel.x > 0) vel.x = 0;
+				}
+			}
+		}
+
+		rigidbody.position += vel * time.deltaTime;
+		transform.position = rigidbody.position;
+	}
+
 	auto transformView = scene_registry.view<TransformComponent>();
 	for (entt::entity entity : transformView) {
 		auto& transform = transformView.get<TransformComponent>(entity);

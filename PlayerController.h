@@ -9,9 +9,10 @@ public:
 
 	void OnUpdate(Time time){
 		glm::vec2 dir = Input::WASDAxis();
-		dir *= playerSpeed * time.deltaTime;
+		dir *= playerSpeed;
 		if (dir.x && dir.y) dir /= glm::sqrt(2);
-		GetComponent<TransformComponent>().position += glm::vec3(dir, 0);
+		GetComponent<RigidbodyComponent>().velocity = glm::vec3(dir, 0);
+		auto& pos = GetComponent<TransformComponent>().position;
 	}
 
 };

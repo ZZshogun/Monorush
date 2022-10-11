@@ -8,6 +8,8 @@ class Layer {
 private:
 	Ref<Scene> scene = Scene::Create();
 	Entity camera;
+	Entity man;
+	Entity chest;
 
 public:
 	Layer();

@@ -20,17 +20,22 @@ void Layer::OnAttach() {
 	BGcomponent.UVrepeat = 4;
 	BGcomponent.parallelTexture = true;
 
-	Entity man = scene->CreateEntity("Man");
+	man = scene->CreateEntity("Man");
 	man.AddComponent<SpriteRendererComponent>().material = Material::Create(mantex);
 	man.AddComponent<NativeScriptComponent>().Bind<PlayerController>();
-	auto& man_transform = man.GetComponent<TransformComponent>();
+	man.AddComponent<RigidbodyComponent>();
+	man.AddComponent<CollisionComponent>().size.x = 0.45f;
 
+	auto& man_transform = man.GetComponent<TransformComponent>();
 	BG.GetComponent<TransformComponent>().parent = &man_transform;
 	camera.GetComponent<TransformComponent>().parent = &man_transform;
 
-	Entity chest = scene->CreateEntity("Chest");
+	chest = scene->CreateEntity("Chest");
 	chest.AddComponent<SpriteRendererComponent>().material = Material::Create(chesttex);
 	chest.GetComponent<TransformComponent>().position = { -2, -1, 0 };
+	auto& chest_colld = chest.AddComponent<CollisionComponent>();
+	chest_colld.size.y = 0.75f;
+	chest_colld.origin.y = -0.05f;
 
 	//Entity enemySpawner = scene->CreateEntity("Enemy Spawner");
 	//enemySpawner.AddComponent<NativeScriptComponent>().Bind<EnemySpawner>();

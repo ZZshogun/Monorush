@@ -20,8 +20,7 @@ public:
 			glm::vec2 rand_pos = { rx, ry };
 
 			Entity enemy = Instantiate();
-			Ref<Material> mat = Material::Create(Texture::library["texture/chest.png"]);
-			enemy.AddComponent<SpriteRendererComponent>().material = mat;
+			enemy.AddComponent<SpriteRendererComponent>().texture = Texture::library["texture/chest.png"];
 			enemy.GetComponent<TransformComponent>().position = glm::vec3(rand_pos, 0);
 			auto& name = enemy.GetComponent<TagComponent>().tag;
 			name = "Enemy " + std::to_string(++count);

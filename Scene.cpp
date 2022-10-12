@@ -2,13 +2,20 @@
 
 void SpriteCreate(entt::registry& registry, entt::entity entity) {
 	auto& sprite = registry.get<SpriteRendererComponent>(entity);
-	if (!sprite.material.get()) sprite.material = Material::Create();
+	if (!sprite.texture) sprite.texture = Texture::defaultTex;
 	sprite.handle = VAO::Create();
-	Sprite::Create(sprite.handle, sprite.size, sprite.material);
+	Ref<Material> material = Material::Create(sprite.texture, sprite.albedo);
+	Sprite::Create(sprite.handle, sprite.size, material);
 }
 
 void SpriteSheetCreate(entt::registry& registry, entt::entity entity) {
 	assert(registry.any_of<SpriteRendererComponent>(entity));
+	assert(!registry.any_of<AnimatorComponent>(entity));
+}
+
+void AnimatorCreate(entt::registry& registry, entt::entity entity) {
+	assert(registry.any_of<SpriteRendererComponent>(entity));
+	assert(!registry.any_of<SpriteSheetComponent>(entity));
 }
 
 void CollisionCreate(entt::registry& registry, entt::entity entity) {
@@ -22,6 +29,7 @@ void CollisionCreate(entt::registry& registry, entt::entity entity) {
 Scene::Scene() {
 	this->scene_registry.on_construct<SpriteRendererComponent>().connect<&SpriteCreate>();
 	this->scene_registry.on_construct<SpriteSheetComponent>().connect<&SpriteSheetCreate>();
+	this->scene_registry.on_construct<AnimatorComponent>().connect<&AnimatorCreate>();
 	this->scene_registry.on_construct<CollisionComponent>().connect<&CollisionCreate>();
 }
 
@@ -108,23 +116,30 @@ void Scene::OnUpdate(Time time) {
 	
 	if (foundCamera) {
 
-		// SpriteSheet
-
-
 		// SpriteRenderer
 		auto renderGroup = 
 			scene_registry.group<SpriteRendererComponent>(entt::get<TransformComponent>);
-		for (auto it = renderGroup.rbegin(); it != renderGroup.rend(); it++) {
+		// Render reordering
+		renderGroup.sort<SpriteRendererComponent>(
+			[](SpriteRendererComponent& a, SpriteRendererComponent& b) {
+				return a.order < b.order;
+			}
+		);
+		for (auto entity : renderGroup) {
 			auto [transformC, sprite] =
-				renderGroup.get<TransformComponent, SpriteRendererComponent>(*it);
+				renderGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 			
 			Transform transform = { transformC.position, transformC.rotation, transformC.scale };
 
 			if (sprite.parallelTexture)
 				sprite.textureOffset = glm::vec2{ transform.position.x, transform.position.y } / sprite.UVrepeat;
 
-			if (scene_registry.any_of<SpriteSheetComponent>(*it)) {
-				auto& spriteSheet = scene_registry.get<SpriteSheetComponent>(*it);
+			Ref<Material> material;
+
+			// Sprite sheet resizing
+			if (scene_registry.any_of<SpriteSheetComponent>(entity)) {
+				auto& spriteSheet = scene_registry.get<SpriteSheetComponent>(entity);
+				if (!spriteSheet.sheet) continue;
 
 				if (spriteSheet.drawIndex < 0) spriteSheet.drawIndex = (int)spriteSheet.size.x - 1;
 				else spriteSheet.drawIndex %= (int)spriteSheet.size.x;
@@ -133,9 +148,34 @@ void Scene::OnUpdate(Time time) {
 				glm::vec2 start = glm::vec2{ offset, 0 } / spriteSheet.size;
 				glm::vec2 end = glm::vec2{ offset + spriteSheet.sizePerSprite, 1 } / spriteSheet.size;
 
+				material = Material::Create(spriteSheet.sheet, sprite.albedo);
 				Sprite::Resize(sprite.handle, sprite.size, start, end);
 			}
+			// Animator resizing
+			else if (scene_registry.any_of<AnimatorComponent>(entity)) {
+				auto& animator = scene_registry.get<AnimatorComponent>(entity);
+				if (animator.current_id == INT_MAX) continue;
+				auto& aniObject = animator.animation_map[animator.current_id];
+
+				if (aniObject.drawIndex < 0) aniObject.drawIndex = (int)aniObject.size.x - 1;
+				else aniObject.drawIndex %= (int)aniObject.size.x;
+
+				aniObject._currentTime += time.deltaTime;
+				if (aniObject._currentTime >= 1.0f / aniObject.fps) {
+					aniObject.drawIndex++;
+					aniObject._currentTime = 0;
+				}
+
+				float offset = (float)aniObject.drawIndex * aniObject.sizePerSprite;
+				glm::vec2 start = glm::vec2{ offset, 0 } / aniObject.size;
+				glm::vec2 end = glm::vec2{ offset + aniObject.sizePerSprite, 1 } / aniObject.size;
+
+				material = Material::Create(aniObject.animation, sprite.albedo);
+				Sprite::Resize(sprite.handle, sprite.size, start, end);
+			}
+			// Default resizing
 			else {
+				material = Material::Create(sprite.texture, sprite.albedo);
 				Sprite::Resize(sprite.handle, sprite.size, sprite.UVrepeat);
 			}
 
@@ -143,7 +183,7 @@ void Scene::OnUpdate(Time time) {
 				sprite.handle,
 				sprite.size,
 				transform,
-				sprite.material,
+				material,
 				sprite.textureOffset
 			);
 		}

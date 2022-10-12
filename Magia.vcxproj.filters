@@ -54,9 +54,6 @@
     <ClCompile Include="stb.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Animation.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
@@ -131,9 +128,6 @@
       <Filter>Header Files\GL</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Sprite.h">

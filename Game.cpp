@@ -47,6 +47,8 @@ void Game::_Setup() {
 	Shader::CompileAll();
 	Texture::defaultTex = Texture::Create("texture/sprite_default.png");
 
+	Audio::Init();
+
 	std::cout << "START Game " << ScreenResolution.x << "x" << ScreenResolution.y << "\n";
 	_Loop();
 }
@@ -75,4 +77,5 @@ void Game::_Loop() {
 	std::cout << "---------------- CLEAN UP -----------------\n";
 	glfwDestroyWindow(window);
 	glfwTerminate();
+	Audio::Destroy();
 }

@@ -46,6 +46,12 @@
     <Filter Include="Header Files\Ext">
       <UniqueIdentifier>{89cd5403-d445-41f5-a665-09e41004ee9b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\AL">
+      <UniqueIdentifier>{932f461b-3bf4-4d73-a49d-cdba11b29534}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AL">
+      <UniqueIdentifier>{1815a5a3-1d08-40a6-8072-75d3c8fad887}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c">
@@ -99,11 +105,14 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files\GL</Filter>
     </ClCompile>
-    <ClCompile Include="Time.cpp">
-      <Filter>Source Files\Magia</Filter>
-    </ClCompile>
     <ClCompile Include="Collision.cpp">
       <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio.cpp">
+      <Filter>Source Files\AL</Filter>
+    </ClCompile>
+    <ClCompile Include="Time.cpp">
+      <Filter>Source Files\Magia</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -133,7 +142,7 @@
     <ClInclude Include="Sprite.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="HelperGLM.h">
+    <ClInclude Include="GLMHelper.h">
       <Filter>Header Files\Magia</Filter>
     </ClInclude>
     <ClInclude Include="Core.h">
@@ -181,11 +190,14 @@
     <ClInclude Include="EnemySpawner.h">
       <Filter>Header Files\Ext</Filter>
     </ClInclude>
-    <ClInclude Include="HelperMath.h">
+    <ClInclude Include="MathHelper.h">
       <Filter>Header Files\Magia</Filter>
     </ClInclude>
     <ClInclude Include="Collision.h">
       <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio.h">
+      <Filter>Header Files\AL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

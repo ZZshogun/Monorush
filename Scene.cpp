@@ -1,5 +1,9 @@
 #include "Scene.h"
 
+void CameraCreate(entt::registry& registry, entt::entity entity) {
+	registry.emplace<AudioListenerComponent>(entity);
+}
+
 void SpriteCreate(entt::registry& registry, entt::entity entity) {
 	auto& sprite = registry.get<SpriteRendererComponent>(entity);
 	if (!sprite.texture) sprite.texture = Texture::defaultTex;
@@ -26,11 +30,18 @@ void CollisionCreate(entt::registry& registry, entt::entity entity) {
 	registry.get<CollisionComponent>(entity).size = { size.x, size.y };
 }
 
+void AudioSourceCreate(entt::registry& registry, entt::entity entity) {
+	auto& audioSource = registry.get<AudioSourceComponent>(entity);
+	audioSource.source = AudioSource::Create();
+}
+
 Scene::Scene() {
+	this->scene_registry.on_construct<CameraComponent>().connect<&CameraCreate>();
 	this->scene_registry.on_construct<SpriteRendererComponent>().connect<&SpriteCreate>();
 	this->scene_registry.on_construct<SpriteSheetComponent>().connect<&SpriteSheetCreate>();
 	this->scene_registry.on_construct<AnimatorComponent>().connect<&AnimatorCreate>();
 	this->scene_registry.on_construct<CollisionComponent>().connect<&CollisionCreate>();
+	this->scene_registry.on_construct<AudioSourceComponent>().connect<&AudioSourceCreate>();
 }
 
 Ref<Scene> Scene::Create() {
@@ -59,7 +70,7 @@ void Scene::OnUpdate(Time time) {
 	// Rigidbody & Collision
 	auto rigidGroup = 
 		scene_registry.group<RigidbodyComponent>(entt::get<TransformComponent, CollisionComponent>);
-	for (entt::entity entity : rigidGroup) {
+	for (auto entity : rigidGroup) {
 		auto [transform, rigidbody, collision] = 
 			rigidGroup.get<TransformComponent, RigidbodyComponent, CollisionComponent>(entity);
 		rigidbody.position = transform.position;
@@ -90,7 +101,7 @@ void Scene::OnUpdate(Time time) {
 
 	// Transform parent inheritance
 	auto transformView = scene_registry.view<TransformComponent>();
-	for (entt::entity entity : transformView) {
+	for (auto entity : transformView) {
 		auto& transform = transformView.get<TransformComponent>(entity);
 		if (transform.parent) {
 			transform.position = transform.parent->position;
@@ -102,7 +113,7 @@ void Scene::OnUpdate(Time time) {
 	// Camera Update
 	bool foundCamera = false;
 	auto cameraGroup = scene_registry.group<CameraComponent>(entt::get<TransformComponent>);
-	for (entt::entity entity : cameraGroup) {
+	for (auto entity : cameraGroup) {
 		auto [transform, camera] =
 			cameraGroup.get<TransformComponent, CameraComponent>(entity);
 		if (camera.primary) {
@@ -114,6 +125,45 @@ void Scene::OnUpdate(Time time) {
 		}
 	}
 	
+	// Audio Sources
+	auto audioGroup = 
+		scene_registry.group<AudioSourceComponent>(entt::get<TransformComponent>);
+	for (auto entity : audioGroup) {
+		auto [audioSource, transform] = 
+			audioGroup.get<AudioSourceComponent, TransformComponent>(entity);
+		if (!audioSource.active) continue;
+
+		AudioSource::SetPosition(audioSource.source, transform.position);
+		if (scene_registry.any_of<RigidbodyComponent>(entity)) {
+			auto& rigidbody = scene_registry.get<RigidbodyComponent>(entity);
+			AudioSource::SetVelocity(audioSource.source, rigidbody.velocity);
+		}
+		else AudioSource::SetVelocity(audioSource.source, { 0, 0, 0 });
+
+		AudioSource::SetAttenuationBeginDistance(audioSource.source, audioSource.reference);
+		AudioSource::SetMaxAttenuationDistance(audioSource.source, audioSource.maxDistance);
+		AudioSource::SetRollOffFactor(audioSource.source, audioSource.rolloff);
+
+		AudioSource::SetLooping(audioSource.source, audioSource.loop);
+		AudioSource::SetGain(audioSource.source, audioSource.gain);
+		AudioSource::SetPitch(audioSource.source, audioSource.pitch);
+	}
+
+	// Audio Listener
+	auto listenerGroup = 
+		scene_registry.group<AudioListenerComponent>(entt::get<TransformComponent>);
+	for (auto entity : listenerGroup) {
+		auto [listener, transform] = 
+			listenerGroup.get<AudioListenerComponent, TransformComponent>(entity);
+		if (!listener.listening) continue;
+		Audio::SetListenerPosition(transform.position);
+		if (scene_registry.any_of<RigidbodyComponent>(entity)) {
+			auto& rigidbody = scene_registry.get<RigidbodyComponent>(entity);
+			Audio::SetListenerVelocity(rigidbody.velocity);
+		}
+		else Audio::SetListenerVelocity({0, 0, 0});
+	}
+
 	if (foundCamera) {
 
 		// SpriteRenderer

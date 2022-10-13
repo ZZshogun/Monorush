@@ -32,6 +32,40 @@ struct CameraComponent {
 	bool primary = false;
 };
 
+struct AudioListenerComponent {
+	bool listening = true;
+};
+
+struct AudioSourceComponent {
+	ALuint source{};
+	bool active = true;
+
+	float gain = 1;
+	float pitch = 1;
+	bool loop = false;
+
+	float rolloff = 1.15f;
+	float reference = 3;
+	float maxDistance = AL_MAX_DISTANCE;
+
+	void Play(ALuint& sound) {
+		AudioSource::Play(source, sound);
+	}
+	void Pause() {
+		AudioSource::Pause(source);
+	}
+	void Resume() {
+		AudioSource::Resume(source);
+	}
+	void Stop() {
+		AudioSource::Stop(source);
+	}
+	void Restart(ALuint& sound) {
+		Stop();
+		Play(sound);
+	}
+};
+
 struct CollisionComponent {
 	bool collision = true;
 	glm::vec2 origin = { 0, 0 };

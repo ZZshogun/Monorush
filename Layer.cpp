@@ -13,6 +13,8 @@ void Layer::OnAttach() {
 	Ref<Texture> mantex2 = Texture::Create("texture/man-sheet2.png");
 	Ref<Texture> chesttex = Texture::Create("texture/chest.png");
 
+	Audio::LoadSound("audio/bounce.wav", "bounce");
+
 	// Background
 	Entity BG = scene->CreateEntity("Background");
 	auto& BGcomponent = BG.AddComponent<SpriteRendererComponent>();
@@ -32,6 +34,7 @@ void Layer::OnAttach() {
 	man.AddComponent<NativeScriptComponent>().Bind<PlayerController>();
 	man.AddComponent<RigidbodyComponent>();
 	man.AddComponent<CollisionComponent>().size.x = 0.45f;
+	man.AddComponent<AudioSourceComponent>();
 
 	// Chest
 	chest = scene->CreateEntity("Chest");

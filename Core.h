@@ -4,6 +4,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AudioFile/AudioFile.h>
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -24,8 +28,8 @@
 
 #include <EnTT/entt.hpp>
 
-#include "HelperGLM.h"
-#include "HelperMath.h"
+#include "GLMHelper.h"
+#include "MathHelper.h"
 
 template<typename T>
 using Ref = std::shared_ptr<T>;

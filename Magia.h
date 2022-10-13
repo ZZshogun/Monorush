@@ -9,5 +9,6 @@
 #include "Camera.h"
 #include "Input.h"
 #include "Time.h"
+#include "Audio.h"
 
 #endif

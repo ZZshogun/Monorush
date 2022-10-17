@@ -35,7 +35,7 @@ public:
 
 		cdtime += time.deltaTime;
 
-		if (cdtime >= 1.0f / bulletpersec && Input::GetMouseDown(GLFW_MOUSE_BUTTON_LEFT)) {
+		if (cdtime >= 1.0f / bulletpersec && Input::GetMouseDown(Button::Mouse_Left)) {
 			cdtime = 0;
 			audio->Play(Audio::AudioBuffers["bounce"]);
 			cbullet = glm::clamp<short>(cbullet - 1, 0, fullammo);
@@ -57,7 +57,7 @@ public:
 			}
 		}
 
-		if (Input::GetKeyDown(GLFW_KEY_H)) {
+		if (Input::GetKeyDown(Key::H)) {
 			playerHeath--;
 			heartCol = glm::vec4{ 1, 0.11f, 0.28f, 1 };
 			hurt = true;

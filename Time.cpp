@@ -9,8 +9,8 @@ void Time::_UpdateTime(float time) {
 }
 
 std::string Time::FormatMinute(float seconds, bool spacing) {
-	int minute = seconds / 60;
-	int second = seconds - minute * 60;
+	int minute = (int)seconds / 60;
+	int second = (int)seconds - minute * 60;
 
 	std::string min, sec;
 

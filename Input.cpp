@@ -111,10 +111,10 @@ glm::vec2 Input::WASDAxis() {
 
 	glm::vec2 dir(0, 0);
 
-	if (GetKey(GLFW_KEY_W)) dir.y += 1;
-	if (GetKey(GLFW_KEY_S)) dir.y -= 1;
-	if (GetKey(GLFW_KEY_A)) dir.x -= 1;
-	if (GetKey(GLFW_KEY_D)) dir.x += 1;
+	if (GetKey(Key::W)) dir.y += 1;
+	if (GetKey(Key::S)) dir.y -= 1;
+	if (GetKey(Key::A)) dir.x -= 1;
+	if (GetKey(Key::D)) dir.x += 1;
 
 	return dir;
 }

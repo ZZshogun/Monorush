@@ -136,9 +136,9 @@ enum Button {
 	Mouse_6      = 5,
 	Mouse_7      = 6,
 	Mouse_8      = 7,
-	Mouse_LEFT   = 0,
-	Mouse_RIGHT  = 1,
-	Mouse_MIDDLE = 2,
+	Mouse_Left   = 0,
+	Mouse_Right  = 1,
+	Mouse_Middle = 2,
 };
 
 class Input {

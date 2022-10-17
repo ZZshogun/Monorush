@@ -8,8 +8,10 @@ std::string UI::glyphShader = "glyph";
 std::string UI::imageShader = "image";
 
 GLuint UI::vao;
+std::vector<UI::Button> UI::buttons;
 
 UIAnchor UI::anchorMode = LEFT;
+
 
 glm::vec2 UI::ratioRef(glm::ivec2 screen_pos) {
 	glm::vec2 scaled = glm::vec2{ screen_pos.x, screen_pos.y } / glm::vec2{ ref_resolution.x, ref_resolution.y };
@@ -81,20 +83,22 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(vao);
 
-	float offsetx = 0;
+	float offsetx = 0, offsety = 0;
 	if (anchorMode != LEFT) {
 		float lastAdvance = 0;
 		for (char c : string) {
 			auto& e = Font::GetFontChar(ftname, c);
 			offsetx += e.bearing.x + (e.advance >> 6);
 			lastAdvance = (float)(e.advance >> 6);
+			offsety = glm::max<float>(offsety, (float)e.bearing.y);
 		}
-		//offsetx -= lastAdvance;
+
 		offsetx *= scale / ref_resolution.x;
+		offsety *= scale / ref_resolution.y;
 		if (anchorMode == CENTER) offsetx /= 2.0f;
 	}
 
-	float x = scr_pos.x - offsetx, y = scr_pos.y;
+	float x = scr_pos.x - offsetx, y = scr_pos.y - offsety / 2.0f;
 
 	for (char c : string) {
 		FontChar& ftChar = Font::GetFontChar(ftname, c);
@@ -203,7 +207,7 @@ void UI::CreateButton(
 	Ref<Texture> image,
 	glm::ivec2 screen_pos,
 	glm::ivec2 screen_size,
-	glm::vec4 color = { 1, 1, 1 ,1 }
+	glm::vec4 color
 ) {
 	Button button;
 	button.color = color;
@@ -232,7 +236,8 @@ void UI::DrawButtons() {
 	for (Button& button : buttons) {
 		Ref<Texture> tex = button.texture.get() ? button.texture : Texture::defaultTex;
 		DrawImage(tex, button.position, button.size, button.color);
-		DrawString(button.text, button.position, button.textScale, button.textColor);
+		glm::vec2 adjust_text = { button.position.x, button.position.y };
+		DrawString(button.text, adjust_text, button.textScale, button.textColor);
 	}
 }
 

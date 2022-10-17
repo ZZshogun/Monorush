@@ -50,6 +50,10 @@ void Layer::OnAttach() {
 
 	//Entity enemySpawner = scene->CreateEntity("Enemy Spawner");
 	//enemySpawner.AddComponent<NativeScriptComponent>().Bind<EnemySpawner>();
+
+	UI::StartUI(glm::ivec2{1920, 1080});
+	UI::CreateButton("TEST", 1, { 0, 0, 0, 1 }, { -500, -300 }, { 400, 150 }, { 0.12f, 1, 0.78f, 1 });
+	UI::EndUI();
 }
 
 glm::vec4 texCol = glm::vec4{ 0, 0, 0, 1 };
@@ -80,12 +84,14 @@ void Layer::OnUpdate(Time time) {
 	std::string timestr = Time::FormatMinute(time_left);
 	std::string millitimestr = "." + Time::FormatMilli(time_left);
 	UI::Anchor(CENTER);
-	UI::DrawString("- TIME LEFT -", { 0, 920 + floatOffset }, 1.25f, { 0, 0, 0, 1 });
+	UI::DrawString("- TIME LEFT -", { 0, 1020 + floatOffset }, 1.25f, { 0, 0, 0, 1 });
 	UI::Anchor(RIGHT);
-	UI::DrawString(timestr, { 100, 760 + floatOffset }, 1.2f, texCol);
+	UI::DrawString(timestr, { 120, 860 + floatOffset }, 1.2f, texCol);
 	UI::Anchor(LEFT);
-	UI::DrawString(millitimestr, { 95, 760 + floatOffset }, 0.65f, texCol);
+	UI::DrawString(millitimestr, { 115, 850 + floatOffset }, 0.65f, texCol);
+
+	UI::Anchor(CENTER);
+	UI::DrawButtons();
 
 	UI::EndUI();
-
 }

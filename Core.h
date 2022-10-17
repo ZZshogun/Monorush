@@ -9,7 +9,9 @@
 #include <AudioFile/AudioFile.h>
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
+#include <sstream>
 #include <vector>
 #include <memory>
 #include <string>

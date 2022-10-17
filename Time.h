@@ -14,6 +14,9 @@ public:
 	float unscaledDeltaTime;
 
 	void _UpdateTime(float time);
+
+	static std::string FormatMinute(float seconds, bool spacing = false);
+	static std::string FormatMilli(float seconds);
 };
 
 

@@ -5,6 +5,7 @@ bool UI::inUI = false;
 glm::ivec2 UI::ref_resolution = {-1, -1};
 std::string UI::font_name = "PixelGameFont";
 std::string UI::glyphShader = "glyph";
+std::string UI::imageShader = "image";
 
 GLuint UI::vao;
 
@@ -134,6 +135,105 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 		x += (ftChar.advance >> 6) * scale / ref_resolution.x;
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void UI::DrawImage(Ref<Texture>& image, glm::ivec2 screen_pos, glm::ivec2 screen_size, glm::vec4 color) {
+	if (!inUI) {
+		std::cout << "ERROR UI No starting UI block\n";
+		return;
+	}
+
+	std::vector<GLuint> indices = {
+		0, 3, 1,
+		1, 3, 2,
+	};
+
+	glm::vec2 scr_pos = ratioRef(screen_pos);
+	glm::vec2 scr_size = ratioRef(screen_size);
+
+	if (anchorMode == CENTER) {
+		scr_pos -= scr_size / 2.0f;
+	}
+	else if (anchorMode == RIGHT) {
+		scr_pos.x -= scr_size.x;
+		scr_pos.y -= scr_size.y / 2.0f;
+	}
+	else if (anchorMode == LEFT) {
+		scr_pos.y -= scr_size.y / 2.0f;
+	}
+
+	std::vector<Vertex> vertices = {
+			Vertex{ glm::vec3{ scr_pos.x, scr_pos.y, 0 }, glm::vec2{ 0, 0 } },
+			Vertex{ glm::vec3{ scr_pos.x, scr_pos.y + scr_size.y, 0 }, glm::vec2{ 0, 1 } },
+			Vertex{ glm::vec3{ scr_pos.x + scr_size.x, scr_pos.y + scr_size.y, 0 }, glm::vec2{ 1, 1 } },
+			Vertex{ glm::vec3{ scr_pos.x + scr_size.x, scr_pos.y, 0 }, glm::vec2{ 1, 0 } },
+	};
+
+	Ref<Shader>& shader = Shader::LUT[imageShader];
+	shader->Bind();
+
+	glUniform4f(glGetUniformLocation(shader->handle, "fColor"), color.r, color.g, color.b, color.a);
+	glActiveTexture(GL_TEXTURE0);
+	glBindVertexArray(vao);
+
+	image->Bind();
+	image->TexUnit(shader, "tex0", 0);
+
+	VBO vbo(vertices);
+	EBO ebo(indices);
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
+	glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, (void*)0);
+
+	vbo.Unbind();
+	ebo.Unbind();
+
+	vbo.Delete();
+	ebo.Delete();
+}
+
+void UI::CreateButton(
+	std::string text,
+	float scale,
+	glm::vec4 textColor,
+	Ref<Texture> image,
+	glm::ivec2 screen_pos,
+	glm::ivec2 screen_size,
+	glm::vec4 color = { 1, 1, 1 ,1 }
+) {
+	Button button;
+	button.color = color;
+	button.text = text;
+	button.textScale = scale;
+	button.textColor = textColor;
+	button.texture = image;
+	button.position = screen_pos;
+	button.size = screen_size;
+
+	UI::buttons.push_back(button);
+}
+
+void UI::CreateButton(
+	std::string text,
+	float scale,
+	glm::vec4 textColor,
+	glm::ivec2 screen_pos,
+	glm::ivec2 screen_size,
+	glm::vec4 color
+) {
+	CreateButton(text, scale, textColor, NULL, screen_pos, screen_size, color);
+}
+
+void UI::DrawButtons() {
+	for (Button& button : buttons) {
+		Ref<Texture> tex = button.texture.get() ? button.texture : Texture::defaultTex;
+		DrawImage(tex, button.position, button.size, button.color);
+		DrawString(button.text, button.position, button.textScale, button.textColor);
+	}
 }
 
 void UI::EndUI() {

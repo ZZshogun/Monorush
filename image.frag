@@ -2,8 +2,8 @@
 
 in vec2 fTexCoord;
 
-uniform vec4 fColor;
 uniform sampler2D tex0;
+uniform vec4 fColor;
 
 out vec4 glColor;
 

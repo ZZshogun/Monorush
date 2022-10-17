@@ -46,7 +46,7 @@ void Game::_Setup() {
 
 	Shader::CompileAll();
 
-	Texture::defaultTex = Texture::Create("texture/sprite_default.png");
+	Texture::defaultTex = Texture::Create("sprite_default", "texture/sprite_default.png");
 
 	Audio::Init();
 
@@ -60,8 +60,8 @@ void Game::_Loop() {
 
 	layer.OnAttach();
 
+	glClearColor(0.95f, 0.97f, 1, 1);
 	while (!glfwWindowShouldClose(window)) {
-		glClearColor(0.95f, 0.97f, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		time._UpdateTime((float)glfwGetTime());

@@ -8,10 +8,10 @@ Layer::Layer() {
 }
 
 void Layer::OnAttach() {
-	Ref<Texture> BGtex = Texture::Create("texture/tile.png");
-	Ref<Texture> mantex = Texture::Create("texture/man-sheet.png");
-	Ref<Texture> mantex2 = Texture::Create("texture/man-sheet2.png");
-	Ref<Texture> chesttex = Texture::Create("texture/chest.png");
+	Ref<Texture> mantex = Texture::Create("man", "texture/man-sheet.png");
+	Ref<Texture> mantex2 = Texture::Create("man2","texture/man-sheet2.png");
+	Ref<Texture> chesttex = Texture::Create("chest","texture/chest.png");
+	Ref<Texture> heart = Texture::Create("heart","texture/heart.png");
 
 	Audio::LoadSound("audio/bounce.wav", "bounce");
 
@@ -52,13 +52,40 @@ void Layer::OnAttach() {
 	//enemySpawner.AddComponent<NativeScriptComponent>().Bind<EnemySpawner>();
 }
 
+glm::vec4 texCol = glm::vec4{ 0, 0, 0, 1 };
+float time_left = 300;
+float outoftimeLimit = 1.3f;
+float outoftime = 0;
+float floatOffsetSpeed = 400;
+float floatOffset = 0;
+
 void Layer::OnUpdate(Time time) {
 	scene->OnUpdate(time);
 
-	UI::StartUI(glm::ivec2{1920, 1080});
+	if (time_left > 0) {
+		time_left -= time.deltaTime;
+		time_left = glm::clamp<float>(time_left, 0, INFINITY);
+	}
+	else if (outoftimeLimit <= 5)  {
+		texCol = glm::vec4{ 1, 0.41f, 0.38f, 1 };
 
+		outoftime += time.deltaTime;
+		if (outoftime >= outoftimeLimit) {
+			floatOffset += time.deltaTime * floatOffsetSpeed;
+		}
+	}
+
+	UI::StartUI(glm::ivec2{ 1920, 1080 });
+
+	std::string timestr = Time::FormatMinute(time_left);
+	std::string millitimestr = "." + Time::FormatMilli(time_left);
+	UI::Anchor(CENTER);
+	UI::DrawString("- TIME LEFT -", { 0, 920 + floatOffset }, 1.25f, { 0, 0, 0, 1 });
+	UI::Anchor(RIGHT);
+	UI::DrawString(timestr, { 100, 760 + floatOffset }, 1.2f, texCol);
 	UI::Anchor(LEFT);
-	UI::DrawString("HEALTH", { -1820, -1020 }, 1.25f, { 0, 0, 0, 1 });
+	UI::DrawString(millitimestr, { 95, 760 + floatOffset }, 0.65f, texCol);
 
 	UI::EndUI();
+
 }

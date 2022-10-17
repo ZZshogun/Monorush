@@ -10,7 +10,16 @@ public:
 	AnimatorComponent* animator = NULL;
 	AudioSourceComponent* audio = NULL;
 
-	uint16_t playerHeath = 6;
+	short playerHeath = 5;
+	short cbullet = 12;
+	short fullammo = 12;
+
+	float bulletpersec = 6;
+	float cdtime = 0;
+
+	glm::vec4 heartCol = { 0, 0, 0 ,1 };
+	bool hurt = false;
+	float blink = 0.1f, blinktime = 0;
 
 	void OnCreate() {
 		rigidbody = &GetComponent<RigidbodyComponent>();
@@ -24,8 +33,12 @@ public:
 		if (dir.x && dir.y) dir /= glm::sqrt(2);
 		rigidbody->velocity = glm::vec3(dir, 0);
 
-		if (Input::GetMouseDown(GLFW_MOUSE_BUTTON_LEFT)) {
+		cdtime += time.deltaTime;
+
+		if (cdtime >= 1.0f / bulletpersec && Input::GetMouseDown(GLFW_MOUSE_BUTTON_LEFT)) {
+			cdtime = 0;
 			audio->Play(Audio::AudioBuffers["bounce"]);
+			cbullet = glm::clamp<short>(cbullet - 1, 0, fullammo);
 		}
 
 		if (dir.x < 0) {
@@ -34,12 +47,34 @@ public:
 		else if (dir.x > 0) {
 			animator->current_id = 1;
 		}
+
+		if (hurt) {
+			blinktime += time.deltaTime;
+			if (blinktime >= blink) {
+				blinktime = 0;
+				hurt = false;
+				heartCol = { 0, 0, 0 ,1 };
+			}
+		}
+
+		if (Input::GetKeyDown(GLFW_KEY_H)) {
+			playerHeath--;
+			heartCol = glm::vec4{ 1, 0.11f, 0.28f, 1 };
+			hurt = true;
+		}
 	}
 
 	void OnDrawUI(Time time) {
 		UI::StartUI(glm::ivec2{ 1920, 1080 });
 
-		UI::DrawString(std::to_string(playerHeath), { -1220, -1020 }, 1.25f, { 0, 0, 0, 1 });
+		UI::Anchor(CENTER);
+		for (int i = 0; i < playerHeath; i++) {
+			UI::DrawImage(Texture::library["heart"], { -1800 + i * 150, -980 }, { 150, 150 }, heartCol);
+		}
+
+		std::string bullet = std::to_string(cbullet) + " | " + std::to_string(fullammo);
+		UI::Anchor(RIGHT);
+		UI::DrawString(bullet, { 1820, -1020 }, 1.25f, { 0, 0, 0, 1 });
 
 		UI::EndUI();
 	}

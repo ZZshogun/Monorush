@@ -46,9 +46,9 @@ Ref<Texture> Texture::Create() {
 	return defaultTex;
 }
 
-Ref<Texture> Texture::Create(const char* file, GLuint slot) {
-	Ref<Texture> tex = std::make_shared<Texture>(file, slot);
-	library[file] = tex;
+Ref<Texture> Texture::Create(std::string name, std::string file, GLuint slot) {
+	Ref<Texture> tex = std::make_shared<Texture>(file.c_str(), slot);
+	library[name] = tex;
 	return tex;
 }
 

@@ -17,7 +17,7 @@ public:
 	Texture(const char* file, GLuint slot);
 	~Texture();
 	static Ref<Texture> Create();
-	static Ref<Texture> Create(const char* file, GLuint slot = 0);
+	static Ref<Texture> Create(std::string name, std::string file, GLuint slot = 0);
 	void TexUnit(Ref<Shader>& shader, const char* uniform, GLuint unit);
 	void Bind();
 	void Unbind();

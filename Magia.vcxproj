@@ -177,6 +177,8 @@
   <ItemGroup>
     <None Include="glyph.frag" />
     <None Include="glyph.vert" />
+    <None Include="image.frag" />
+    <None Include="image.vert" />
     <None Include="unlit.frag" />
     <None Include="unlit.vert" />
   </ItemGroup>

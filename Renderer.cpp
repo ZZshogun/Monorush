@@ -22,7 +22,7 @@ void Renderer::DrawSprite(
 	);
 	glUniform2f(glGetUniformLocation(material->shader->handle, "offset"), texOffset.x, texOffset.y);
 
-	glUniform4f(glGetUniformLocation(material->shader->handle, "color"),
+	glUniform4f(glGetUniformLocation(material->shader->handle, "fColor"),
 		material->color.r,
 		material->color.g,
 		material->color.b,

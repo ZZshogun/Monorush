@@ -71,6 +71,7 @@ Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 void Shader::CompileAll() {
 	LUT["unlit"] = Create("unlit.vert", "unlit.frag");
 	LUT["glyph"] = Create("glyph.vert", "glyph.frag");
+	LUT["image"] = Create("image.vert", "image.frag");
 }
 
 void Shader::Bind() {

@@ -63,19 +63,19 @@ void Input::ClearInputBuffer() {
 	mouseScrollDelta = glm::vec2(0, 0);
 }
 
-bool Input::GetKey(GLenum GLFW_KEY) {
-	if (!mainWindow || GLFW_KEY == GLFW_KEY_UNKNOWN) return false;
-	return keyCode[GLFW_KEY] == KeyState::KEY_STAY || keyCode[GLFW_KEY] == KeyState::KEY_DOWN;
+bool Input::GetKey(Key key) {
+	if (!mainWindow || key == GLFW_KEY_UNKNOWN) return false;
+	return keyCode[key] == KeyState::KEY_STAY || keyCode[key] == KeyState::KEY_DOWN;
 }
 
-bool Input::GetKeyDown(GLenum GLFW_KEY) {
-	if (!mainWindow || GLFW_KEY == GLFW_KEY_UNKNOWN) return false;
-	return keyCode[GLFW_KEY] == KeyState::KEY_DOWN;
+bool Input::GetKeyDown(Key key) {
+	if (!mainWindow || key == GLFW_KEY_UNKNOWN) return false;
+	return keyCode[key] == KeyState::KEY_DOWN;
 }
 
-bool Input::GetKeyUp(GLenum GLFW_KEY) {
-	if (!mainWindow || GLFW_KEY == GLFW_KEY_UNKNOWN) return false;
-	return keyCode[GLFW_KEY] == KeyState::KEY_UP;
+bool Input::GetKeyUp(Key key) {
+	if (!mainWindow || key == GLFW_KEY_UNKNOWN) return false;
+	return keyCode[key] == KeyState::KEY_UP;
 }
 
 glm::vec2 Input::MousePosition() {
@@ -91,19 +91,19 @@ glm::vec2 Input::MouseScrollDelta() {
 	return mouseScrollDelta;
 }
 
-bool Input::GetMouse(GLenum GLFW_MOUSE_BUTTON) {
+bool Input::GetMouse(Button button) {
 	if (!mainWindow) return false;
-	return mouseCode[GLFW_MOUSE_BUTTON] == KeyState::KEY_STAY || mouseCode[GLFW_MOUSE_BUTTON] == KeyState::KEY_DOWN;
+	return mouseCode[button] == KeyState::KEY_STAY || mouseCode[button] == KeyState::KEY_DOWN;
 }
 
-bool Input::GetMouseDown(GLenum GLFW_MOUSE_BUTTON) {
+bool Input::GetMouseDown(Button button) {
 	if (!mainWindow) return false;
-	return mouseCode[GLFW_MOUSE_BUTTON] == KeyState::KEY_DOWN;
+	return mouseCode[button] == KeyState::KEY_DOWN;
 }
 
-bool Input::GetMouseUp(GLenum GLFW_MOUSE_BUTTON) {
+bool Input::GetMouseUp(Button button) {
 	if (!mainWindow) return false;
-	return mouseCode[GLFW_MOUSE_BUTTON] == KeyState::KEY_UP;
+	return mouseCode[button] == KeyState::KEY_UP;
 }
 
 glm::vec2 Input::WASDAxis() {

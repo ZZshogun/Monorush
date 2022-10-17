@@ -127,6 +127,20 @@ enum Key {
 	Menu = 348,
 };
 
+enum Button {
+	Mouse_1      = 0,
+	Mouse_2      = 1,
+	Mouse_3      = 2,
+	Mouse_4      = 3,
+	Mouse_5      = 4,
+	Mouse_6      = 5,
+	Mouse_7      = 6,
+	Mouse_8      = 7,
+	Mouse_LEFT   = 0,
+	Mouse_RIGHT  = 1,
+	Mouse_MIDDLE = 2,
+};
+
 class Input {
 
 	enum KeyState {
@@ -150,16 +164,16 @@ public:
 
 	static void ClearInputBuffer();
 
-	static bool GetKey(GLenum GLFW_KEY);
-	static bool GetKeyDown(GLenum GLFW_KEY);
-	static bool GetKeyUp(GLenum GLFW_KEY);
+	static bool GetKey(Key key);
+	static bool GetKeyDown(Key key);
+	static bool GetKeyUp(Key key);
 
 	static glm::vec2 MousePosition();
 	static glm::vec2 MouseScrollDelta();
 
-	static bool GetMouse(GLenum GLFW_MOUSE_BUTTON);
-	static bool GetMouseDown(GLenum GLFW_MOUSE_BUTTON);
-	static bool GetMouseUp(GLenum GLFW_MOUSE_BUTTON);
+	static bool GetMouse(Button button);
+	static bool GetMouseDown(Button button);
+	static bool GetMouseUp(Button button);
 
 	static glm::vec2 WASDAxis();
 };

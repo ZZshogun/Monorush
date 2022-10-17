@@ -3,7 +3,7 @@
 bool UI::inUI = false;
 
 glm::ivec2 UI::ref_resolution = {-1, -1};
-std::string UI::font_name = "Arial";
+std::string UI::font_name = "PixelGameFont";
 std::string UI::glyphShader = "glyph";
 
 GLuint UI::vao;
@@ -17,7 +17,8 @@ glm::vec2 UI::ratioRef(glm::ivec2 screen_pos) {
 
 void UI::Init() {
 
-	Font::LoadFont("Arial", "font/arial.ttf");
+	Font::LoadFont("Arial", "font/arial.ttf", {0, 96});
+	Font::LoadFont("PixelGameFont", "font/PixelGameFont.ttf", {0, 96});
 
 	std::cout << "INIT UI\n";
 }
@@ -65,8 +66,8 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 	}
 
 	std::vector<GLuint> indices = {
-			0, 3, 1,
-			1, 3, 2,
+		0, 3, 1,
+		1, 3, 2,
 	};
 
 	std::string ftname = fontName == "" ? font_name : fontName;
@@ -85,11 +86,11 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 		for (char c : string) {
 			auto& e = Font::GetFontChar(ftname, c);
 			offsetx += e.bearing.x + (e.advance >> 6);
-			lastAdvance = e.advance >> 6;
+			lastAdvance = (float)(e.advance >> 6);
 		}
-		offsetx -= lastAdvance;
-		offsetx /= scale * ref_resolution.x;
-		if (anchorMode == CENTER) offsetx /= 2;
+		//offsetx -= lastAdvance;
+		offsetx *= scale / ref_resolution.x;
+		if (anchorMode == CENTER) offsetx /= 2.0f;
 	}
 
 	float x = scr_pos.x - offsetx, y = scr_pos.y;

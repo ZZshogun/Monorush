@@ -61,7 +61,7 @@ void Game::_Loop() {
 	layer.OnAttach();
 
 	while (!glfwWindowShouldClose(window)) {
-		glClearColor(0.07f, 0.07f, 0.09f, 1);
+		glClearColor(0.95f, 0.97f, 1, 1);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
 		time._UpdateTime((float)glfwGetTime());

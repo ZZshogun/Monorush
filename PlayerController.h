@@ -10,6 +10,8 @@ public:
 	AnimatorComponent* animator = NULL;
 	AudioSourceComponent* audio = NULL;
 
+	uint16_t playerHeath = 6;
+
 	void OnCreate() {
 		rigidbody = &GetComponent<RigidbodyComponent>();
 		animator = &GetComponent<AnimatorComponent>();
@@ -32,6 +34,14 @@ public:
 		else if (dir.x > 0) {
 			animator->current_id = 1;
 		}
+	}
+
+	void OnDrawUI(Time time) {
+		UI::StartUI(glm::ivec2{ 1920, 1080 });
+
+		UI::DrawString(std::to_string(playerHeath), { -1220, -1020 }, 1.25f, { 0, 0, 0, 1 });
+
+		UI::EndUI();
 	}
 
 };

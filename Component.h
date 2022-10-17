@@ -5,10 +5,6 @@
 
 class ScriptableEntity;
 
-struct BaseComponent {
-	bool active = true;
-};
-
 struct TagComponent {
 	std::string tag;
 };
@@ -20,7 +16,8 @@ struct TransformComponent {
 	glm::vec3 scale = { 1, 1, 1 };
 };
 
-struct SpriteRendererComponent : public BaseComponent {
+struct SpriteRendererComponent {
+	bool active = true;
 	Ref<VAO> handle;
 	Ref<Texture> texture;
 	glm::vec4 albedo = { 1, 1, 1, 1 };
@@ -31,16 +28,19 @@ struct SpriteRendererComponent : public BaseComponent {
 	int order = 0;
 };
 
-struct CameraComponent : public BaseComponent {
+struct CameraComponent {
+	bool active = true;
 	glm::vec2 resolution = { 16, 9 };
 	bool primary = false;
 };
 
-struct AudioListenerComponent : public BaseComponent {
+struct AudioListenerComponent {
+	bool active = true;
 	bool listening = true;
 };
 
-struct AudioSourceComponent : public BaseComponent {
+struct AudioSourceComponent {
+	bool active = true;
 	ALuint source{};
 
 	float gain = 1;
@@ -69,24 +69,28 @@ struct AudioSourceComponent : public BaseComponent {
 	}
 };
 
-struct CollisionComponent : public BaseComponent {
+struct CollisionComponent {
+	bool active = true;
 	glm::vec2 origin = { 0, 0 };
 	glm::vec2 size = { 1, 1 };
 };
 
-struct RigidbodyComponent : public BaseComponent {
+struct RigidbodyComponent {
+	bool active = true;
 	glm::vec3 position = { 0, 0, 0 };
 	glm::vec3 velocity = { 0, 0, 0 };
 };
 
-struct SpriteSheetComponent : public BaseComponent {
+struct SpriteSheetComponent {
+	bool active = true;
 	glm::vec2 size = { 1, 1 };
 	int sizePerSprite = 1;
 	int drawIndex = 0;
 	Ref<Texture> sheet;
 };
 
-struct AnimatorComponent : public BaseComponent {
+struct AnimatorComponent {
+	bool active = true;
 
 	struct AnimatorObject {
 		Ref<Texture> animation;
@@ -111,7 +115,8 @@ struct AnimatorComponent : public BaseComponent {
 	}
 };
 
-struct NativeScriptComponent : public BaseComponent {
+struct NativeScriptComponent {
+	bool active = true;
 	ScriptableEntity* instance = NULL;
 
 	ScriptableEntity*(*InstantiateScript)() = NULL;

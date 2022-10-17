@@ -16,14 +16,14 @@ void Layer::OnAttach() {
 	Audio::LoadSound("audio/bounce.wav", "bounce");
 
 	// Background
-	Entity BG = scene->CreateEntity("Background");
-	auto& BGcomponent = BG.AddComponent<SpriteRendererComponent>();
-	float maxL = glm::max(camera.GetComponent<CameraComponent>().resolution);
-	BGcomponent.texture = BGtex;
-	BGcomponent.size = { maxL, maxL };
-	BGcomponent.UVrepeat = 4;
-	BGcomponent.parallelTexture = true;
-	BGcomponent.order = -1;
+	//Entity BG = scene->CreateEntity("Background");
+	//auto& BGcomponent = BG.AddComponent<SpriteRendererComponent>();
+	//float maxL = glm::max(camera.GetComponent<CameraComponent>().resolution);
+	//BGcomponent.texture = BGtex;
+	//BGcomponent.size = { maxL, maxL };
+	//BGcomponent.UVrepeat = 4;
+	//BGcomponent.parallelTexture = true;
+	//BGcomponent.order = -1;
 
 	// Player
 	man = scene->CreateEntity("Man");
@@ -45,7 +45,7 @@ void Layer::OnAttach() {
 	chest_colld.origin.y = -0.05f;
 
 	auto& man_transform = man.GetComponent<TransformComponent>();
-	BG.GetComponent<TransformComponent>().parent = &man_transform;
+	//BG.GetComponent<TransformComponent>().parent = &man_transform;
 	camera.GetComponent<TransformComponent>().parent = &man_transform;
 
 	//Entity enemySpawner = scene->CreateEntity("Enemy Spawner");
@@ -55,10 +55,10 @@ void Layer::OnAttach() {
 void Layer::OnUpdate(Time time) {
 	scene->OnUpdate(time);
 
-	UI::StartUI();
+	UI::StartUI(glm::ivec2{1920, 1080});
 
-	UI::Anchor(CENTER);
-	UI::DrawString("Hello World", { 0, 100 }, 1, { 0, 0, 0, 1 });
+	UI::Anchor(LEFT);
+	UI::DrawString("HEALTH", { -1820, -1020 }, 1.25f, { 0, 0, 0, 1 });
 
 	UI::EndUI();
 }

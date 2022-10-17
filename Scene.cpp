@@ -241,6 +241,12 @@ void Scene::OnUpdate(Time time) {
 				sprite.textureOffset
 			);
 		}
+
+		scene_registry.view<NativeScriptComponent>().each([=](auto entity, auto& script) {
+			if (script.active) {
+				script.instance->OnDrawUI(time);
+			}
+		});
 	}
 	
 }

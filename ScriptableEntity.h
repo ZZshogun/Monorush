@@ -13,7 +13,7 @@ class ScriptableEntity {
 protected:
 	virtual void OnCreate() {}
 	virtual void OnUpdate(Time time) {}
-	virtual void OnDestroy() {}
+	virtual void OnDrawUI(Time time) {}
 
 public:
 	virtual ~ScriptableEntity() {}

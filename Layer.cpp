@@ -56,6 +56,9 @@ void Layer::OnUpdate(Time time) {
 	scene->OnUpdate(time);
 
 	UI::StartUI();
-	UI::DrawString("Hello World", { 300, 100 }, 1, { 0, 0, 0, 1 });
+
+	UI::Anchor(CENTER);
+	UI::DrawString("Hello World", { 0, 100 }, 1, { 0, 0, 0, 1 });
+
 	UI::EndUI();
 }

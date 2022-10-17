@@ -4,6 +4,12 @@
 #include "Magia.h"
 #include "Font.h"
 
+enum UIAnchor {
+	LEFT,
+	CENTER,
+	RIGHT
+};
+
 class UI {
 
 	UI();
@@ -17,6 +23,8 @@ class UI {
 
 	static GLuint vao;
 
+	static UIAnchor anchorMode;
+
 public:
 
 	static void Init();
@@ -25,8 +33,11 @@ public:
 	static void StartUI();
 	static void StartUI(std::string fontName, std::string shader = "");
 	static void StartUI(glm::ivec2 ref_resolution, std::string fontName = "", std::string shader = "");
-	static void DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm::vec4 color, std::string fontName = "");
 	static void EndUI();
+	
+	static void Anchor(UIAnchor anchorEnum);
+
+	static void DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm::vec4 color, std::string fontName = "");
 };
 
 #endif

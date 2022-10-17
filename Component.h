@@ -111,7 +111,7 @@ struct AnimatorComponent : public BaseComponent {
 	}
 };
 
-struct NativeScriptComponent {
+struct NativeScriptComponent : public BaseComponent {
 	ScriptableEntity* instance = NULL;
 
 	ScriptableEntity*(*InstantiateScript)() = NULL;

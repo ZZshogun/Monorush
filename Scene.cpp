@@ -59,12 +59,14 @@ void Scene::OnUpdate(Time time) {
 	
 	// Native Script Component
 	scene_registry.view<NativeScriptComponent>().each([=](auto entity, auto& script) {
-		if (!script.instance) {
-			script.instance = script.InstantiateScript();
-			script.instance->entity = Entity{ entity, &scene_registry };
-			script.instance->OnCreate();
+		if (script.active) {
+			if (!script.instance) {
+				script.instance = script.InstantiateScript();
+				script.instance->entity = Entity{ entity, &scene_registry };
+				script.instance->OnCreate();
+			}
+			script.instance->OnUpdate(time);
 		}
-		script.instance->OnUpdate(time);
 	});
 
 	// Rigidbody & Collision

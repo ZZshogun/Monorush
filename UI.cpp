@@ -8,6 +8,8 @@ std::string UI::glyphShader = "glyph";
 
 GLuint UI::vao;
 
+UIAnchor UI::anchorMode = LEFT;
+
 glm::vec2 UI::ratioRef(glm::ivec2 screen_pos) {
 	glm::vec2 scaled = glm::vec2{ screen_pos.x, screen_pos.y } / glm::vec2{ ref_resolution.x, ref_resolution.y };
 	return scaled;
@@ -37,6 +39,8 @@ void UI::StartUI(glm::ivec2 ref_resolution, std::string fontName, std::string sh
 
 	glGenVertexArrays(1, &vao);
 
+	anchorMode = LEFT;
+
 	inUI = true;
 }
 
@@ -50,11 +54,21 @@ void UI::StartUI() {
 	StartUI(res, font_name);
 }
 
+void UI::Anchor(UIAnchor anchorEnum) {
+	anchorMode = anchorEnum;
+}
+
 void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm::vec4 color, std::string fontName) {
 	if (!inUI) {
 		std::cout << "ERROR UI No starting UI block\n";
 		return;
 	}
+
+	std::vector<GLuint> indices = {
+			0, 3, 1,
+			1, 3, 2,
+	};
+
 	std::string ftname = fontName == "" ? font_name : fontName;
 	glm::vec2 scr_pos = ratioRef(screen_pos);
 
@@ -65,12 +79,20 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(vao);
 
-	float x = scr_pos.x, y = scr_pos.y;
+	float offsetx = 0;
+	if (anchorMode != LEFT) {
+		float lastAdvance = 0;
+		for (char c : string) {
+			auto& e = Font::GetFontChar(ftname, c);
+			offsetx += e.bearing.x + (e.advance >> 6);
+			lastAdvance = e.advance >> 6;
+		}
+		offsetx -= lastAdvance;
+		offsetx /= scale * ref_resolution.x;
+		if (anchorMode == CENTER) offsetx /= 2;
+	}
 
-	std::vector<GLuint> indices = {
-			0, 3, 1,
-			1, 3, 2,
-	};
+	float x = scr_pos.x - offsetx, y = scr_pos.y;
 
 	for (char c : string) {
 		FontChar& ftChar = Font::GetFontChar(ftname, c);

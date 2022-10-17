@@ -28,6 +28,9 @@
 
 #include <EnTT/entt.hpp>
 
+#include <ft2build.h>
+#include <freetype/freetype.h>
+
 #include "GLMHelper.h"
 #include "MathHelper.h"
 

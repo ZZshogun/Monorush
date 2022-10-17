@@ -5,6 +5,10 @@
 
 class ScriptableEntity;
 
+struct BaseComponent {
+	bool active = true;
+};
+
 struct TagComponent {
 	std::string tag;
 };
@@ -16,7 +20,7 @@ struct TransformComponent {
 	glm::vec3 scale = { 1, 1, 1 };
 };
 
-struct SpriteRendererComponent {
+struct SpriteRendererComponent : public BaseComponent {
 	Ref<VAO> handle;
 	Ref<Texture> texture;
 	glm::vec4 albedo = { 1, 1, 1, 1 };
@@ -27,18 +31,17 @@ struct SpriteRendererComponent {
 	int order = 0;
 };
 
-struct CameraComponent {
+struct CameraComponent : public BaseComponent {
 	glm::vec2 resolution = { 16, 9 };
 	bool primary = false;
 };
 
-struct AudioListenerComponent {
+struct AudioListenerComponent : public BaseComponent {
 	bool listening = true;
 };
 
-struct AudioSourceComponent {
+struct AudioSourceComponent : public BaseComponent {
 	ALuint source{};
-	bool active = true;
 
 	float gain = 1;
 	float pitch = 1;
@@ -66,26 +69,24 @@ struct AudioSourceComponent {
 	}
 };
 
-struct CollisionComponent {
-	bool collision = true;
+struct CollisionComponent : public BaseComponent {
 	glm::vec2 origin = { 0, 0 };
 	glm::vec2 size = { 1, 1 };
 };
 
-struct RigidbodyComponent {
-	bool simulate = true;
+struct RigidbodyComponent : public BaseComponent {
 	glm::vec3 position = { 0, 0, 0 };
 	glm::vec3 velocity = { 0, 0, 0 };
 };
 
-struct SpriteSheetComponent {
+struct SpriteSheetComponent : public BaseComponent {
 	glm::vec2 size = { 1, 1 };
 	int sizePerSprite = 1;
 	int drawIndex = 0;
 	Ref<Texture> sheet;
 };
 
-struct AnimatorComponent {
+struct AnimatorComponent : public BaseComponent {
 
 	struct AnimatorObject {
 		Ref<Texture> animation;

@@ -45,9 +45,12 @@ void Game::_Setup() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	Shader::CompileAll();
+
 	Texture::defaultTex = Texture::Create("texture/sprite_default.png");
 
 	Audio::Init();
+
+	UI::Init();
 
 	std::cout << "START Game " << ScreenResolution.x << "x" << ScreenResolution.y << "\n";
 	_Loop();
@@ -78,4 +81,5 @@ void Game::_Loop() {
 	glfwDestroyWindow(window);
 	glfwTerminate();
 	Audio::Destroy();
+	UI::Destroy();
 }

@@ -30,6 +30,7 @@ void VAO::Unbind() {
 void VAO::Delete() {
 	if (disposed) return;
 
+	std::cout << "DELETE VAO " << handle << "\n";
 	disposed = true;
 	glDeleteVertexArrays(1, &handle);
 }

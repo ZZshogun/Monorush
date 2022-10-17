@@ -40,7 +40,7 @@ CollisionPacket Collision::Check(entt::entity entity, entt::registry& registry) 
 	for (auto other : view) {
 		if (entity == other) continue;
 		auto& other_collision = view.get<CollisionComponent>(other);
-		if (!other_collision.collision) continue;
+		if (!other_collision.active) continue;
 		auto& collision = view.get<CollisionComponent>(entity);
 		auto& transformA = registry.get<TransformComponent>(entity);
 		auto& transformB = registry.get<TransformComponent>(other);

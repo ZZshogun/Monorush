@@ -75,7 +75,7 @@ void Scene::OnUpdate(Time time) {
 			rigidGroup.get<TransformComponent, RigidbodyComponent, CollisionComponent>(entity);
 		rigidbody.position = transform.position;
 
-		if (!rigidbody.simulate || !collision.collision) continue;
+		if (!rigidbody.active || !collision.active) continue;
 
 		glm::vec3 vel = rigidbody.velocity;
 
@@ -116,7 +116,7 @@ void Scene::OnUpdate(Time time) {
 	for (auto entity : cameraGroup) {
 		auto [transform, camera] =
 			cameraGroup.get<TransformComponent, CameraComponent>(entity);
-		if (camera.primary) {
+		if (camera.active && camera.primary) {
 			Transform t = { transform.position, transform.rotation, transform.scale };
 			for (auto& it : Shader::LUT)
 				Camera::Update(t, camera.resolution, it.second);
@@ -155,7 +155,7 @@ void Scene::OnUpdate(Time time) {
 	for (auto entity : listenerGroup) {
 		auto [listener, transform] = 
 			listenerGroup.get<AudioListenerComponent, TransformComponent>(entity);
-		if (!listener.listening) continue;
+		if (!listener.active || !listener.listening) continue;
 		Audio::SetListenerPosition(transform.position);
 		if (scene_registry.any_of<RigidbodyComponent>(entity)) {
 			auto& rigidbody = scene_registry.get<RigidbodyComponent>(entity);
@@ -179,6 +179,8 @@ void Scene::OnUpdate(Time time) {
 			auto [transformC, sprite] =
 				renderGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 			
+			if (!sprite.active) continue;
+
 			Transform transform = { transformC.position, transformC.rotation, transformC.scale };
 
 			if (sprite.parallelTexture)

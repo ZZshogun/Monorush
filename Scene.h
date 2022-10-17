@@ -5,6 +5,7 @@
 #include "Component.h"
 #include "Entity.h"
 #include "Renderer.h"
+#include "UI.h"
 #include "ScriptableEntity.h"
 
 class Scene {

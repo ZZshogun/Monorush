@@ -10,5 +10,6 @@
 #include "Input.h"
 #include "Time.h"
 #include "Audio.h"
+#include "Font.h"
 
 #endif

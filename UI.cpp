@@ -14,21 +14,21 @@ UIAnchor UI::anchorMode = LEFT;
 
 
 glm::vec2 UI::ratioRef(glm::ivec2 screen_pos) {
-	glm::vec2 scaled = glm::vec2{ screen_pos.x, screen_pos.y } / glm::vec2{ ref_resolution.x, ref_resolution.y };
+	glm::vec2 scaled = glm::vec2{ screen_pos } / glm::vec2{ ref_resolution };
 	return scaled;
 }
 
 void UI::Init() {
 
 	Font::LoadFont("Arial", "font/arial.ttf", {0, 96});
-	Font::LoadFont("PixelGameFont", "font/PixelGameFont.ttf", {0, 96});
+	Font::LoadFont("PixelGameFont", "font/PixelGameFont.ttf", {0, 48});
 
 	std::cout << "INIT UI\n";
 }
 
 void UI::Destroy() {
 	glDeleteVertexArrays(1, &vao);
-	std::cout << "DESTROY UI\n";
+	std::cout << "DELETE UI\n";
 }
 
 void UI::StartUI(glm::ivec2 ref_resolution, std::string fontName, std::string shader) {
@@ -37,7 +37,7 @@ void UI::StartUI(glm::ivec2 ref_resolution, std::string fontName, std::string sh
 		return;
 	}
 
-	UI::ref_resolution = ref_resolution;
+	UI::ref_resolution = ref_resolution / 2;
 	if (fontName != "") UI::font_name = fontName;
 	if (shader != "") UI::glyphShader = shader;
 
@@ -207,6 +207,7 @@ void UI::CreateButton(
 	Ref<Texture> image,
 	glm::ivec2 screen_pos,
 	glm::ivec2 screen_size,
+	std::function<void()> function,
 	glm::vec4 color
 ) {
 	Button button;
@@ -217,6 +218,8 @@ void UI::CreateButton(
 	button.texture = image;
 	button.position = screen_pos;
 	button.size = screen_size;
+	button.function = function;
+	button.ref_resolution = UI::ref_resolution;
 
 	UI::buttons.push_back(button);
 }
@@ -227,17 +230,17 @@ void UI::CreateButton(
 	glm::vec4 textColor,
 	glm::ivec2 screen_pos,
 	glm::ivec2 screen_size,
-	glm::vec4 color
+	glm::vec4 color,
+	std::function<void()> function
 ) {
-	CreateButton(text, scale, textColor, NULL, screen_pos, screen_size, color);
+	CreateButton(text, scale, textColor, NULL, screen_pos, screen_size, function, color);
 }
 
 void UI::DrawButtons() {
 	for (Button& button : buttons) {
 		Ref<Texture> tex = button.texture.get() ? button.texture : Texture::defaultTex;
 		DrawImage(tex, button.position, button.size, button.color);
-		glm::vec2 adjust_text = { button.position.x, button.position.y };
-		DrawString(button.text, adjust_text, button.textScale, button.textColor);
+		DrawString(button.text, button.position, button.textScale, button.textColor);
 	}
 }
 
@@ -250,4 +253,20 @@ void UI::EndUI() {
 	ref_resolution = { -1, -1 };
 	glDeleteVertexArrays(1, &vao);
 	inUI = false;
+}
+
+bool UI::ClickEvent(glm::ivec2 resolution) {
+
+	for (auto& button : buttons) {
+
+		glm::ivec2 rawPos = glm::ivec2(Input::MousePosition()) - resolution / 2;
+		glm::ivec2 clickPos = glm::ivec2{ rawPos.x, -rawPos.y };
+		clickPos = glm::vec2{clickPos} / glm::vec2{resolution / 2} * glm::vec2{ button.ref_resolution };
+
+		if (Math::InVec2(clickPos, button.position, button.size)) {
+			if (button.function) button.function();
+			return true;
+		}
+	}
+	return false;
 }

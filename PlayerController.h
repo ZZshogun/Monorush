@@ -69,12 +69,12 @@ public:
 
 		UI::Anchor(CENTER);
 		for (int i = 0; i < playerHeath; i++) {
-			UI::DrawImage(Texture::library["heart"], { -1800 + i * 150, -975 }, { 150, 150 }, heartCol);
+			UI::DrawImage(Texture::library["heart"], { -910 + i * 70, -490 }, { 70, 70 }, heartCol);
 		}
 
 		std::string bullet = std::to_string(cbullet) + " | " + std::to_string(fullammo);
 		UI::Anchor(RIGHT);
-		UI::DrawString(bullet, { 1870, -990 }, 1.25f, { 0, 0, 0, 1 });
+		UI::DrawString(bullet, { 940, -500 }, 1.25f, { 0, 0, 0, 1 });
 
 		UI::EndUI();
 	}

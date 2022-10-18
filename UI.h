@@ -12,7 +12,7 @@ enum UIAnchor {
 
 class UI {
 
-	// scaled position & size
+	// Holds button data
 	struct Button {
 		std::string text;
 		float textScale;
@@ -21,6 +21,8 @@ class UI {
 		glm::vec2 size;
 		glm::vec4 color = {1, 1, 1 ,1};
 		Ref<Texture> texture = NULL;
+		glm::ivec2 ref_resolution;
+		std::function<void()> function = NULL;
 	};
 
 	UI();
@@ -44,6 +46,8 @@ public:
 	static void Init();
 	static void Destroy();
 
+	static bool ClickEvent(glm::ivec2 resolution);
+
 	static void StartUI();
 	static void StartUI(std::string fontName, std::string shader = "");
 	static void StartUI(glm::ivec2 ref_resolution, std::string fontName = "", std::string shader = "");
@@ -55,7 +59,6 @@ public:
 	static void DrawImage(Ref<Texture>& image, glm::ivec2 screen_pos, glm::ivec2 screen_size, glm::vec4 color = {1, 1, 1, 1});
 	static void DrawButtons();
 
-	// TODO : Make buttons clickable
 	static void CreateButton(
 		std::string text,
 		float scale,
@@ -63,6 +66,7 @@ public:
 		Ref<Texture> image, 
 		glm::ivec2 screen_pos, 
 		glm::ivec2 screen_size, 
+		std::function<void()> function,
 		glm::vec4 color = {1, 1, 1 ,1}
 	);
 	static void CreateButton(
@@ -71,7 +75,8 @@ public:
 		glm::vec4 textColor,
 		glm::ivec2 screen_pos, 
 		glm::ivec2 screen_size, 
-		glm::vec4 color
+		glm::vec4 color,
+		std::function<void()> function
 	);
 };
 

@@ -98,7 +98,9 @@ bool Input::GetMouse(Button button) {
 
 bool Input::GetMouseDown(Button button) {
 	if (!mainWindow) return false;
-	return mouseCode[button] == KeyState::KEY_DOWN;
+	int x, y;
+	glfwGetWindowSize(mainWindow, &x, &y);
+	return mouseCode[button] == KeyState::KEY_DOWN && !UI::ClickEvent({ x, y });
 }
 
 bool Input::GetMouseUp(Button button) {

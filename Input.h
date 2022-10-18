@@ -2,6 +2,7 @@
 #define INPUT_CLASS_H
 
 #include "Core.h"
+#include "UI.h"
 
 enum Key {
 	Unknown = -1,

@@ -11,13 +11,19 @@ class Game {
 	void _Loop();
 
 private:
-	Layer layer;
+	int layerIndex = 1;
+
+	MenuLayer menuLayer;
+	GameLayer gameLayer;
 	Time time;
 
 public:
 	glm::vec2 ScreenResolution = { 1280, 720 };
 	Game(glm::vec2 screen_resolution);
 
+	void ClearLayer(int layerIndex);
+	void LoadLayer(int layerIndex);
+	void UpdateLayer(int layerIndex, Time time);
 };
 
 #endif

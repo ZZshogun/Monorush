@@ -10,21 +10,60 @@ public:
 	AnimatorComponent* animator = NULL;
 	AudioSourceComponent* audio = NULL;
 
-	short playerHeath = 5;
+	const short maxPlayerHealth = 5;
+	short playerHeath = maxPlayerHealth;
 	short cbullet = 12;
 	short fullammo = 12;
 
 	float bulletpersec = 6;
 	float cdtime = 0;
 
-	glm::vec4 heartCol = { 0, 0, 0 ,1 };
+	std::vector<glm::vec4> heartsCol;
 	bool hurt = false;
+	bool heal = false;
 	float blink = 0.1f, blinktime = 0;
+
+	void Hurt() {
+		playerHeath = glm::clamp<short>(playerHeath - 1, 0, maxPlayerHealth);
+		heartsCol[playerHeath] = glm::vec4{1, 0.11f, 0.28f, 1};
+		hurt = true;
+	}
+
+	void Heal() {
+		playerHeath = glm::clamp<short>(playerHeath + 1, 0, maxPlayerHealth);
+		heartsCol[playerHeath - 1] = glm::vec4{ 0.11f, 1, 0.28f, 1 };
+		heal = true;
+	}
 
 	void OnCreate() {
 		rigidbody = &GetComponent<RigidbodyComponent>();
 		animator = &GetComponent<AnimatorComponent>();
 		audio = &GetComponent<AudioSourceComponent>();
+
+		for (int i = 0; i < maxPlayerHealth; i++) heartsCol.emplace_back(0, 0, 0, 1);
+
+		UI::StartUI(glm::ivec2{ 1920, 1080 });
+		UI::CreateButton(
+			"HURT",
+			1,
+			{ 1, 1, 1, 1 },
+			{ -150, -450 },
+			{ 200, 100 },
+			{ 0, 0, 0, 1 },
+			[&]() { Hurt(); },
+			{ 0.3f, 0.3f, 0.3f, 1 }
+		);
+		UI::CreateButton(
+			"HEAL",
+			1,
+			{ 1, 1, 1, 1 },
+			{ 150, -450 },
+			{ 200, 100 },
+			{ 0, 0, 0, 1 },
+			[&]() { Heal(); },
+			{ 0.3f, 0.3f, 0.3f, 1 }
+		);
+		UI::EndUI();
 	}
 
 	void OnUpdate(Time time){
@@ -53,14 +92,16 @@ public:
 			if (blinktime >= blink) {
 				blinktime = 0;
 				hurt = false;
-				heartCol = { 0, 0, 0 ,1 };
+				heartsCol[playerHeath] = {0, 0, 0 , 0.25f};
 			}
 		}
-
-		if (Input::GetKeyDown(Key::H)) {
-			playerHeath--;
-			heartCol = glm::vec4{ 1, 0.11f, 0.28f, 1 };
-			hurt = true;
+		if (heal) {
+			blinktime += time.deltaTime;
+			if (blinktime >= blink) {
+				blinktime = 0;
+				heal = false;
+				heartsCol[playerHeath - 1] = { 0, 0, 0 , 1 };
+			}
 		}
 	}
 
@@ -68,8 +109,8 @@ public:
 		UI::StartUI(glm::ivec2{ 1920, 1080 });
 
 		UI::Anchor(CENTER);
-		for (int i = 0; i < playerHeath; i++) {
-			UI::DrawImage(Texture::library["heart"], { -910 + i * 70, -490 }, { 70, 70 }, heartCol);
+		for (int i = 0; i < maxPlayerHealth; i++) {
+			UI::DrawImage(Texture::library["heart"], { -910 + i * 70, -490 }, { 70, 70 }, heartsCol[i]);
 		}
 
 		std::string bullet = std::to_string(cbullet) + " | " + std::to_string(fullammo);

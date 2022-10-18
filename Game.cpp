@@ -58,9 +58,10 @@ void Game::_Setup() {
 
 void Game::_Loop() {
 
-	layer.OnAttach();
-
 	glClearColor(0.95f, 0.97f, 1, 1);
+
+	LoadLayer(layerIndex);
+
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
@@ -68,8 +69,9 @@ void Game::_Loop() {
 
 		Input::ScanKey(window);
 		Input::ScanMouse(window);
+		UI::PollsEvent(window);
 
-		layer.OnUpdate(time);
+		UpdateLayer(layerIndex, time);
 
 		Input::ClearInputBuffer();
 
@@ -82,4 +84,43 @@ void Game::_Loop() {
 	glfwTerminate();
 	Audio::Destroy();
 	UI::Destroy();
+}
+
+void Game::ClearLayer(int layerIndex) {
+	switch (layerIndex) {
+		case 0:
+			menuLayer = {};
+			break;
+		case 1:
+			gameLayer = {};
+			break;
+		default:
+			break;
+	}
+}
+
+void Game::LoadLayer(int layerIndex) {
+	switch (layerIndex) {
+	case 0:
+		menuLayer.OnAttach();
+		break;
+	case 1:
+		gameLayer.OnAttach();
+		break;
+	default:
+		break;
+	}
+}
+
+void Game::UpdateLayer(int layerIndex, Time time) {
+	switch (layerIndex) {
+	case 0:
+		menuLayer.OnUpdate(time);
+		break;
+	case 1:
+		gameLayer.OnUpdate(time);
+		break;
+	default:
+		break;
+	}
 }

@@ -247,6 +247,12 @@ void Scene::OnUpdate(Time time) {
 				script.instance->OnDrawUI(time);
 			}
 		});
+	}	
+}
+
+void Scene::Destroy() {
+	auto allEntt = scene_registry.view<TransformComponent>();
+	for (auto entity : allEntt) {
+		scene_registry.destroy(entity);
 	}
-	
 }

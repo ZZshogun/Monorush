@@ -93,14 +93,12 @@ glm::vec2 Input::MouseScrollDelta() {
 
 bool Input::GetMouse(Button button) {
 	if (!mainWindow) return false;
-	return mouseCode[button] == KeyState::KEY_STAY || mouseCode[button] == KeyState::KEY_DOWN;
+	return (mouseCode[button] == KeyState::KEY_STAY || mouseCode[button] == KeyState::KEY_DOWN) && !UI::onEvents;
 }
 
 bool Input::GetMouseDown(Button button) {
 	if (!mainWindow) return false;
-	int x, y;
-	glfwGetWindowSize(mainWindow, &x, &y);
-	return mouseCode[button] == KeyState::KEY_DOWN && !UI::ClickEvent({ x, y });
+	return mouseCode[button] == KeyState::KEY_DOWN && !UI::onEvents;
 }
 
 bool Input::GetMouseUp(Button button) {

@@ -1,6 +1,8 @@
 #ifndef CORE_H
 #define CORE_H
 
+// Includes
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -36,7 +38,15 @@
 #include "GLMHelper.h"
 #include "MathHelper.h"
 
+// Macros
+
 template<typename T>
 using Ref = std::shared_ptr<T>;
+
+namespace Color {
+	const glm::vec4 Transparent = { 0, 0, 0, 0 };
+	const glm::vec4 Black = { 0, 0, 0, 1 };
+	const glm::vec4 White = { 1, 1, 1, 1 };
+}
 
 #endif

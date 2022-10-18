@@ -157,6 +157,8 @@ class Input {
 	static GLuint mouseCode[GLFW_MOUSE_BUTTON_LAST + 1];
 	static glm::vec2 mouseScrollDelta;
 
+	friend class UI;
+
 public:
 	static void SetWindowInput(GLFWwindow* window);
 	static void ScanKey(GLFWwindow* window);

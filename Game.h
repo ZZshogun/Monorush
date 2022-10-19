@@ -4,17 +4,16 @@
 #include "Layer.h"
 
 class Game {
-
 	GLFWwindow* window;
 
 	void _Setup();
 	void _Loop();
 
 private:
-	int layerIndex = 1;
+	int layerIndex = 0;
 
-	MenuLayer menuLayer;
-	GameLayer gameLayer;
+	Ref<MenuLayer> menuLayer;
+	Ref<GameLayer> gameLayer;
 	Time time;
 
 public:
@@ -24,6 +23,7 @@ public:
 	void ClearLayer(int layerIndex);
 	void LoadLayer(int layerIndex);
 	void UpdateLayer(int layerIndex, Time time);
+	void ProcessLayerState(int layerIndex);
 };
 
 #endif

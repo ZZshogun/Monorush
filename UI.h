@@ -70,6 +70,7 @@ public:
 	static Button* on_button;
 
 	static void Init();
+	static void ClearBuffers();
 	static void Destroy();
 
 	static void PollsEvent(GLFWwindow* window);

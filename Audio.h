@@ -37,6 +37,7 @@ public:
 	static std::map<std::string, ALuint> AudioBuffers;
 
 	static void Init();
+	static void ClearBuffers();
 	static void Destroy();
 
 	static void LoadSound(std::string file, std::string name = "");

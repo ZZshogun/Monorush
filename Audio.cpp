@@ -89,14 +89,17 @@ void Audio::Init() {
 	std::cout << alGetString(AL_VERSION) << "\n";
 }
 
+void Audio::ClearBuffers() {
+	for (auto& audio : AudioBuffers) {
+		std::cout << "DELETE Audio " << audio.second << "\n";
+		alDeleteBuffers(1, &audio.second);
+	}
+	AudioBuffers.clear();
+}
+
 void Audio::Destroy() {
 	if (!init) return;
 	init = false;
-
-	for (auto sound : AudioBuffers) {
-		std::cout << "DELETE Audio " << sound.second << " " << sound.first << "\n";
-		alDeleteBuffers(1, &sound.second);
-	}
 
 	alcMakeContextCurrent(NULL);
 	alcCloseDevice(device);

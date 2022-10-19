@@ -19,7 +19,7 @@ void MenuLayer::OnAttach() {
 		{ 0, -150 },
 		{ 230, 70 },
 		{0, 1, 0, 0},
-		[]() { std::cout << "Pressed\n"; },
+		[&]() { state.sceneAddition = 1; },
 		Color::Transparent,
 		OnButtonHover
 	);
@@ -31,7 +31,7 @@ void MenuLayer::OnAttach() {
 		{ 0, -270 },
 		{ 270, 70 },
 		{ 0, 1, 0, 0 },
-		[]() { std::cout << "Pressed\n"; },
+		[&]() { std::cout << "Pressed\n"; },
 		Color::Transparent,
 		OnButtonHover
 	);
@@ -43,7 +43,7 @@ void MenuLayer::OnAttach() {
 		{ 0, -390 },
 		{ 150, 70 },
 		{ 0, 1, 0, 0 },
-		[]() { std::cout << "Pressed\n"; },
+		[&]() { state.terminate = true; },
 		Color::Transparent,
 		OnButtonHover
 	);

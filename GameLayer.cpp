@@ -45,14 +45,22 @@ void GameLayer::OnAttach() {
 
 	//Entity enemySpawner = scene->CreateEntity("Enemy Spawner");
 	//enemySpawner.AddComponent<NativeScriptComponent>().Bind<EnemySpawner>();
-}
 
-glm::vec4 texCol = glm::vec4{ 0, 0, 0, 1 };
-float GameLayer::time_left = 300;
-float outoftimeLimit = 1.3f;
-float outoftime = 0;
-float floatOffsetSpeed = 250;
-float floatOffset = 0;
+	UI::StartUI(glm::ivec2{ 1920, 1080 });
+	UI::Anchor(CENTER);
+	UI::CreateButton(
+		"MENU",
+		0.75f,
+		Color::White,
+		{ -850, 480 },
+		{ 160, 75 },
+		Color::Black,
+		[&]() { state.sceneAddition = -1; },
+		Color::Black,
+		[]() { UI::on_button->textScale = 1; }
+	);
+	UI::EndUI();
+}
 
 void GameLayer::OnUpdate(Time time) {
 	Layer::OnUpdate(time);

@@ -3,8 +3,9 @@
 Ref<Texture> Texture::defaultTex;
 std::map <std::string, Ref<Texture>> Texture::library;
 
-Texture::Texture(const char* file, GLuint slot) {
+Texture::Texture(std::string name, const char* file, GLuint slot) {
 	this->unit = slot;
+	this->name = name;
 
 	int imgW, imgH, imgCh;
 	stbi_set_flip_vertically_on_load(true);
@@ -47,9 +48,18 @@ Ref<Texture> Texture::Create() {
 }
 
 Ref<Texture> Texture::Create(std::string name, std::string file, GLuint slot) {
-	Ref<Texture> tex = std::make_shared<Texture>(file.c_str(), slot);
-	library[name] = tex;
-	return tex;
+	if (library.find(name) != library.end()) library[name]->Delete();
+	library[name] = std::make_shared<Texture>(name, file.c_str(), slot);
+	return library[name];
+}
+
+void Texture::ClearHandles() {
+	for (auto& tex : library) {
+		if (tex.first == defaultTex->name) continue;
+		tex.second->Delete();
+	}
+	library.clear();
+	library[defaultTex->name] = defaultTex;
 }
 
 void Texture::TexUnit(Ref<Shader>& shader, const char* uniform, GLuint unit) {

@@ -14,10 +14,12 @@ public:
 
 	GLuint handle;
 	GLuint unit;
-	Texture(const char* file, GLuint slot);
+	std::string name;
+	Texture(std::string name, const char* file, GLuint slot);
 	~Texture();
 	static Ref<Texture> Create();
 	static Ref<Texture> Create(std::string name, std::string file, GLuint slot = 0);
+	static void ClearHandles();
 	void TexUnit(Ref<Shader>& shader, const char* uniform, GLuint unit);
 	void Bind();
 	void Unbind();

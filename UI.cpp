@@ -27,6 +27,11 @@ void UI::Init() {
 	std::cout << "INIT UI\n";
 }
 
+void UI::ClearBuffers() {
+	buttons.clear();
+	_buttons.clear();
+}
+
 void UI::Destroy() {
 	glDeleteVertexArrays(1, &vao);
 	std::cout << "DELETE UI\n";

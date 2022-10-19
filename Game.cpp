@@ -71,6 +71,7 @@ void Game::_Loop() {
 		Input::ScanMouse(window);
 		UI::PollsEvent(window);
 
+		ProcessLayerState(layerIndex);
 		UpdateLayer(layerIndex, time);
 
 		Input::ClearInputBuffer();
@@ -89,10 +90,10 @@ void Game::_Loop() {
 void Game::ClearLayer(int layerIndex) {
 	switch (layerIndex) {
 		case 0:
-			menuLayer = {};
+			menuLayer.reset();
 			break;
 		case 1:
-			gameLayer = {};
+			gameLayer.reset();
 			break;
 		default:
 			break;
@@ -102,10 +103,12 @@ void Game::ClearLayer(int layerIndex) {
 void Game::LoadLayer(int layerIndex) {
 	switch (layerIndex) {
 	case 0:
-		menuLayer.OnAttach();
+		menuLayer = std::make_shared<MenuLayer>();
+		menuLayer->OnAttach();
 		break;
 	case 1:
-		gameLayer.OnAttach();
+		gameLayer = std::make_shared<GameLayer>();
+		gameLayer->OnAttach();
 		break;
 	default:
 		break;
@@ -115,12 +118,38 @@ void Game::LoadLayer(int layerIndex) {
 void Game::UpdateLayer(int layerIndex, Time time) {
 	switch (layerIndex) {
 	case 0:
-		menuLayer.OnUpdate(time);
+		menuLayer->OnUpdate(time);
 		break;
 	case 1:
-		gameLayer.OnUpdate(time);
+		gameLayer->OnUpdate(time);
 		break;
 	default:
 		break;
+	}
+}
+
+void Game::ProcessLayerState(int layerIndex) {
+	LayerState* layerState = NULL;
+
+	switch (layerIndex) {
+	case 0:
+		layerState = &menuLayer->state;
+		break;
+	case 1:
+		layerState = &gameLayer->state;
+		break;
+	default:
+		return;
+	}
+
+	if (layerState->terminate) glfwSetWindowShouldClose(window, true);
+
+	if (layerState->sceneIndex != -1 || layerState->sceneAddition != 0) {
+		int prevLayer = this->layerIndex;
+		if (layerState->sceneIndex != -1) this->layerIndex = layerState->sceneIndex;
+		else this->layerIndex = glm::clamp<int>(this->layerIndex + layerState->sceneAddition, 0, 256);
+		ClearLayer(prevLayer);
+		LoadLayer(this->layerIndex);
+		*layerState = {};
 	}
 }

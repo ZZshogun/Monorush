@@ -89,7 +89,7 @@ void GameLayer::OnUpdate(Time time) {
 	UI::Anchor(RIGHT);
 	UI::DrawString(timestr, { 50, 430 + floatOffset }, 1.2f, texCol);
 	UI::Anchor(LEFT);
-	UI::DrawString(millitimestr, { 50, 425 + floatOffset }, 0.60f, texCol);
+	UI::DrawString(millitimestr, { 55, 430 + floatOffset }, 0.60f, texCol);
 
 	UI::Anchor(CENTER);
 	UI::DrawButton(menuButton, time);

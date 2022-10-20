@@ -16,7 +16,7 @@ public:
 	// Holds button data
 	struct Button {
 		bool active = true;
-		bool draw = true;
+		bool draw = false;
 		std::string text = "";
 		float textScale = -1;
 		glm::vec4 textColor = Color::White;

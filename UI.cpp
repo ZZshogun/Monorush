@@ -92,8 +92,6 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 	};
 
 	std::string ftname = fontName == "" ? font_name : fontName;
-	glm::vec2 scr_pos = ratioRef(screen_pos);
-
 	Ref<Shader>& shader = Shader::LUT[glyphShader];
 	shader->Bind();
 
@@ -101,31 +99,38 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(vao);
 
-	float offsetx = 0, offsety = 0;
-	if (anchorMode != LEFT) {
-		for (char c : string) {
-			FontChar& e = Font::GetFontChar(ftname, c);
-			offsetx += e.bearing.x + (e.advance >> 6);
-			offsety = glm::max<float>(offsety, (float)e.bearing.y);
-		}
-		offsetx *= scale / ref_resolution.x;
-		offsety *= scale / ref_resolution.y;
-		if (anchorMode == CENTER) offsetx /= 2.0f;
+	float offsetx = 0;
+	float offsety = 0;
+	size_t n = string.size() - 1;
+	for (size_t i = 0; i <= n; i++) {
+		FontChar& e = Font::GetFontChar(ftname, string[i]);
+		if (i < n) offsetx += e.bearing.x + (e.advance >> 6);
+		else offsetx += e.bearing.x + e.size.x;
+		offsety = glm::max(offsety, (float)e.bearing.y / 2);
 	}
+	offsetx *= scale;
+	offsety *= scale;
+	if (anchorMode == CENTER) offsetx /= 2.0f;
+	else if (anchorMode == LEFT) offsetx = 0;
 
-	float x = scr_pos.x - offsetx + 0.005f; // 0.005 -> magic number
-	float y = scr_pos.y - offsety / 2.0f;
+	float x = (float)screen_pos.x - offsetx;
+	float y = (float)screen_pos.y - offsety;
 
 	for (char c : string) {
 		FontChar& ftChar = Font::GetFontChar(ftname, c);
-		glm::vec2 scaledSize = ratioRef(ftChar.size);
-		glm::vec2 scaledBearing = ratioRef(ftChar.bearing);
+		glm::vec2 scaledSize = glm::vec2(ftChar.size) * scale;
+		scaledSize = ratioRef(scaledSize);
 
-		float xpos = x + scaledBearing.x * scale;
-		float ypos = y - (scaledSize.y - scaledBearing.y) * scale;
+		float width = scaledSize.x;
+		float height = scaledSize.y;
 
-		float width = scaledSize.x * scale;
-		float height = scaledSize.y * scale;
+		glm::vec2 scaledPos{0};
+		scaledPos.x = x + ftChar.bearing.x * scale;
+		scaledPos.y = y - (ftChar.size.y - ftChar.bearing.y) * scale;
+		scaledPos = ratioRef(scaledPos);
+
+		float xpos = scaledPos.x;
+		float ypos = scaledPos.y;
 
 		std::vector<Vertex> vertices = {
 			Vertex{ glm::vec3{ xpos, ypos, 0 }, glm::vec2{ 0, 1 } },
@@ -134,6 +139,7 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 			Vertex{ glm::vec3{ xpos + width, ypos, 0 }, glm::vec2{ 1, 1} },
 		};
 		glBindTexture(GL_TEXTURE_2D, ftChar.texID);
+		//Texture::defaultTex->Bind();
 		glUniform1i(glGetUniformLocation(shader->handle, "tex0"), 0);
 
 		VBO vbo(vertices);
@@ -152,7 +158,7 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 		vbo.Delete();
 		ebo.Delete();
 
-		x += (ftChar.advance >> 6) * scale / ref_resolution.x;
+		x += (ftChar.advance >> 6) * scale;
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -250,7 +256,8 @@ Ref<UI::Button> UI::CreateButton(
 }
 
 void UI::DrawButton(Ref<Button>& button, Time time) {
-	if (!button || !button->draw) return;
+	if (!button) return;
+	button->draw = true;
 	Ref<Texture> tex = button->texture ? button->texture : Texture::defaultTex;
 	
 	if (button->blink > 0 && button->cur_color == button->presscolor) {
@@ -326,5 +333,6 @@ void UI::PollsEvent(GLFWwindow* window, Time time) {
 			*button = hovering_button;
 			hovering_button = null_button;
 		}
+		button->draw = false;
 	}
 }

@@ -6,11 +6,12 @@
 class Game {
 	GLFWwindow* window;
 
-	void _Setup();
-	void _Loop();
+	void Setup();
+	void Loop();
 
 private:
 	int layerIndex = 0;
+	bool log = true;
 
 	Ref<MenuLayer> menuLayer;
 	Ref<GameLayer> gameLayer;
@@ -18,12 +19,12 @@ private:
 
 public:
 	glm::vec2 ScreenResolution = { 1280, 720 };
-	Game(glm::vec2 screen_resolution);
+	Game(glm::vec2 screen_resolution, bool logging = true);
 
 	void ClearLayer(int layerIndex);
-	void LoadLayer(int layerIndex);
+	bool LoadLayer(int layerIndex);
 	void UpdateLayer(int layerIndex, Time time);
-	void ProcessLayerState(int layerIndex);
+	bool ProcessLayerState(int layerIndex);
 };
 
 #endif

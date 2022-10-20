@@ -1,9 +1,14 @@
 #include "Audio.h"
 
+std::vector<ALuint> AudioSource::sourceBuffers;
+bool AudioSource::log = true;
+
 ALuint AudioSource::Create() {
 	ALuint source = UINT_MAX;
 	alGenSources(1, &source);
 	assert(source != UINT_MAX);
+	sourceBuffers.push_back(source);
+	if (log) std::cout << "CREATE AudioSource " << source << "\n";
 	return source;
 }
 
@@ -58,7 +63,9 @@ void AudioSource::Stop(ALuint& source) {
 
 // =========================================== //
 
-std::map<std::string, ALuint> Audio::AudioBuffers;
+bool Audio::log = true;
+
+std::map<std::string, ALuint*> Audio::AudioBuffers;
 bool Audio::init = false;
 ALCdevice* Audio::device;
 ALCcontext* Audio::context;
@@ -85,30 +92,38 @@ void Audio::Init() {
 	SetListenerGain(10);
 	SetListenerPitch(1);
 
-	std::cout << "INIT Audio Version : ";
-	std::cout << alGetString(AL_VERSION) << "\n";
+	AudioSource::log = log;
+
+	if (log)
+		std::cout << "INIT Audio Version : " << alGetString(AL_VERSION) << "\n";
 }
 
 void Audio::ClearBuffers() {
 	for (auto& audio : AudioBuffers) {
-		std::cout << "DELETE Audio " << audio.second << "\n";
-		alDeleteBuffers(1, &audio.second);
+		if (log) std::cout << "DELETE Audio " << *audio.second << "\n";
+		alDeleteBuffers(1, audio.second);
 	}
 	AudioBuffers.clear();
+	for (auto& source : AudioSource::sourceBuffers) {
+		if (log) std::cout << "DELETE AudioSource " << source << "\n";
+		alDeleteSources(1, &source);
+	}
+	AudioSource::sourceBuffers.clear();
 }
 
 void Audio::Destroy() {
 	if (!init) return;
 	init = false;
 
+	ClearBuffers();
+
 	alcMakeContextCurrent(NULL);
 	alcCloseDevice(device);
 	alcDestroyContext(context);
-	std::cout << "DELETE Audio\n";
+	if (log) std::cout << "DELETE Audio\n";
 }
 
 void Audio::LoadSound(std::string file, std::string name) {
-	
 	ALenum format = AL_FORMAT_MONO16;
 	AudioFile<float> audiofile;
 	audiofile.load(file);
@@ -132,22 +147,27 @@ void Audio::LoadSound(std::string file, std::string name) {
 	else {
 		throw std::exception((std::to_string(channel) + " audio channels are not supported").c_str());
 	}
+	
+	if (name != "" && AudioBuffers.find(name) != AudioBuffers.end()) {
+		if (log) std::cout << "DELETE Audio " << name << "\n";
+		alDeleteBuffers(1, AudioBuffers[name]);
+	}
+	else if (AudioBuffers.find(file) != AudioBuffers.end()) {
+		if (log) std::cout << "DELETE Audio " << file << "\n";
+		alDeleteBuffers(1, AudioBuffers[file]);
+	}
 
 	ALuint buffer;
 	alGenBuffers(1, &buffer);
 	alBufferData(buffer, format, byteset.data(), (ALsizei)byteset.size(), (ALsizei)audiofile.getSampleRate());
-	
-	if (AudioBuffers.find(file) != AudioBuffers.end()) {
-		alDeleteBuffers(1, &AudioBuffers[file]);
-	}
 
 	if (name != "") {
-		Audio::AudioBuffers[name] = buffer;
-		std::cout << "CREATE Audio " << buffer << " " << name << "\n";
+		Audio::AudioBuffers[name] = &buffer;
+		if (log) std::cout << "CREATE Audio " << buffer << " " << name << "\n";
 	}
 	else {
-		Audio::AudioBuffers[file] = buffer;
-		std::cout << "CREATE Audio " << buffer << " " << file << "\n";
+		Audio::AudioBuffers[file] = &buffer;
+		if (log) std::cout << "CREATE Audio " << buffer << " " << file << "\n";
 	}
 }
 

@@ -12,6 +12,7 @@ class Shader {
 
 public:
 	static std::map<std::string, Ref<Shader>> LUT;
+	static bool log;
 	int handle;
 
 	Shader(const char* vertexCode, const char* fragmentCode);
@@ -19,7 +20,7 @@ public:
 	void Delete();
 	~Shader();
 
-	static void CompileAll();
+	static void Init();
 	static Ref<Shader> Create(const char* vertexCode, const char* fragmentCode);
 };
 

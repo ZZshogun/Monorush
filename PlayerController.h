@@ -10,10 +10,10 @@ public:
 	AnimatorComponent* animator = NULL;
 	AudioSourceComponent* audio = NULL;
 
-	const short maxPlayerHealth = 5;
-	short playerHeath = maxPlayerHealth;
-	short cbullet = 12;
-	short fullammo = 12;
+	const int maxPlayerHealth = 5;
+	int playerHeath = maxPlayerHealth;
+	int cbullet = 12;
+	int fullammo = 12;
 
 	float bulletpersec = 6;
 	float cdtime = 0;
@@ -23,15 +23,18 @@ public:
 	bool heal = false;
 	float blink = 0.1f, blinktime = 0;
 
+	Ref<UI::Button> hurtButton;
+	Ref<UI::Button> healButton;
+
 	void Hurt() {
-		playerHeath = glm::clamp<short>(playerHeath - 1, 0, maxPlayerHealth);
-		heartsCol[playerHeath] = glm::vec4{1, 0.11f, 0.28f, 1};
+		playerHeath = glm::clamp<int>(playerHeath - 1, 0, maxPlayerHealth);
+		heartsCol[(size_t)playerHeath] = glm::vec4{1, 0.11f, 0.28f, 1};
 		hurt = true;
 	}
 
 	void Heal() {
-		playerHeath = glm::clamp<short>(playerHeath + 1, 0, maxPlayerHealth);
-		heartsCol[playerHeath - 1] = glm::vec4{ 0.11f, 1, 0.28f, 1 };
+		playerHeath = glm::clamp<int>(playerHeath + 1, 0, maxPlayerHealth);
+		heartsCol[(size_t)playerHeath - 1] = glm::vec4{ 0.11f, 1, 0.28f, 1 };
 		heal = true;
 	}
 
@@ -43,7 +46,7 @@ public:
 		for (int i = 0; i < maxPlayerHealth; i++) heartsCol.emplace_back(0, 0, 0, 1);
 
 		UI::StartUI(glm::ivec2{ 1920, 1080 });
-		UI::CreateButton(
+		hurtButton = UI::CreateButton(
 			"HURT",
 			1,
 			{ 1, 1, 1, 1 },
@@ -53,7 +56,7 @@ public:
 			[&]() { Hurt(); },
 			{ 0.3f, 0.3f, 0.3f, 1 }
 		);
-		UI::CreateButton(
+		healButton = UI::CreateButton(
 			"HEAL",
 			1,
 			{ 1, 1, 1, 1 },
@@ -77,7 +80,7 @@ public:
 		if (cdtime >= 1.0f / bulletpersec && Input::GetMouseDown(Button::Mouse_Left)) {
 			cdtime = 0;
 			audio->Play(Audio::AudioBuffers["bounce"]);
-			cbullet = glm::clamp<short>(cbullet - 1, 0, fullammo);
+			cbullet = glm::clamp<int>(cbullet - 1, 0, fullammo);
 		}
 
 		if (dir.x < 0) {
@@ -92,7 +95,7 @@ public:
 			if (blinktime >= blink) {
 				blinktime = 0;
 				hurt = false;
-				heartsCol[playerHeath] = {0, 0, 0 , 0.25f};
+				heartsCol[(size_t)playerHeath] = {0, 0, 0 , 0.25f};
 			}
 		}
 		if (heal) {
@@ -100,7 +103,7 @@ public:
 			if (blinktime >= blink) {
 				blinktime = 0;
 				heal = false;
-				heartsCol[playerHeath - 1] = { 0, 0, 0 , 1 };
+				heartsCol[(size_t)playerHeath - 1] = { 0, 0, 0 , 1 };
 			}
 		}
 	}
@@ -116,6 +119,10 @@ public:
 		std::string bullet = std::to_string(cbullet) + " | " + std::to_string(fullammo);
 		UI::Anchor(RIGHT);
 		UI::DrawString(bullet, { 940, -500 }, 1.25f, { 0, 0, 0, 1 });
+
+		UI::Anchor(CENTER);
+		UI::DrawButton(hurtButton, time);
+		UI::DrawButton(healButton, time);
 
 		UI::EndUI();
 	}

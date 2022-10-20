@@ -56,7 +56,6 @@ Entity Scene::CreateEntity(std::string name) {
 }
 
 void Scene::OnUpdate(Time time) {
-	
 	// Native Script Component
 	scene_registry.view<NativeScriptComponent>().each([=](auto entity, auto& script) {
 		if (script.active) {
@@ -69,18 +68,18 @@ void Scene::OnUpdate(Time time) {
 		}
 	});
 
-	// Rigidbody & Collision
+	//Rigidbody & Collision
 	auto rigidGroup = 
-		scene_registry.group<RigidbodyComponent>(entt::get<TransformComponent, CollisionComponent>);
+		scene_registry.group<RigidbodyComponent, CollisionComponent>(entt::get<TransformComponent>);
 	for (auto entity : rigidGroup) {
 		auto [transform, rigidbody, collision] = 
 			rigidGroup.get<TransformComponent, RigidbodyComponent, CollisionComponent>(entity);
 		rigidbody.position = transform.position;
-
+	
 		if (!rigidbody.active || !collision.active) continue;
-
+	
 		glm::vec3 vel = rigidbody.velocity;
-
+	
 		CollisionPacket packet = Collision::Check(entity, scene_registry);
 		if (packet.count) {
 			for (glm::vec3 other : packet.positions) {
@@ -96,7 +95,7 @@ void Scene::OnUpdate(Time time) {
 				}
 			}
 		}
-
+	
 		rigidbody.position += vel * time.deltaTime;
 		transform.position = rigidbody.position;
 	}
@@ -251,8 +250,6 @@ void Scene::OnUpdate(Time time) {
 }
 
 void Scene::Destroy() {
-	auto allEntt = scene_registry.view<TransformComponent>();
-	for (auto entity : allEntt) {
-		scene_registry.destroy(entity);
-	}
+	auto allEntt = scene_registry.view<TagComponent>();
+	scene_registry.destroy(allEntt.begin(), allEntt.end());
 }

@@ -1,6 +1,7 @@
 #include "Shader.h"
 
 std::map<std::string, Ref<Shader>> Shader::LUT;
+bool Shader::log = true;
 
 std::string Read_from_file(const char* filepath) {
 	std::string ret = "";
@@ -65,10 +66,10 @@ Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 	glDeleteShader(vert);
 	glDeleteShader(frag);
 
-	std::cout << "CREATE Shader " << handle << " " << vertexfile << " " << fragmentfile << "\n";
+	if (Shader::log) std::cout << "CREATE Shader " << handle << " " << vertexfile << " " << fragmentfile << "\n";
 }
 
-void Shader::CompileAll() {
+void Shader::Init() {
 	LUT["unlit"] = Create("unlit.vert", "unlit.frag");
 	LUT["glyph"] = Create("glyph.vert", "glyph.frag");
 	LUT["image"] = Create("image.vert", "image.frag");
@@ -85,7 +86,7 @@ Shader::~Shader() {
 void Shader::Delete() {
 	if (disposed) return;
 
-	std::cout << "DELETE Shader " << handle << "\n";
+	if (log) std::cout << "DELETE Shader " << handle << "\n";
 	glDeleteProgram(handle);
 	disposed = true;
 }

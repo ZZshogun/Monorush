@@ -51,8 +51,8 @@ struct AudioSourceComponent {
 	float reference = 3;
 	float maxDistance = AL_MAX_DISTANCE;
 
-	void Play(ALuint& sound) {
-		AudioSource::Play(source, sound);
+	void Play(ALuint* sound) {
+		AudioSource::Play(source, *sound);
 	}
 	void Pause() {
 		AudioSource::Pause(source);
@@ -63,7 +63,7 @@ struct AudioSourceComponent {
 	void Stop() {
 		AudioSource::Stop(source);
 	}
-	void Restart(ALuint& sound) {
+	void Restart(ALuint* sound) {
 		Stop();
 		Play(sound);
 	}

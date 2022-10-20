@@ -16,6 +16,8 @@ class Font {
 	static std::map<std::string, FontFace> fonts_map;
 
 public:
+	static bool log;
+
 	Font() = default;
 	static void LoadFont(std::string name, std::string path, glm::ivec2 charsetsSize = {0, 48});
 

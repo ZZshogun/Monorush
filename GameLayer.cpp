@@ -2,6 +2,19 @@
 #include "PlayerController.h"
 #include "EnemySpawner.h"
 
+GameLayer::GameLayer() {
+	scene = Scene::Create();
+	camera = scene->CreateEntity("Camera");
+	camera.AddComponent<CameraComponent>().primary = true;
+}
+
+GameLayer::~GameLayer() {
+	UI::ClearBuffers();
+	Texture::ClearHandles();
+	Audio::ClearBuffers();
+	scene->Destroy();
+}
+
 void GameLayer::OnAttach() {
 	Ref<Texture> mantex = Texture::Create("man", "texture/man-sheet.png");
 	Ref<Texture> mantex2 = Texture::Create("man2","texture/man-sheet2.png");
@@ -9,16 +22,6 @@ void GameLayer::OnAttach() {
 	Ref<Texture> heart = Texture::Create("heart","texture/heart.png");
 
 	Audio::LoadSound("audio/bounce.wav", "bounce");
-
-	// Background
-	//Entity BG = scene->CreateEntity("Background");
-	//auto& BGcomponent = BG.AddComponent<SpriteRendererComponent>();
-	//float maxL = glm::max(camera.GetComponent<CameraComponent>().resolution);
-	//BGcomponent.texture = BGtex;
-	//BGcomponent.size = { maxL, maxL };
-	//BGcomponent.UVrepeat = 4;
-	//BGcomponent.parallelTexture = true;
-	//BGcomponent.order = -1;
 
 	// Player
 	man = scene->CreateEntity("Man");
@@ -40,7 +43,6 @@ void GameLayer::OnAttach() {
 	chest_colld.origin.y = -0.05f;
 
 	auto& man_transform = man.GetComponent<TransformComponent>();
-	//BG.GetComponent<TransformComponent>().parent = &man_transform;
 	camera.GetComponent<TransformComponent>().parent = &man_transform;
 
 	//Entity enemySpawner = scene->CreateEntity("Enemy Spawner");
@@ -48,7 +50,7 @@ void GameLayer::OnAttach() {
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
 	UI::Anchor(CENTER);
-	UI::CreateButton(
+	menuButton = UI::CreateButton(
 		"MENU",
 		0.75f,
 		Color::White,
@@ -63,7 +65,7 @@ void GameLayer::OnAttach() {
 }
 
 void GameLayer::OnUpdate(Time time) {
-	Layer::OnUpdate(time);
+	scene->OnUpdate(time);
 
 	if (time_left > 0) {
 		time_left -= time.deltaTime;
@@ -88,6 +90,9 @@ void GameLayer::OnUpdate(Time time) {
 	UI::DrawString(timestr, { 50, 430 + floatOffset }, 1.2f, texCol);
 	UI::Anchor(LEFT);
 	UI::DrawString(millitimestr, { 50, 425 + floatOffset }, 0.60f, texCol);
+
+	UI::Anchor(CENTER);
+	UI::DrawButton(menuButton, time);
 
 	UI::EndUI();
 }

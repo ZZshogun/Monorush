@@ -10,49 +10,38 @@ struct LayerState {
 };
 
 class Layer {
-protected:
-	Ref<Scene> scene = Scene::Create();
+public:
+	static void SetClearColor(glm::vec4 color);
+};
+
+class MenuLayer {
+private:
+	Ref<Scene> scene;
 	Entity camera;
+private:
+	bool in_setting = false;
+	Ref<UI::Button> playButton;
+	Ref<UI::Button> settingButton;
+	Ref<UI::Button> quitButton;
 public:
 	LayerState state{};
 
-	Layer() {
-		camera = scene->CreateEntity("Camera");
-		camera.AddComponent<CameraComponent>().primary = true;
-	}
-	~Layer() {
-		UI::ClearBuffers();
-		Texture::ClearHandles();
-		Audio::ClearBuffers();
-		scene->Destroy();
-	}
-
-	virtual void OnAttach() {}
-	virtual void OnUpdate(Time time) { 
-		scene->OnUpdate(time); 
-		UI::StartUI();
-		UI::Anchor(CENTER);
-		UI::DrawButtons(time); 
-		UI::EndUI();
-	}
-
-	static void SetClearColor(glm::vec4 color) {
-		glClearColor(color.r, color.g, color.b, color.a);
-	}
-};
-
-class MenuLayer : public Layer {
-public:
+	MenuLayer();
+	~MenuLayer();
 	void OnAttach();
-	void OnUpdate(Time time) override;
+	void OnUpdate(Time time);
 };
 
-class GameLayer : public Layer {
+class GameLayer {
+private:
+	Ref<Scene> scene;
+	Entity camera;
 private:
 	Entity man;
 	Entity chest;
+	Ref<UI::Button> menuButton;
 
-	glm::vec4 texCol = glm::vec4{ 0, 0, 0, 1 };
+	glm::vec4 texCol = Color::Black;
 	float time_left = 300;
 	float outoftimeLimit = 1.3f;
 	float outoftime = 0;
@@ -60,8 +49,12 @@ private:
 	float floatOffset = 0;
 
 public:
+	LayerState state{};
+
+	GameLayer();
+	~GameLayer();
 	void OnAttach();
-	void OnUpdate(Time time) override;
+	void OnUpdate(Time time);
 };
 
 #endif

@@ -16,7 +16,7 @@ public:
 	Scene();
 	static Ref<Scene> Create();
 	void Destroy();
-
+	
 	Entity CreateEntity(std::string name = "");
 
 	void OnUpdate(Time time);

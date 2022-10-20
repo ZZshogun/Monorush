@@ -1,11 +1,12 @@
 #include "Game.h"
 
-Game::Game(glm::vec2 screen_resolution) {
+Game::Game(glm::vec2 screen_resolution, bool logging) {
 	ScreenResolution = screen_resolution;
-	_Setup();
+	log = logging;
+	Setup();
 }
 
-void Game::_Setup() {
+void Game::Setup() {
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -44,23 +45,25 @@ void Game::_Setup() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	Shader::CompileAll();
+	glfwSwapInterval(1);
 
+	Audio::log = false;
+	UI::log = true;
+	Texture::log = false;
+	Shader::log = false;
+
+	Shader::Init();
+	Audio::Init();
+	UI::Init();
 	Texture::defaultTex = Texture::Create("sprite_default", "texture/sprite_default.png");
 
-	Audio::Init();
-
-	UI::Init();
-
-	std::cout << "START Game " << ScreenResolution.x << "x" << ScreenResolution.y << "\n";
-	_Loop();
+	if (log) std::cout << "START Game " << ScreenResolution.x << "x" << ScreenResolution.y << "\n";
+	Loop();
 }
 
-void Game::_Loop() {
-
+void Game::Loop() {
 	glClearColor(0.95f, 0.97f, 1, 1);
-
-	LoadLayer(layerIndex);
+	if (!LoadLayer(layerIndex)) return;
 
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -69,10 +72,12 @@ void Game::_Loop() {
 
 		Input::ScanKey(window);
 		Input::ScanMouse(window);
-		UI::PollsEvent(window);
+		UI::PollsEvent(window, time);
 
-		ProcessLayerState(layerIndex);
-		UpdateLayer(layerIndex, time);
+		if (ProcessLayerState(layerIndex)) {
+			UpdateLayer(layerIndex, time);
+		}
+		else glfwSetWindowShouldClose(window, true);
 
 		Input::ClearInputBuffer();
 
@@ -80,7 +85,7 @@ void Game::_Loop() {
 		glfwPollEvents();
 	}
 
-	std::cout << "---------------- CLEAN UP -----------------\n";
+	if (log) std::cout << "---------------- CLEAN UP -----------------\n";
 	glfwDestroyWindow(window);
 	glfwTerminate();
 	Audio::Destroy();
@@ -100,18 +105,18 @@ void Game::ClearLayer(int layerIndex) {
 	}
 }
 
-void Game::LoadLayer(int layerIndex) {
+bool Game::LoadLayer(int layerIndex) {
 	switch (layerIndex) {
 	case 0:
 		menuLayer = std::make_shared<MenuLayer>();
 		menuLayer->OnAttach();
-		break;
+		return true;
 	case 1:
 		gameLayer = std::make_shared<GameLayer>();
 		gameLayer->OnAttach();
-		break;
+		return true;
 	default:
-		break;
+		return false;
 	}
 }
 
@@ -128,7 +133,7 @@ void Game::UpdateLayer(int layerIndex, Time time) {
 	}
 }
 
-void Game::ProcessLayerState(int layerIndex) {
+bool Game::ProcessLayerState(int layerIndex) {
 	LayerState* layerState = NULL;
 
 	switch (layerIndex) {
@@ -139,7 +144,7 @@ void Game::ProcessLayerState(int layerIndex) {
 		layerState = &gameLayer->state;
 		break;
 	default:
-		return;
+		return false;
 	}
 
 	if (layerState->terminate) glfwSetWindowShouldClose(window, true);
@@ -148,8 +153,11 @@ void Game::ProcessLayerState(int layerIndex) {
 		int prevLayer = this->layerIndex;
 		if (layerState->sceneIndex != -1) this->layerIndex = layerState->sceneIndex;
 		else this->layerIndex = glm::clamp<int>(this->layerIndex + layerState->sceneAddition, 0, 256);
+		if (log) std::cout << "SWITCH Scene from " << prevLayer << " to " << this->layerIndex << "\n";
 		ClearLayer(prevLayer);
-		LoadLayer(this->layerIndex);
+		if (!LoadLayer(this->layerIndex)) return false;
 		*layerState = {};
 	}
+	
+	return true;
 }

@@ -6,7 +6,10 @@
 class AudioSource {
 	AudioSource();
 
+	static std::vector<ALuint> sourceBuffers;
+	friend class Audio;
 public:
+	static bool log;
 	static ALuint Create();
 
 	static void SetLooping(ALuint& source, bool loop);
@@ -26,15 +29,14 @@ public:
 };
 
 class Audio {
-
 	static bool init;
 	static ALCdevice* device;
 	static ALCcontext* context;
 
 	Audio();
 public:
-
-	static std::map<std::string, ALuint> AudioBuffers;
+	static std::map<std::string, ALuint*> AudioBuffers;
+	static bool log;
 
 	static void Init();
 	static void ClearBuffers();

@@ -1,6 +1,7 @@
 #include "Font.h"
 
 std::map<std::string, Font::FontFace> Font::fonts_map;
+bool Font::log = true;
 
 void Font::LoadFont(std::string name, std::string path, glm::ivec2 charsetsSize) {
 
@@ -54,7 +55,7 @@ void Font::LoadFont(std::string name, std::string path, glm::ivec2 charsetsSize)
 	FT_Done_Face(face);
 	FT_Done_FreeType(ftLibrary);
 
-	std::cout << "CREATE Font " << name << " " << path << "\n";
+	if (log) std::cout << "CREATE Font " << name << " " << path << "\n";
 }
 
 Font::FontFace& Font::GetFont(std::string fontName) {

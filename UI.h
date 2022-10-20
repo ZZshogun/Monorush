@@ -12,42 +12,69 @@ enum UIAnchor {
 };
 
 class UI {
-
+public:
 	// Holds button data
 	struct Button {
+		bool active = true;
+		bool draw = true;
 		std::string text = "";
 		float textScale = -1;
 		glm::vec4 textColor = Color::White;
-		glm::vec2 position = {0, 0};
-		glm::vec2 size = {-1, -1};
+		glm::vec2 position = { 0, 0 };
+		glm::vec2 size = { -1, -1 };
 		glm::vec4 color = Color::White;
 		glm::vec4 presscolor = Color::White;
 		Ref<Texture> texture = NULL;
-		glm::ivec2 ref_resolution = {-1, -1};
+		glm::ivec2 ref_resolution = { -1, -1 };
 		std::function<void()> hover_function = NULL;
 		std::function<void()> function = NULL;
 
+		const float resetPress = 0.1f;
 		const float resetBlink = 0.15f;
+		float blink = 0;
 		float press = 0;
 		glm::vec4 cur_color = Color::White;
 		bool hovered = false;
+		
+		Button() {
+			//std::cout << "CREATE Button " << text << "\n";
+		}
 
-		Button operator=(const Button b) {
-			this->text = b.text;
-			this->textScale = b.textScale;
-			this->textColor = b.textColor;
-			this->position = b.position;
-			this->size = b.size;
-			this->color = b.color;
-			this->presscolor = b.presscolor;
-			this->texture = b.texture;
-			this->ref_resolution = b.ref_resolution;
-			this->hover_function = b.hover_function;
-			this->function = b.function;
+		Button(std::string text, float texScale, glm::vec4 textColor, glm::vec2 position, glm::vec2 size,
+			glm::vec4 color, glm::vec4 pressColor, Ref<Texture>& texture, glm::ivec2 ref_res,
+			std::function<void()> hover_func, std::function<void()> func) :
+			text(text), textScale(texScale), textColor(textColor), position(position), size(size), color(color),
+			presscolor(pressColor), texture(texture), ref_resolution(ref_res), hover_function(hover_func),
+			function(func)
+		{
+			//std::cout << "CREATE Button " << text << "\n";
+		}
+
+		~Button() {
+			//std::cout << "DELETE Button " << text << "\n";
+		}
+
+		bool isValid() {
+			return size.x > 0 && size.y > 0 && textScale >= 0;
+		}
+
+		Button& operator=(const Button& b) {
+			text = b.text;
+			textScale = b.textScale;
+			textColor = b.textColor;
+			position = b.position;
+			size = b.size;
+			color = b.color;
+			presscolor = b.presscolor;
+			texture = b.texture;
+			ref_resolution = b.ref_resolution;
+			hover_function = b.hover_function;
+			function = b.function;
 			return *this;
 		}
 	};
 
+private:
 	UI();
 	static bool inUI;
 
@@ -59,21 +86,22 @@ class UI {
 	static std::string imageShader;
 
 	static GLuint vao;
-
 	static UIAnchor anchorMode;
-
-	static std::vector<Button> buttons;
-	static std::vector<Button> _buttons;
+	static std::vector<Ref<Button>> buttons;
+	static Button null_button;
 
 public:
 	static bool onEvents;
-	static Button* on_button;
+	static Ref<Button> on_button;
+	static Button hovering_button;
+
+	static bool log;
 
 	static void Init();
 	static void ClearBuffers();
 	static void Destroy();
 
-	static void PollsEvent(GLFWwindow* window);
+	static void PollsEvent(GLFWwindow* window, Time time);
 
 	static void StartUI();
 	static void StartUI(std::string fontName, std::string shader = "");
@@ -84,9 +112,10 @@ public:
 
 	static void DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm::vec4 color, std::string fontName = "");
 	static void DrawImage(Ref<Texture>& image, glm::ivec2 screen_pos, glm::ivec2 screen_size, glm::vec4 color = Color::White);
+	static void DrawButton(Ref<Button>& button, Time time);
 	static void DrawButtons(Time time);
 
-	static void CreateButton(
+	static Ref<Button> CreateButton(
 		std::string text,
 		float scale,
 		glm::vec4 textColor,
@@ -98,7 +127,7 @@ public:
 		glm::vec4 presscolor = Color::White,
 		std::function<void()> hover_function = [](){}
 	);
-	static void CreateButton(
+	static Ref<Button> CreateButton(
 		std::string text, 
 		float scale, 
 		glm::vec4 textColor,

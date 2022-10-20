@@ -9,7 +9,7 @@ class Texture {
 public:
 
 	static Ref<Texture> defaultTex;
-
+	static bool log;
 	static std::map <std::string, Ref<Texture>> library;
 
 	GLuint handle;

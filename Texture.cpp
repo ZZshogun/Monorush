@@ -1,6 +1,7 @@
 #include "Texture.h"
 
 Ref<Texture> Texture::defaultTex;
+bool Texture::log = true;
 std::map <std::string, Ref<Texture>> Texture::library;
 
 Texture::Texture(std::string name, const char* file, GLuint slot) {
@@ -37,7 +38,7 @@ Texture::Texture(std::string name, const char* file, GLuint slot) {
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	std::cout << "CREATE Texture " << handle << " " << file << "\n";
+	if (log) std::cout << "CREATE Texture " << handle << " " << file << "\n";
 
 	stbi_image_free(bytes);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -81,7 +82,7 @@ void Texture::Delete() {
 	if (disposed) return;
 
 	disposed = true;
-	std::cout << "DELETE Texture " << handle << "\n";
+	if (log) std::cout << "DELETE Texture " << handle << "\n";
 	glDeleteTextures(1, &handle);
 }
 

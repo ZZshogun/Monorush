@@ -3,6 +3,7 @@
 bool UI::inUI = false;
 bool UI::onEvents = false;
 Ref<UI::Button> UI::on_button = NULL;
+Ref<UI::Button> UI::clicked_button = NULL;
 
 glm::ivec2 UI::ref_resolution = {-1, -1};
 std::string UI::font_name = "PixelGameFont";
@@ -317,13 +318,21 @@ void UI::PollsEvent(GLFWwindow* window, Time time) {
 
 			if (button->active) {
 				if (!button->press && Input::mouseCode[Mouse_Left] == Input::KeyState::KEY_DOWN) {
-					if (button->function) button->function();
 					button->blink = button->resetBlink;
 					button->press = button->resetPress;
+					*button = hovering_button;
+					hovering_button = null_button;
+					clicked_button = button;
+					if (button->function) button->function();
+					UI::hovering_button = *button;
+					button->hover_function();
 				}
 				else {
 					button->press -= time.deltaTime;
-					if (button->press <= 0) button->press = 0;
+					if (button->press <= 0) {
+						button->press = 0;
+						clicked_button = NULL;
+					}
 				}
 			}
 			break;

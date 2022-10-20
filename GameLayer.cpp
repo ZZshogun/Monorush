@@ -57,7 +57,7 @@ void GameLayer::OnAttach() {
 		{ -850, 480 },
 		{ 160, 75 },
 		Color::Black,
-		[&]() { state.sceneAddition = -1; },
+		[&]() { state.SceneAddition(-1); },
 		Color::Black,
 		[]() { UI::on_button->textScale = 1; }
 	);

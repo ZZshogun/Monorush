@@ -93,6 +93,7 @@ private:
 public:
 	static bool onEvents;
 	static Ref<Button> on_button;
+	static Ref<Button> clicked_button;
 	static Button hovering_button;
 
 	static bool log;

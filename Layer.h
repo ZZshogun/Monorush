@@ -4,8 +4,16 @@
 #include "Scene.h"
 
 struct LayerState {
-	int sceneIndex = -1;
-	int sceneAddition = 0;
+	// SETTING
+	void SceneAddition(int addition) { currentSceneIndex += addition; }
+	void SwitchVolume() { volumeGain += 2.5f; if (volumeGain > 10) volumeGain = 0; else if (volumeGain < 0) volumeGain = 10; }
+	void ToggleFullScreen() { fullScreen = !fullScreen; }
+	void Terminate() { terminate = true; }
+
+	// RESPONSE
+	int currentSceneIndex = 0;
+	float volumeGain = 10;
+	bool fullScreen = false;
 	bool terminate = false;
 };
 
@@ -28,8 +36,7 @@ private:
 
 	// Settings
 	Ref<UI::Button> fulLScreenButton;
-	Ref<UI::Button> addVolume;
-	Ref<UI::Button> subVolume;
+	Ref<UI::Button> volumeButton;
 	Ref<UI::Button> backButton;
 
 

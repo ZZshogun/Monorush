@@ -3,6 +3,16 @@
 
 #include "Core.h"
 
+class AudioBuffer {
+public:
+	static bool log;
+
+	ALuint handle;
+	AudioBuffer(std::string file);
+	~AudioBuffer();
+	static Ref<AudioBuffer> Create(std::string file);
+};
+
 class AudioSource {
 	AudioSource();
 
@@ -22,7 +32,7 @@ public:
 	static void SetAttenuationBeginDistance(ALuint& source, float distance);
 	static void SetMaxAttenuationDistance(ALuint& source, float distance);
 
-	static void Play(ALuint& source, ALuint& buffer);
+	static void Play(ALuint& source, Ref<AudioBuffer>& buffer);
 	static void Pause(ALuint& source);
 	static void Resume(ALuint& source);
 	static void Stop(ALuint& source);
@@ -35,7 +45,7 @@ class Audio {
 
 	Audio();
 public:
-	static std::map<std::string, ALuint*> AudioBuffers;
+	static std::map<std::string, Ref<AudioBuffer>> AudioBuffers;
 	static bool log;
 
 	static void Init();
@@ -48,6 +58,7 @@ public:
 	static void SetListenerGain(float gain);
 	static void SetListenerPitch(float pitch);
 
+	static float GetListenerGain();
 };
 
 #endif

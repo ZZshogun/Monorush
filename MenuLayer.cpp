@@ -2,7 +2,7 @@
 
 void OnButtonHover() {
 	auto& button = UI::on_button;
-	button->textScale += 0.35f;
+	button->textScale *= 1.2f;
 	button->text = "- " + button->text + " -";
 }
 
@@ -31,19 +31,19 @@ void MenuLayer::OnAttach() {
 		Color::Black,
 		{ 0, -150 },
 		{ 230, 70 },
-		{ 0, 1, 0, 1 },
-		[&]() { state.sceneAddition = 1; },
+		{ 0, 1, 0, 0 },
+		[&]() { state.SceneAddition(1); },
 		Color::Transparent,
 		OnButtonHover
 	);
 
 	settingButton = UI::CreateButton(
-		"SET.TING",
+		"SETTING",
 		1.25f,
 		Color::Black,
 		{ 0, -270 },
 		{ 270, 70 },
-		{ 0, 1, 0, 1 },
+		{ 0, 1, 0, 0 },
 		[&]() { in_setting = true; },
 		Color::Transparent,
 		OnButtonHover
@@ -55,20 +55,38 @@ void MenuLayer::OnAttach() {
 		Color::Black,
 		{ 0, -390 },
 		{ 150, 70 },
-		{ 0, 1, 0, 1 },
-		[&]() { state.terminate = true; },
+		{ 0, 1, 0, 0 },
+		[&]() { state.Terminate(); },
 		Color::Transparent,
 		OnButtonHover
 	);
 
 	fulLScreenButton = UI::CreateButton(
-		"SCREEN : WINDOWED",
-		2,
+		state.fullScreen ? "SCREEN : FULLSCREEN" : "SCREEN : WINDOWED",
+		1.0f,
 		Color::Black,
-		{ 0, -200 },
-		{ 250, 100 },
+		{ 0, 100 },
+		{ 500, 65 },
 		{ 0, 1, 0, 1 },
-		[&]() {},
+		[&]() { 
+			state.ToggleFullScreen();
+			UI::clicked_button->text = state.fullScreen ? "SCREEN : FULLSCREEN" : "SCREEN : WINDOWED";
+		},
+		Color::Transparent,
+		OnButtonHover
+	);
+
+	volumeButton = UI::CreateButton(
+		"VOLUME : " + std::to_string((int)(state.volumeGain * 10)) + "%",
+		1.0f,
+		Color::Black,
+		{ 0, 0 },
+		{ 400, 65 },
+		{ 0, 1, 0, 1 },
+		[&]() { 
+			state.SwitchVolume();
+			UI::clicked_button->text = "VOLUME : " + std::to_string((int)(state.volumeGain * 10)) + "%";
+		},
 		Color::Transparent,
 		OnButtonHover
 	);
@@ -100,6 +118,8 @@ void MenuLayer::OnUpdate(Time time) {
 		UI::Anchor(CENTER);
 		if (backButton) {
 			UI::DrawButton(backButton, time);
+			UI::DrawButton(fulLScreenButton, time);
+			UI::DrawButton(volumeButton, time);
 		}
 	}
 	else {

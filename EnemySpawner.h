@@ -1,5 +1,5 @@
-#ifndef ENEMY_SPAWNER_CLASS_H
-#define ENEMY_SPAWNER_CLASS_H
+#ifndef ENEMY_SPAWNER_H
+#define ENEMY_SPAWNER_H
 
 #include "ScriptableEntity.h"
 

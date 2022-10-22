@@ -27,7 +27,11 @@ void CollisionCreate(entt::registry& registry, entt::entity entity) {
 	if (registry.any_of<SpriteRendererComponent>(entity))
 		size = glm::vec3(registry.get<SpriteRendererComponent>(entity).size, 0);
 	size *= registry.get<TransformComponent>(entity).scale;
-	registry.get<CollisionComponent>(entity).size = { size.x, size.y };
+	auto& col = registry.get<CollisionComponent>(entity);
+	col.size = { size.x, size.y };
+	col.handle = VAO::Create();
+	col.material = Material::Create({ 0, 1, 0, 1 });
+	Sprite::Create(col.handle, col.size, col.material);
 }
 
 void AudioSourceCreate(entt::registry& registry, entt::entity entity) {
@@ -58,7 +62,7 @@ Entity Scene::CreateEntity(std::string name) {
 void Scene::OnUpdate(Time time) {
 	// Native Script Component
 	scene_registry.view<NativeScriptComponent>().each([=](auto entity, auto& script) {
-		if (script.active) {
+		if (script.active && scene_registry.get<TagComponent>(entity).active) {
 			if (!script.instance) {
 				script.instance = script.InstantiateScript();
 				script.instance->entity = Entity{ entity, &scene_registry };
@@ -76,7 +80,7 @@ void Scene::OnUpdate(Time time) {
 			rigidGroup.get<TransformComponent, RigidbodyComponent, CollisionComponent>(entity);
 		rigidbody.position = transform.position;
 	
-		if (!rigidbody.active || !collision.active) continue;
+		if (!rigidbody.active || !collision.active || !scene_registry.get<TagComponent>(entity).active) continue;
 	
 		glm::vec3 vel = rigidbody.velocity;
 	
@@ -103,6 +107,7 @@ void Scene::OnUpdate(Time time) {
 	// Transform parent inheritance
 	auto transformView = scene_registry.view<TransformComponent>();
 	for (auto entity : transformView) {
+		if (!scene_registry.get<TagComponent>(entity).active) continue;
 		auto& transform = transformView.get<TransformComponent>(entity);
 		if (transform.parent) {
 			transform.position = transform.parent->position;
@@ -117,7 +122,7 @@ void Scene::OnUpdate(Time time) {
 	for (auto entity : cameraGroup) {
 		auto [transform, camera] =
 			cameraGroup.get<TransformComponent, CameraComponent>(entity);
-		if (camera.active && camera.primary) {
+		if (camera.active && camera.primary && scene_registry.get<TagComponent>(entity).active) {
 			Transform t = { transform.position, transform.rotation, transform.scale };
 			for (auto& it : Shader::LUT)
 				Camera::Update(t, camera.resolution, it.second);
@@ -132,7 +137,7 @@ void Scene::OnUpdate(Time time) {
 	for (auto entity : audioGroup) {
 		auto [audioSource, transform] = 
 			audioGroup.get<AudioSourceComponent, TransformComponent>(entity);
-		if (!audioSource.active) continue;
+		if (!audioSource.active || !scene_registry.get<TagComponent>(entity).active) continue;
 
 		AudioSource::SetPosition(audioSource.source, transform.position);
 		if (scene_registry.any_of<RigidbodyComponent>(entity)) {
@@ -156,7 +161,7 @@ void Scene::OnUpdate(Time time) {
 	for (auto entity : listenerGroup) {
 		auto [listener, transform] = 
 			listenerGroup.get<AudioListenerComponent, TransformComponent>(entity);
-		if (!listener.active || !listener.listening) continue;
+		if (!listener.active || !listener.listening || !scene_registry.get<TagComponent>(entity).active) continue;
 		Audio::SetListenerPosition(transform.position);
 		if (scene_registry.any_of<RigidbodyComponent>(entity)) {
 			auto& rigidbody = scene_registry.get<RigidbodyComponent>(entity);
@@ -180,7 +185,7 @@ void Scene::OnUpdate(Time time) {
 			auto [transformC, sprite] =
 				renderGroup.get<TransformComponent, SpriteRendererComponent>(entity);
 			
-			if (!sprite.active) continue;
+			if (!sprite.active || !scene_registry.get<TagComponent>(entity).active) continue;
 
 			Transform transform = { transformC.position, transformC.rotation, transformC.scale };
 
@@ -232,9 +237,23 @@ void Scene::OnUpdate(Time time) {
 				Sprite::Resize(sprite.handle, sprite.size, sprite.UVrepeat);
 			}
 
+			if (scene_registry.any_of<CollisionComponent>(entity)) {
+				auto& collision = scene_registry.get<CollisionComponent>(entity);
+				if (collision.drawBox) {
+					Transform col_t = transform;
+					col_t.position += glm::vec3(collision.origin, 0);
+					Sprite::Resize(collision.handle, collision.size, 1);
+					Renderer::DrawSprite(
+						collision.handle,
+						col_t,
+						collision.material,
+						{ 0, 0 }
+					);
+				}
+			}
+
 			Renderer::DrawSprite(
 				sprite.handle,
-				sprite.size,
 				transform,
 				material,
 				sprite.textureOffset
@@ -242,7 +261,7 @@ void Scene::OnUpdate(Time time) {
 		}
 
 		scene_registry.view<NativeScriptComponent>().each([=](auto entity, auto& script) {
-			if (script.active) {
+			if (script.active && scene_registry.get<TagComponent>(entity).active) {
 				script.instance->OnDrawUI(time);
 			}
 		});

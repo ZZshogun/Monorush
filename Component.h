@@ -7,6 +7,7 @@ class ScriptableEntity;
 
 struct TagComponent {
 	std::string tag;
+	bool active = true;
 };
 
 struct TransformComponent {
@@ -71,6 +72,9 @@ struct AudioSourceComponent {
 
 struct CollisionComponent {
 	bool active = true;
+	bool drawBox = false;
+	Ref<VAO> handle;
+	Ref<Material> material;
 	glm::vec2 origin = { 0, 0 };
 	glm::vec2 size = { 1, 1 };
 };

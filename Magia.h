@@ -11,5 +11,6 @@
 #include "Time.h"
 #include "Audio.h"
 #include "Font.h"
+#include "Noise.h"
 
 #endif

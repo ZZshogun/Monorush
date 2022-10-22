@@ -18,6 +18,8 @@
 #include <memory>
 #include <string>
 #include <map>
+#include <queue>
+#include <random>
 #include <assert.h>
 
 #include <stb/stb_image.h>
@@ -34,6 +36,8 @@
 
 #include <ft2build.h>
 #include <freetype/freetype.h>
+
+#include <FastNoise/FastNoise.h>
 
 #include "GLMHelper.h"
 #include "MathHelper.h"

@@ -66,8 +66,8 @@ void MenuLayer::OnAttach() {
 		1.0f,
 		Color::Black,
 		{ 0, 100 },
-		{ 500, 65 },
-		{ 0, 1, 0, 1 },
+		{ 550, 65 },
+		{ 0, 1, 0, 0 },
 		[&]() { 
 			state.ToggleFullScreen();
 			UI::clicked_button->text = state.fullScreen ? "SCREEN : FULLSCREEN" : "SCREEN : WINDOWED";
@@ -82,7 +82,7 @@ void MenuLayer::OnAttach() {
 		Color::Black,
 		{ 0, 0 },
 		{ 400, 65 },
-		{ 0, 1, 0, 1 },
+		{ 0, 1, 0, 0 },
 		[&]() { 
 			state.SwitchVolume();
 			UI::clicked_button->text = "VOLUME : " + std::to_string((int)(state.volumeGain * 10)) + "%";

@@ -46,19 +46,17 @@ void Game::Setup() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	glfwSwapInterval(1);
-
 	Audio::log = true;
 	UI::log = false;
 	Texture::log = false;
-	Shader::log = false;
+	Shader::log = true;
+	Noise::log = true;
 
 	Shader::Init();
 	Audio::Init();
 	UI::Init();
-	Texture::defaultTex = Texture::Create("sprite_default", "texture/sprite_default.png");
-
-	if (log) std::cout << "START Game " << ScreenResolution.x << "x" << ScreenResolution.y << "\n";
+	Noise::Init();
+	Texture::Init();
 	Loop();
 }
 
@@ -98,7 +96,7 @@ void Game::SetFullscreen(bool status) {
 	if (fullscreen) {
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		auto mode = glfwGetVideoMode(monitor);
-		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
+		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 		glViewport(0, 0, mode->width, mode->height);
 	}
 	else {

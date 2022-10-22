@@ -1,6 +1,7 @@
 #include "Layer.h"
 #include "PlayerController.h"
 #include "EnemySpawner.h"
+#include "BoxSpawner.h"
 
 GameLayer::GameLayer() {
 	scene = Scene::Create();
@@ -18,10 +19,12 @@ GameLayer::~GameLayer() {
 void GameLayer::OnAttach() {
 	Ref<Texture> mantex = Texture::Create("man", "texture/man-sheet.png");
 	Ref<Texture> mantex2 = Texture::Create("man2","texture/man-sheet2.png");
-	Ref<Texture> chesttex = Texture::Create("chest","texture/chest.png");
+	Ref<Texture> boxtex = Texture::Create("box","texture/box.png");
 	Ref<Texture> heart = Texture::Create("heart","texture/heart.png");
 
 	Audio::LoadSound("audio/bounce.wav", "bounce");
+
+	Noise::RandomSeed();
 
 	// Player
 	man = scene->CreateEntity("Man");
@@ -31,19 +34,18 @@ void GameLayer::OnAttach() {
 	anim_man.AddAnimation(2, mantex2, { 2, 1 }, 3);
 	man.AddComponent<NativeScriptComponent>().Bind<PlayerController>();
 	man.AddComponent<RigidbodyComponent>();
-	man.AddComponent<CollisionComponent>().size.x = 0.45f;
+	auto& man_col = man.AddComponent<CollisionComponent>();
+	man_col.size = { 0.35f, 0.9f };
+	man_col.origin = { 0.01f, -0.02f };
 	man.AddComponent<AudioSourceComponent>();
 
-	// Chest
-	chest = scene->CreateEntity("Chest");
-	chest.AddComponent<SpriteRendererComponent>().texture = chesttex;
-	chest.GetComponent<TransformComponent>().position = { -2, -1, 0 };
-	auto& chest_colld = chest.AddComponent<CollisionComponent>();
-	chest_colld.size.y = 0.75f;
-	chest_colld.origin.y = -0.05f;
+	// Box Spawner
+	boxSpawner = scene->CreateEntity("Box Spawner");
+	boxSpawner.AddComponent<NativeScriptComponent>().Bind<BoxSpawner>();
 
 	auto& man_transform = man.GetComponent<TransformComponent>();
 	camera.GetComponent<TransformComponent>().parent = &man_transform;
+	boxSpawner.GetComponent<TransformComponent>().parent = &man_transform;
 
 	//Entity enemySpawner = scene->CreateEntity("Enemy Spawner");
 	//enemySpawner.AddComponent<NativeScriptComponent>().Bind<EnemySpawner>();

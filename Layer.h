@@ -55,7 +55,7 @@ private:
 	Entity camera;
 private:
 	Entity man;
-	Entity chest;
+	Entity boxSpawner;
 	Ref<UI::Button> menuButton;
 
 	glm::vec4 texCol = Color::Black;

@@ -126,6 +126,9 @@
     <ClCompile Include="Layer.cpp">
       <Filter>Source Files\Magia</Filter>
     </ClCompile>
+    <ClCompile Include="Noise.cpp">
+      <Filter>Source Files\Magia</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="unlit.vert">
@@ -229,6 +232,12 @@
     </ClInclude>
     <ClInclude Include="UI.h">
       <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="BoxSpawner.h">
+      <Filter>Header Files\Ext</Filter>
+    </ClInclude>
+    <ClInclude Include="Noise.h">
+      <Filter>Header Files\Magia</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

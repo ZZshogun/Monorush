@@ -12,8 +12,8 @@ class Time {
 	friend class Game;
 public:
 	float timeScale = 1;
-	float deltaTime;
-	float unscaledDeltaTime;
+	float deltaTime = 0;
+	float unscaledDeltaTime = 0;
 
 	static std::string FormatMinute(float seconds, bool spacing = false);
 	static std::string FormatMilli(float seconds);

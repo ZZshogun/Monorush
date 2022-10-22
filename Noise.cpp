@@ -9,7 +9,7 @@ bool Noise::log = true;
 
 void Noise::Init() {
 	std::random_device dev;
-	std::mt19937 rng(dev());
+	rng = RNG(dev());
 	rng.seed((unsigned)time(NULL));
 	int16_dist = std::uniform_int_distribution<int16_t>(INT16_MIN, INT16_MAX);
 	RandomSeed();

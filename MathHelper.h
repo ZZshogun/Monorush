@@ -18,6 +18,11 @@ namespace Math {
 		if (start.x <= point.x && start.y <= point.y && point.x <= end.x && point.y <= end.y) return true;
 		else return false;
 	}
+
+	template <typename T> 
+	static int Sign(T val) {
+		return (T(0) < val) - (val < T(0));
+	}
 }
 
 #endif

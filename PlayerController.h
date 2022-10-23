@@ -11,6 +11,8 @@ public:
 	RigidbodyComponent* rigidbody = NULL;
 	AnimatorComponent* animator = NULL;
 	AudioSourceComponent* audio = NULL;
+	CollisionComponent* collider = NULL;
+	SpriteRendererComponent* sprite = NULL;
 
 	const int maxPlayerHealth = 5;
 	int playerHeath = maxPlayerHealth;
@@ -34,14 +36,18 @@ public:
 	Ref<UI::Button> healButton;
 
 	void Hurt() {
+		if (playerHeath <= 0) return;
 		playerHeath = glm::clamp<int>(playerHeath - 1, 0, maxPlayerHealth);
 		heartsCol[(size_t)playerHeath] = glm::vec4{1, 0.11f, 0.28f, 1};
+		sprite->albedo = { 1, 0.41f, 0.38f, 1 };
 		hurt = true;
 	}
 
 	void Heal() {
+		if (playerHeath >= maxPlayerHealth) return;
 		playerHeath = glm::clamp<int>(playerHeath + 1, 0, maxPlayerHealth);
 		heartsCol[(size_t)playerHeath - 1] = glm::vec4{ 0.11f, 1, 0.28f, 1 };
+		sprite->albedo = { 0.12f, 1, 0.12f, 1 };
 		heal = true;
 	}
 
@@ -50,6 +56,8 @@ public:
 		rigidbody = &GetComponent<RigidbodyComponent>();
 		animator = &GetComponent<AnimatorComponent>();
 		audio = &GetComponent<AudioSourceComponent>();
+		collider = &GetComponent<CollisionComponent>();
+		sprite = &GetComponent<SpriteRendererComponent>();
 
 		for (int i = 0; i < maxPlayerHealth; i++) heartsCol.emplace_back(0, 0, 0, 1);
 
@@ -113,10 +121,15 @@ public:
 			}
 		}
 
-		if (dir.x > 0)
-			animator->current_id = 1;
-		else if (dir.x < 0)
+		if (glm::length(dir) > 0) {
 			animator->current_id = 2;
+		}
+		else {
+			animator->current_id = 1;
+		}
+
+		if (dir.x < 0) transform->scale.x = -1;
+		else if (dir.x > 0) transform->scale.x = 1;
 
 		if (hurt) {
 			blinktime += time.deltaTime;
@@ -124,6 +137,7 @@ public:
 				blinktime = 0;
 				hurt = false;
 				heartsCol[(size_t)playerHeath] = {0, 0, 0 , 0.25f};
+				sprite->albedo = { 1, 1, 1, 1 };
 			}
 		}
 		if (heal) {
@@ -132,6 +146,7 @@ public:
 				blinktime = 0;
 				heal = false;
 				heartsCol[(size_t)playerHeath - 1] = { 0, 0, 0 , 1 };
+				sprite->albedo = { 1, 1, 1, 1 };
 			}
 		}
 	}

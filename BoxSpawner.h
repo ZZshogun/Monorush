@@ -23,7 +23,7 @@ public:
 		transform = &GetComponent<TransformComponent>();
 		for (int i = 0; i < count; i++) {
 			Entity entity = Instantiate();
-			entity.AddComponent<CollisionComponent>().drawBox = true;
+			entity.AddComponent<CollisionComponent>().drawBox = false;
 			entity.AddComponent<SpriteRendererComponent>().texture = Texture::library["box"];
 			auto& tag = entity.GetComponent<TagComponent>();
 			tag.active = false;

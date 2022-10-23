@@ -17,8 +17,8 @@ GameLayer::~GameLayer() {
 }
 
 void GameLayer::OnAttach() {
-	Ref<Texture> mantex = Texture::Create("man", "texture/man-sheet.png");
-	Ref<Texture> mantex2 = Texture::Create("man2","texture/man-sheet2.png");
+	Ref<Texture> manIdletex = Texture::Create("manIdle", "texture/player_idle_sheet.png");
+	Ref<Texture> manRuntex = Texture::Create("manRun", "texture/player_run_sheet.png");
 	Ref<Texture> boxtex = Texture::Create("box","texture/box.png");
 	Ref<Texture> heart = Texture::Create("heart","texture/heart.png");
 
@@ -30,14 +30,13 @@ void GameLayer::OnAttach() {
 	man = scene->CreateEntity("Man");
 	man.AddComponent<SpriteRendererComponent>().order = 1;
 	auto& anim_man = man.AddComponent<AnimatorComponent>();
-	anim_man.AddAnimation(1, mantex, { 2, 1 }, 3);
-	anim_man.AddAnimation(2, mantex2, { 2, 1 }, 3);
+	anim_man.AddAnimation(1, manIdletex, { 2, 1 }, 3);
+	anim_man.AddAnimation(2, manRuntex, { 6, 1 }, 6);
 	man.AddComponent<NativeScriptComponent>().Bind<PlayerController>();
 	man.AddComponent<RigidbodyComponent>();
 	auto& man_col = man.AddComponent<CollisionComponent>();
-	man_col.size = { 0.35f, 0.85f };
-	man_col.origin = { 0.01f, -0.02f };
-	man_col.drawBox = true;
+	man_col.size = { 0.35f, 0.9f };
+	man_col.drawBox = false;
 	man.AddComponent<AudioSourceComponent>();
 
 	// Box Spawner

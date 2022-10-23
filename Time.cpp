@@ -1,11 +1,11 @@
 #include "Time.h"
 
 void Time::_UpdateTime(float time) {
-	this->_prevTime = this->_currentTime;
-	this->_currentTime = time;
+	_prevTime = _currentTime;
+	_currentTime = time;
 
-	this->unscaledDeltaTime = this->_currentTime - this->_prevTime;
-	this->deltaTime = this->timeScale * this->unscaledDeltaTime;
+	unscaledDeltaTime = glm::clamp(_currentTime - _prevTime, 0.0f, 0.06f);
+	deltaTime = timeScale * unscaledDeltaTime;
 }
 
 std::string Time::FormatMinute(float seconds, bool spacing) {

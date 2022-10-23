@@ -78,8 +78,7 @@ public:
 	}
 
 	void OnUpdate(Time time){
-		glm::vec2 dir = Input::WASDAxis();
-		dir *= playerSpeed;
+		glm::vec2 dir = Input::WASDAxis() * playerSpeed;
 		if (dir.x && dir.y) dir /= glm::sqrt(2);
 		rigidbody->velocity = glm::vec3(dir, 0);
 

@@ -3,14 +3,18 @@
 
 #include "Component.h"
 
+struct BoxPacket {
+	bool collided = false;
+	float depth = 0;
+	glm::vec2 normal = { 0, 0 };
+};
+
 struct CollisionPacket {
-	int count = 0;
-	std::vector<glm::vec3> positions;
+	std::vector<BoxPacket> boxes;
 };
 
 class Collision {
-	static bool _InBox(glm::vec2 box_low, glm::vec2 box_high, glm::vec2 point);
-	static bool _BoxCollision(CollisionComponent& a, CollisionComponent& b,
+	static BoxPacket _BoxCollision(CollisionComponent& a, CollisionComponent& b,
 		glm::vec2 translate_a, glm::vec2 translate_b);
 	Collision();
 public:

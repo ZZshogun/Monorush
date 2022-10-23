@@ -81,26 +81,19 @@ void Scene::OnUpdate(Time time) {
 		rigidbody.position = transform.position;
 	
 		if (!rigidbody.active || !collision.active || !scene_registry.get<TagComponent>(entity).active) continue;
-	
-		glm::vec3 vel = rigidbody.velocity;
-	
+
+		rigidbody.position += rigidbody.velocity * time.deltaTime;
+		glm::vec2 push_dpos = { 0, 0 };
+
 		CollisionPacket packet = Collision::Check(entity, scene_registry);
-		if (packet.count) {
-			for (glm::vec3 other : packet.positions) {
-				float dot = glm::dot(glm::vec3{0, 1, 0}, glm::normalize(transform.position - other));
-				const float cos45deg = 0.707107f * 1.15f;
-				if (glm::abs(dot) > cos45deg) {
-					if (dot > 0 && vel.y < 0) vel.y = 0;
-					else if (dot < 0 && vel.y > 0) vel.y = 0;
-				}
-				else {
-					if (transform.position.x >= other.x && vel.x < 0) vel.x = 0;
-					else if (transform.position.x <= other.x && vel.x > 0) vel.x = 0;
-				}
-			}
+		for (auto& box : packet.boxes) {
+			glm::vec2 push = box.normal * box.depth;
+
+			if (glm::abs(push_dpos.x) < glm::abs(push.x)) push_dpos.x = push.x;
+			if (glm::abs(push_dpos.y) < glm::abs(push.y)) push_dpos.y = push.y;
 		}
-	
-		rigidbody.position += vel * time.deltaTime;
+
+		rigidbody.position += glm::vec3(push_dpos, 0);
 		transform.position = rigidbody.position;
 	}
 

@@ -35,8 +35,9 @@ void GameLayer::OnAttach() {
 	man.AddComponent<NativeScriptComponent>().Bind<PlayerController>();
 	man.AddComponent<RigidbodyComponent>();
 	auto& man_col = man.AddComponent<CollisionComponent>();
-	man_col.size = { 0.35f, 0.9f };
+	man_col.size = { 0.35f, 0.85f };
 	man_col.origin = { 0.01f, -0.02f };
+	man_col.drawBox = true;
 	man.AddComponent<AudioSourceComponent>();
 
 	// Box Spawner

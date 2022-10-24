@@ -255,7 +255,8 @@ void Scene::OnUpdate(Time time) {
 
 		scene_registry.view<NativeScriptComponent>().each([=](auto entity, auto& script) {
 			if (script.active && scene_registry.get<TagComponent>(entity).active) {
-				script.instance->OnDrawUI(time);
+				if (script.instance)
+					script.instance->OnDrawUI(time);
 			}
 		});
 	}	

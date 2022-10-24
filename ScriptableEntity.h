@@ -29,6 +29,19 @@ public:
 		e.AddComponent<TransformComponent>();
 		return e;
 	}
+
+	Entity FindEntityOfName(std::string name) {
+		auto view = entity.registry->view<TagComponent>();
+		Entity search;
+		for (auto entity : view) {
+			if (!view.get<TagComponent>(entity).active) continue;
+			if (view.get<TagComponent>(entity).tag == name) {
+				search = { entity, this->entity.registry };
+				break;
+			}
+		}
+		return search;
+	}
 };
 
 

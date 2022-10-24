@@ -18,6 +18,10 @@ public:
 	Entity();
 	Entity(entt::entity handle, entt::registry* registry);
 
+	bool IsValid() {
+		return this->registry->valid(handle);
+	}
+
 	template <typename T>
 	bool HasComponent() {
 		return this->registry->any_of<T>(this->handle);

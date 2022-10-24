@@ -54,7 +54,7 @@ private:
 	Ref<Scene> scene;
 	Entity camera;
 private:
-	Entity man;
+	Entity player;
 	Entity boxSpawner;
 	Ref<UI::Button> menuButton;
 

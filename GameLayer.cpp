@@ -17,8 +17,9 @@ GameLayer::~GameLayer() {
 }
 
 void GameLayer::OnAttach() {
-	Ref<Texture> manIdletex = Texture::Create("manIdle", "texture/player_idle_sheet.png");
-	Ref<Texture> manRuntex = Texture::Create("manRun", "texture/player_run_sheet.png");
+	Ref<Texture> playerIdletex = Texture::Create("playerIdle", "texture/player_idle_sheet.png");
+	Ref<Texture> playerRuntex = Texture::Create("playerRun", "texture/player_run_sheet.png");
+	Ref<Texture> enemyTex = Texture::Create("enemy", "texture/enemy.png");
 	Ref<Texture> boxtex = Texture::Create("box","texture/box.png");
 	Ref<Texture> heart = Texture::Create("heart","texture/heart.png");
 
@@ -27,28 +28,28 @@ void GameLayer::OnAttach() {
 	Noise::RandomSeed();
 
 	// Player
-	man = scene->CreateEntity("Man");
-	man.AddComponent<SpriteRendererComponent>().order = 1;
-	auto& anim_man = man.AddComponent<AnimatorComponent>();
-	anim_man.AddAnimation(1, manIdletex, { 2, 1 }, 3);
-	anim_man.AddAnimation(2, manRuntex, { 6, 1 }, 6);
-	man.AddComponent<NativeScriptComponent>().Bind<PlayerController>();
-	man.AddComponent<RigidbodyComponent>();
-	auto& man_col = man.AddComponent<CollisionComponent>();
-	man_col.size = { 0.35f, 0.9f };
-	man_col.drawBox = false;
-	man.AddComponent<AudioSourceComponent>();
+	player = scene->CreateEntity("Player");
+	player.AddComponent<SpriteRendererComponent>().order = 1;
+	auto& anim_player = player.AddComponent<AnimatorComponent>();
+	anim_player.AddAnimation(1, playerIdletex, { 2, 1 }, 3);
+	anim_player.AddAnimation(2, playerRuntex, { 6, 1 }, 6);
+	player.AddComponent<NativeScriptComponent>().Bind<PlayerController>();
+	player.AddComponent<RigidbodyComponent>();
+	auto& player_col = player.AddComponent<CollisionComponent>();
+	player_col.size = { 0.35f, 0.9f };
+	player_col.drawBox = false;
+	player.AddComponent<AudioSourceComponent>();
 
 	// Box Spawner
 	boxSpawner = scene->CreateEntity("Box Spawner");
 	boxSpawner.AddComponent<NativeScriptComponent>().Bind<BoxSpawner>();
 
-	auto& man_transform = man.GetComponent<TransformComponent>();
-	camera.GetComponent<TransformComponent>().parent = &man_transform;
-	boxSpawner.GetComponent<TransformComponent>().parent = &man_transform;
+	auto& player_transform = player.GetComponent<TransformComponent>();
+	camera.GetComponent<TransformComponent>().parent = &player_transform;
+	boxSpawner.GetComponent<TransformComponent>().parent = &player_transform;
 
-	//Entity enemySpawner = scene->CreateEntity("Enemy Spawner");
-	//enemySpawner.AddComponent<NativeScriptComponent>().Bind<EnemySpawner>();
+	Entity enemySpawner = scene->CreateEntity("Enemy Spawner");
+	enemySpawner.AddComponent<NativeScriptComponent>().Bind<EnemySpawner>();
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
 	UI::Anchor(CENTER);

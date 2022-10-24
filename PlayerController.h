@@ -14,6 +14,11 @@ public:
 	CollisionComponent* collider = NULL;
 	SpriteRendererComponent* sprite = NULL;
 
+	glm::vec2 col_idle_size = { 0.35f, 0.9f };
+	glm::vec2 col_idle_offset = { 0, 0 };
+	glm::vec2 col_run_size = { 0.35f, 0.7f };
+	glm::vec2 col_run_offset = { 0, -0.12f };
+
 	const int maxPlayerHealth = 5;
 	int playerHeath = maxPlayerHealth;
 	int cbullet = 12;
@@ -123,9 +128,12 @@ public:
 
 		if (glm::length(dir) > 0) {
 			animator->current_id = 2;
+			collider->size = col_run_size;
+			collider->origin = col_run_offset;
 		}
 		else {
 			animator->current_id = 1;
+			collider->origin = col_idle_offset;
 		}
 
 		if (dir.x < 0) transform->scale.x = -1;

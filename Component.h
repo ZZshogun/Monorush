@@ -133,11 +133,6 @@ struct NativeScriptComponent {
 	
 		InstantiateScript();
 	}
-
-	template<typename T>
-	auto Get() {
-		return (static_cast<T*>(instance));
-	}
 };
 
 #endif

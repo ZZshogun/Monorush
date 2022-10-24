@@ -239,6 +239,9 @@
     <ClInclude Include="Noise.h">
       <Filter>Header Files\Magia</Filter>
     </ClInclude>
+    <ClInclude Include="EnemyController.h">
+      <Filter>Header Files\Ext</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="texture\tile.png">

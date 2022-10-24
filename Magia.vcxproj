@@ -193,6 +193,7 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="EBO.h" />
+    <ClInclude Include="EnemyController.h" />
     <ClInclude Include="EnemySpawner.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Font.h" />

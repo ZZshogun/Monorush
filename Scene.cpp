@@ -6,10 +6,10 @@ void CameraCreate(entt::registry& registry, entt::entity entity) {
 
 void SpriteCreate(entt::registry& registry, entt::entity entity) {
 	auto& sprite = registry.get<SpriteRendererComponent>(entity);
-	if (!sprite.texture) sprite.texture = Texture::defaultTex;
-	sprite.handle = VAO::Create();
-	Ref<Material> material = Material::Create(sprite.texture, sprite.albedo);
-	Sprite::Create(sprite.handle, sprite.size, material);
+	if (!sprite.GetTexture()) sprite.SetTexture(Texture::defaultTex);
+	sprite.Pointer() = VAO::Create();
+	Ref<Material> material = Material::Create(sprite.GetTexture(), sprite.Albedo());
+	Sprite::Create(sprite.Pointer(), sprite.Data(), sprite.Albedo(), material);
 }
 
 void SpriteSheetCreate(entt::registry& registry, entt::entity entity) {
@@ -25,13 +25,13 @@ void AnimatorCreate(entt::registry& registry, entt::entity entity) {
 void CollisionCreate(entt::registry& registry, entt::entity entity) {
 	glm::vec3 size = { 1, 1, 0 };
 	if (registry.any_of<SpriteRendererComponent>(entity))
-		size = glm::vec3(registry.get<SpriteRendererComponent>(entity).size, 0);
+		size = glm::vec3(registry.get<SpriteRendererComponent>(entity).Size(), 0);
 	size *= registry.get<TransformComponent>(entity).scale;
 	auto& col = registry.get<CollisionComponent>(entity);
-	col.size = { size.x, size.y };
-	col.handle = VAO::Create();
-	col.material = Material::Create({ 0, 1, 0, 1 });
-	Sprite::Create(col.handle, col.size, col.material);
+	col.Size({size.x, size.y});
+	col.Pointer() = VAO::Create();
+	col.GetMaterial() = Material::Create({0, 1, 0, 1});
+	Sprite::Create(col.Pointer(), col.Data(), col.Size(), col.GetMaterial());
 }
 
 void AudioSourceCreate(entt::registry& registry, entt::entity entity) {
@@ -88,6 +88,14 @@ void Scene::OnUpdate(Time time) {
 		CollisionPacket packet = Collision::Check(entity, scene_registry);
 		for (auto& box : packet.boxes) {
 			glm::vec2 push = box.normal * box.depth;
+
+			float massMultiplier = 1;
+			if (box.rigidbody && !box.rigidbody->isStatic) {
+				massMultiplier = box.rigidbody->mass / rigidbody.mass;
+				push /= 2.0f;
+				box.rigidbody->position -= glm::vec3(push, 0);
+			}
+			push *= massMultiplier;
 
 			if (glm::abs(push_dpos.x) < glm::abs(push.x)) push_dpos.x = push.x;
 			if (glm::abs(push_dpos.y) < glm::abs(push.y)) push_dpos.y = push.y;
@@ -183,73 +191,93 @@ void Scene::OnUpdate(Time time) {
 			Transform transform = { transformC.position, transformC.rotation, transformC.scale };
 
 			if (sprite.parallelTexture)
-				sprite.textureOffset = glm::vec2{ transform.position.x, transform.position.y } / sprite.UVrepeat;
+				sprite.TextureOffset(glm::vec2{ transform.position.x, transform.position.y } / sprite.UVRepeat());
 
-			Ref<Material> material;
+			Ref<Material> material = Material::Create(sprite.GetTexture(), sprite.Albedo());
 
 			// Sprite sheet resizing
 			if (scene_registry.any_of<SpriteSheetComponent>(entity)) {
 				auto& spriteSheet = scene_registry.get<SpriteSheetComponent>(entity);
-				if (!spriteSheet.sheet) continue;
+				if (!spriteSheet.SpriteSheet()) continue;
 
-				if (spriteSheet.drawIndex < 0) spriteSheet.drawIndex = (int)spriteSheet.size.x - 1;
-				else spriteSheet.drawIndex %= (int)spriteSheet.size.x;
+				int sheetIndex = spriteSheet.DrawAtIndex();
+				int sheetSizeP = spriteSheet.SizePerSprite();
+				glm::vec2 sheetSize = spriteSheet.Size();
 
-				float offset = (float)spriteSheet.drawIndex * spriteSheet.sizePerSprite;
-				glm::vec2 start = glm::vec2{ offset, 0 } / spriteSheet.size;
-				glm::vec2 end = glm::vec2{ offset + spriteSheet.sizePerSprite, 1 } / spriteSheet.size;
+				if (sheetIndex < 0) sheetIndex = (int)(sheetSize.x / sheetSizeP) - 1;
+				else sheetIndex %= (int)(sheetSize.x / sheetSizeP);
 
-				material = Material::Create(spriteSheet.sheet, sprite.albedo);
-				Sprite::Resize(sprite.handle, sprite.size, start, end);
+				spriteSheet.DrawAtIndex(sheetIndex);
+
+				if (spriteSheet.UpdateRequired()) {
+					float offset = (float)spriteSheet.DrawAtIndex() * spriteSheet.SizePerSprite();
+					glm::vec2 start = glm::vec2{ offset, 0 } / spriteSheet.Size();
+					glm::vec2 end = glm::vec2{ offset + spriteSheet.SizePerSprite(), 1 } / spriteSheet.Size();
+
+					material.reset();
+					material = Material::Create(spriteSheet.SpriteSheet(), sprite.Albedo());
+					Sprite::Resize(sprite.Pointer(), sprite.Data(), sprite.Size(), start, end);
+				}
 			}
 			// Animator resizing
 			else if (scene_registry.any_of<AnimatorComponent>(entity)) {
 				auto& animator = scene_registry.get<AnimatorComponent>(entity);
-				if (animator.current_id == INT_MAX) continue;
-				auto& aniObject = animator.animation_map[animator.current_id];
-
-				if (aniObject.drawIndex < 0) aniObject.drawIndex = (int)aniObject.size.x - 1;
-				else aniObject.drawIndex %= (int)aniObject.size.x;
+				if (animator.GetCurrentIndex() == INT_MAX) continue;
+				auto& aniObject = animator.GetCurrentAnimation();
 
 				aniObject._currentTime += time.deltaTime;
-				if (aniObject._currentTime >= 1.0f / aniObject.fps) {
-					aniObject.drawIndex++;
+				if (aniObject._currentTime >= 1.0f / aniObject.FPS()) {
+					aniObject.DrawAtIndex(aniObject.DrawAtIndex() + 1);
 					aniObject._currentTime = 0;
 				}
 
-				float offset = (float)aniObject.drawIndex * aniObject.sizePerSprite;
-				glm::vec2 start = glm::vec2{ offset, 0 } / aniObject.size;
-				glm::vec2 end = glm::vec2{ offset + aniObject.sizePerSprite, 1 } / aniObject.size;
+				int sheetIndex = aniObject.DrawAtIndex();
+				int sheetSizeP = aniObject.SizePerSprite();
+				glm::vec2 sheetSize = aniObject.Size();
 
-				material = Material::Create(aniObject.animation, sprite.albedo);
-				Sprite::Resize(sprite.handle, sprite.size, start, end);
-			}
-			// Default resizing
-			else {
-				material = Material::Create(sprite.texture, sprite.albedo);
-				Sprite::Resize(sprite.handle, sprite.size, sprite.UVrepeat);
-			}
+				if (sheetIndex < 0) sheetIndex = (int)(sheetSize.x / sheetSizeP) - 1;
+				else sheetIndex %= (int)(sheetSize.x / sheetSizeP);
 
-			if (scene_registry.any_of<CollisionComponent>(entity)) {
-				auto& collision = scene_registry.get<CollisionComponent>(entity);
-				if (collision.drawBox) {
-					Transform col_t = transform;
-					col_t.position += glm::vec3(collision.origin, 0);
-					Sprite::Resize(collision.handle, collision.size, 1);
-					Renderer::DrawSprite(
-						collision.handle,
-						col_t,
-						collision.material,
-						{ 0, 0 }
-					);
+				aniObject.DrawAtIndex(sheetIndex);
+
+				if (aniObject.UpdateRequired() || animator.UpdateRequired()) {
+					float offset = (float)aniObject.DrawAtIndex() * aniObject.SizePerSprite();
+					glm::vec2 start = glm::vec2{ offset, 0 } / aniObject.Size();
+					glm::vec2 end = glm::vec2{ offset + aniObject.SizePerSprite(), 1 } / aniObject.Size();
+
+					material.reset();
+					material = Material::Create(aniObject.AnimationSheet(), sprite.Albedo());
+					Sprite::Resize(sprite.Pointer(), sprite.Data(), sprite.Size(), start, end);
 				}
 			}
+			// Default resizing
+			else if (sprite.UpdateRequired()) {
+				Sprite::Resize(sprite.Pointer(), sprite.Data(), sprite.Size(), sprite.UVRepeat());
+			}
 
+			// Collsion box visualization
+			CollisionComponent* collision = scene_registry.try_get<CollisionComponent>(entity);
+			if (collision && collision->DrawBox()) {
+				Transform col_t = transform;
+				col_t.position += glm::vec3(collision->Origin(), 0);
+
+				if (collision->UpdateRequired())
+					Sprite::Resize(collision->Pointer(), collision->Data(), collision->Size(), 1);
+
+				Renderer::DrawSprite(
+					collision->Pointer(),
+					col_t,
+					collision->GetMaterial(),
+					{ 0, 0 }
+				);
+			}
+
+			// Draw
 			Renderer::DrawSprite(
-				sprite.handle,
+				sprite.Pointer(),
 				transform,
 				material,
-				sprite.textureOffset
+				sprite.TextureOffset()
 			);
 		}
 

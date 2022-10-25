@@ -6,6 +6,10 @@ EBO::EBO(std::vector<GLuint>& indices) {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), indices.data(), GL_DYNAMIC_DRAW);
 }
 
+Ref<EBO> EBO::Create(std::vector<GLuint>& indices) {
+	return std::make_shared<EBO>(indices);
+}
+
 void EBO::Bind() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle);
 }

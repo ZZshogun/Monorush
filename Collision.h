@@ -7,6 +7,7 @@ struct BoxPacket {
 	bool collided = false;
 	float depth = 0;
 	glm::vec2 normal = { 0, 0 };
+	RigidbodyComponent* rigidbody = NULL;
 };
 
 struct CollisionPacket {

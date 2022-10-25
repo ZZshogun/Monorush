@@ -3,11 +3,11 @@
 BoxPacket Collision::_BoxCollision(CollisionComponent& a, CollisionComponent& b,
 	glm::vec2 translate_a, glm::vec2 translate_b) 
 {
-	glm::vec2 a_low = a.origin - a.size / 2.0f + translate_a;
-	glm::vec2 a_high = a.origin + a.size / 2.0f + translate_a;
+	glm::vec2 a_low = a.Origin() - a.Size() / 2.0f + translate_a;
+	glm::vec2 a_high = a.Origin() + a.Size() / 2.0f + translate_a;
 
-	glm::vec2 b_low = b.origin - b.size / 2.0f + translate_b;
-	glm::vec2 b_high = b.origin + b.size / 2.0f + translate_b;
+	glm::vec2 b_low = b.Origin() - b.Size() / 2.0f + translate_b;
+	glm::vec2 b_high = b.Origin() + b.Size() / 2.0f + translate_b;
 
 	float depth = std::numeric_limits<float>::max();
 	glm::vec2 normal = {0, 0};
@@ -49,8 +49,13 @@ CollisionPacket Collision::Check(entt::entity entity, entt::registry& registry) 
 		auto& transformB = registry.get<TransformComponent>(other);
 		glm::vec2 translate_a = { transformA.position.x, transformA.position.y };
 		glm::vec2 translate_b = { transformB.position.x, transformB.position.y };
-		BoxPacket boxpacketA = _BoxCollision(collision, other_collision, translate_a, translate_b);
-		if (boxpacketA.collided) packet.boxes.push_back(boxpacketA);
+		BoxPacket boxpacket = _BoxCollision(collision, other_collision, translate_a, translate_b);
+		if (boxpacket.collided) {
+			boxpacket.rigidbody = registry.try_get<RigidbodyComponent>(other);
+			if (boxpacket.rigidbody && !boxpacket.rigidbody->active) boxpacket.rigidbody = NULL;
+			packet.boxes.push_back(boxpacket);
+			
+		}
 	}
 
 	return packet;

@@ -10,10 +10,13 @@ std::string UI::font_name = "PixelGameFont";
 std::string UI::glyphShader = "glyph";
 std::string UI::imageShader = "image";
 
-GLuint UI::vao;
 std::vector<Ref<UI::Button>> UI::buttons;
 UI::Button UI::hovering_button{};
 UI::Button UI::null_button{};
+
+Ref<VAO> UI::vao;
+Ref<VBO> UI::vbo;
+Ref<EBO> UI::ebo;
 
 UIAnchor UI::anchorMode = LEFT;
 
@@ -30,19 +33,38 @@ void UI::Init() {
 	Font::LoadFont("Arial", "font/arial.ttf", {0, 48});
 	Font::LoadFont("PixelGameFont", "font/PixelGameFont.ttf", {0, 48});
 
+	std::vector<GLuint> indices = {
+		0, 3, 1,
+		1, 3, 2,
+	};
+
+	std::vector<Vertex> vertices = {
+			Vertex{ glm::vec3{ 0, 0, 0 }, glm::vec2{ 0, 1 } },
+			Vertex{ glm::vec3{ 0, 1, 0 }, glm::vec2{ 0, 0 } },
+			Vertex{ glm::vec3{ 1, 1, 0 }, glm::vec2{ 1, 0 } },
+			Vertex{ glm::vec3{ 0, 1, 0 }, glm::vec2{ 1, 1} },
+	};
+
+	vao = VAO::Create();
+	vao->Bind();
+	vbo = VBO::Create(vertices);
+	ebo = EBO::Create(indices);
+	vao->Unbind();
+	vbo->Unbind();
+	ebo->Unbind();
+
 	if (log) std::cout << "INIT UI\n";
 }
 
 void UI::ClearBuffers() {
-	for (auto& e : buttons) {
-		//std::cout << e->text << "\n";
-		e.reset();
-	}
+	for (auto& e : buttons) e.reset();
 	buttons.clear();
 }
 
 void UI::Destroy() {
-	glDeleteVertexArrays(1, &vao);
+	vao->Delete();
+	vbo->Delete();
+	ebo->Delete();
 	if (log) std::cout << "DELETE UI\n";
 }
 
@@ -56,10 +78,8 @@ void UI::StartUI(glm::ivec2 ref_resolution, std::string fontName, std::string sh
 	if (fontName != "") UI::font_name = fontName;
 	if (shader != "") UI::glyphShader = shader;
 
-	glGenVertexArrays(1, &vao);
-
+	vao->Bind();
 	anchorMode = LEFT;
-
 	inUI = true;
 }
 
@@ -87,18 +107,12 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 		return;
 	}
 
-	std::vector<GLuint> indices = {
-		0, 3, 1,
-		1, 3, 2,
-	};
-
 	std::string ftname = fontName == "" ? font_name : fontName;
 	Ref<Shader>& shader = Shader::LUT[glyphShader];
 	shader->Bind();
 
 	glUniform4f(glGetUniformLocation(shader->handle, "fColor"), color.r, color.g, color.b, color.a);
 	glActiveTexture(GL_TEXTURE0);
-	glBindVertexArray(vao);
 
 	float offsetx = 0;
 	float offsety = 0;
@@ -143,21 +157,17 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 		//Texture::defaultTex->Bind();
 		glUniform1i(glGetUniformLocation(shader->handle, "tex0"), 0);
 
-		VBO vbo(vertices);
-		EBO ebo(indices);
+		vbo->Subdata(vertices);
+		vbo->Bind();
+		ebo->Bind();
 
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
+		vao->LinkAttrib(*vbo.get(), 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+		vao->LinkAttrib(*vbo.get(), 1, 2, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
 
-		glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, (void*)0);
+		glDrawElements(GL_TRIANGLES, (GLsizei)6, GL_UNSIGNED_INT, (void*)0);
 
-		vbo.Unbind();
-		ebo.Unbind();
-
-		vbo.Delete();
-		ebo.Delete();
+		vbo->Unbind();
+		ebo->Unbind();
 
 		x += (ftChar.advance >> 6) * scale;
 	}
@@ -169,11 +179,6 @@ void UI::DrawImage(Ref<Texture>& image, glm::ivec2 screen_pos, glm::ivec2 screen
 		std::cout << "ERROR UI No starting UI block\n";
 		return;
 	}
-
-	std::vector<GLuint> indices = {
-		0, 3, 1,
-		1, 3, 2,
-	};
 
 	glm::vec2 scr_pos = ratioRef(screen_pos);
 	glm::vec2 scr_size = ratioRef(screen_size);
@@ -201,26 +206,21 @@ void UI::DrawImage(Ref<Texture>& image, glm::ivec2 screen_pos, glm::ivec2 screen
 
 	glUniform4f(glGetUniformLocation(shader->handle, "fColor"), color.r, color.g, color.b, color.a);
 	glActiveTexture(GL_TEXTURE0);
-	glBindVertexArray(vao);
 
 	image->Bind();
 	image->TexUnit(shader, "tex0", 0);
 
-	VBO vbo(vertices);
-	EBO ebo(indices);
+	vbo->Subdata(vertices);
+	vbo->Bind();
+	ebo->Bind();
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
+	vao->LinkAttrib(*vbo.get(), 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+	vao->LinkAttrib(*vbo.get(), 1, 2, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
 
-	glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, (void*)0);
+	glDrawElements(GL_TRIANGLES, (GLsizei)6, GL_UNSIGNED_INT, (void*)0);
 
-	vbo.Unbind();
-	ebo.Unbind();
-
-	vbo.Delete();
-	ebo.Delete();
+	vbo->Unbind();
+	ebo->Unbind();
 }
 
 Ref<UI::Button> UI::CreateButton(
@@ -290,7 +290,9 @@ void UI::EndUI() {
 	}
 
 	ref_resolution = { -1, -1 };
-	glDeleteVertexArrays(1, &vao);
+	vao->Unbind();
+	vbo->Unbind();
+	ebo->Unbind();
 	inUI = false;
 }
 

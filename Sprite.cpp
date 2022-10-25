@@ -30,26 +30,26 @@ std::vector<Vertex> Sprite::GetVertices(glm::vec2 size, float UVLimit) {
 	return vertices;
 }
 
-void Sprite::Create(Ref<VAO>& handle, glm::vec2 size, Ref<Material>& material, float UVLimit) {
+void Sprite::Create(Ref<VAO>& handle, Ref<VBO>& data, glm::vec2 size, Ref<Material>& material, float UVLimit) {
 	std::vector<Vertex> vertices = GetVertices(size, UVLimit);
 
 	handle->Bind();
 
-	VBO vbo(vertices);
+	if (data) data.reset();
+	data = VBO::Create(vertices);
 	EBO ebo(_indices_square);
 
-	handle->LinkAttrib(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
-	handle->LinkAttrib(vbo, 1, 2, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
+	handle->LinkAttrib(*data, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+	handle->LinkAttrib(*data, 1, 2, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
 
 	handle->Unbind();
-	vbo.Unbind();
+	data->Unbind();
 	ebo.Unbind();
 
-	vbo.Delete();
 	ebo.Delete();
 }
 
-void Sprite::Resize(Ref<VAO>& handle, glm::vec2 size, glm::vec2 start, glm::vec2 end) {
+void Sprite::Resize(Ref<VAO>& handle, Ref<VBO>& data, glm::vec2 size, glm::vec2 start, glm::vec2 end) {
 	handle->Bind();
 
 	float h_width = size.x / 2;
@@ -61,17 +61,16 @@ void Sprite::Resize(Ref<VAO>& handle, glm::vec2 size, glm::vec2 start, glm::vec2
 		{glm::vec3{h_width, -h_height, 0}, glm::vec2{end.x, start.y}},
 	};
 
-	VBO vbo(vertices);
-	handle->LinkAttrib(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
-	handle->LinkAttrib(vbo, 1, 2, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
+	data->Subdata(vertices);
+	data->Bind();
+	handle->LinkAttrib(*data, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+	handle->LinkAttrib(*data, 1, 2, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
 
 	handle->Unbind();
-	vbo.Unbind();
-
-	vbo.Delete();
+	data->Unbind();
 }
 
-void Sprite::Resize(Ref<VAO>& handle, glm::vec2 size, float UVrepeat) {
+void Sprite::Resize(Ref<VAO>& handle, Ref<VBO>& data, glm::vec2 size, float UVrepeat) {
 	handle->Bind();
 
 	float h_width = size.x / 2;
@@ -83,12 +82,11 @@ void Sprite::Resize(Ref<VAO>& handle, glm::vec2 size, float UVrepeat) {
 		{glm::vec3{h_width, -h_height, 0}, glm::vec2{UVrepeat, 0}},
 	};
 
-	VBO vbo(vertices);
-	handle->LinkAttrib(vbo, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
-	handle->LinkAttrib(vbo, 1, 2, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
+	data->Subdata(vertices);
+	data->Bind();
+	handle->LinkAttrib(*data, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+	handle->LinkAttrib(*data, 1, 2, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
 
 	handle->Unbind();
-	vbo.Unbind();
-
-	vbo.Delete();
+	data->Unbind();
 }

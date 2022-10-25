@@ -85,10 +85,13 @@ private:
 	static std::string glyphShader;
 	static std::string imageShader;
 
-	static GLuint vao;
 	static UIAnchor anchorMode;
 	static std::vector<Ref<Button>> buttons;
 	static Button null_button;
+
+	static Ref<VAO> vao;
+	static Ref<VBO> vbo;
+	static Ref<EBO> ebo;
 
 public:
 	static bool onEvents;

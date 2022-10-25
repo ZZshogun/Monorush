@@ -44,7 +44,7 @@ public:
 		if (playerHeath <= 0) return;
 		playerHeath = glm::clamp<int>(playerHeath - 1, 0, maxPlayerHealth);
 		heartsCol[(size_t)playerHeath] = glm::vec4{1, 0.11f, 0.28f, 1};
-		sprite->albedo = { 1, 0.41f, 0.38f, 1 };
+		sprite->Albedo({1, 0.41f, 0.38f, 1});
 		hurt = true;
 	}
 
@@ -52,7 +52,7 @@ public:
 		if (playerHeath >= maxPlayerHealth) return;
 		playerHeath = glm::clamp<int>(playerHeath + 1, 0, maxPlayerHealth);
 		heartsCol[(size_t)playerHeath - 1] = glm::vec4{ 0.11f, 1, 0.28f, 1 };
-		sprite->albedo = { 0.12f, 1, 0.12f, 1 };
+		sprite->Albedo({ 0.12f, 1, 0.12f, 1 });
 		heal = true;
 	}
 
@@ -127,13 +127,13 @@ public:
 		}
 
 		if (glm::length(dir) > 0) {
-			animator->current_id = 2;
-			collider->size = col_run_size;
-			collider->origin = col_run_offset;
+			animator->SetAnimationIndex(2);
+			collider->Size(col_run_size);
+			collider->Origin(col_run_offset);
 		}
 		else {
-			animator->current_id = 1;
-			collider->origin = col_idle_offset;
+			animator->SetAnimationIndex(1);
+			collider->Origin(col_idle_offset);
 		}
 
 		if (dir.x < 0) transform->scale.x = -1;
@@ -145,7 +145,7 @@ public:
 				blinktime = 0;
 				hurt = false;
 				heartsCol[(size_t)playerHeath] = {0, 0, 0 , 0.25f};
-				sprite->albedo = { 1, 1, 1, 1 };
+				sprite->Albedo({1, 1, 1, 1});
 			}
 		}
 		if (heal) {
@@ -154,7 +154,7 @@ public:
 				blinktime = 0;
 				heal = false;
 				heartsCol[(size_t)playerHeath - 1] = { 0, 0, 0 , 1 };
-				sprite->albedo = { 1, 1, 1, 1 };
+				sprite->Albedo({ 1, 1, 1, 1 });
 			}
 		}
 	}

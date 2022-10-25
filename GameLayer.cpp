@@ -36,20 +36,22 @@ void GameLayer::OnAttach() {
 	player.AddComponent<NativeScriptComponent>().Bind<PlayerController>();
 	player.AddComponent<RigidbodyComponent>();
 	auto& player_col = player.AddComponent<CollisionComponent>();
-	player_col.size = { 0.35f, 0.9f };
-	player_col.drawBox = false;
+	player_col.Size({0.35f, 0.9f});
+	player_col.DrawBox(false);
 	player.AddComponent<AudioSourceComponent>();
 
 	// Box Spawner
 	boxSpawner = scene->CreateEntity("Box Spawner");
 	boxSpawner.AddComponent<NativeScriptComponent>().Bind<BoxSpawner>();
 
+	// Enemy Spawner
+	Entity enemySpawner = scene->CreateEntity("Enemy Spawner");
+	enemySpawner.AddComponent<NativeScriptComponent>().Bind<EnemySpawner>();
+
 	auto& player_transform = player.GetComponent<TransformComponent>();
 	camera.GetComponent<TransformComponent>().parent = &player_transform;
 	boxSpawner.GetComponent<TransformComponent>().parent = &player_transform;
-
-	Entity enemySpawner = scene->CreateEntity("Enemy Spawner");
-	enemySpawner.AddComponent<NativeScriptComponent>().Bind<EnemySpawner>();
+	enemySpawner.GetComponent<TransformComponent>().parent = &player_transform;
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
 	UI::Anchor(CENTER);

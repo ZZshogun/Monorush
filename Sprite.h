@@ -38,9 +38,9 @@ public:
 	};
 
 	static std::vector<Vertex> GetVertices(glm::vec2 size, float UVLimit);
-	static void Create(Ref<VAO>& handle, glm::vec2 size, Ref<Material>& material, float UVLimit = 1);
-	static void Resize(Ref<VAO>& handle, glm::vec2 size, glm::vec2 start = {0, 0}, glm::vec2 end = {1, 1});
-	static void Resize(Ref<VAO>& handle, glm::vec2 size, float UVrepeat);
+	static void Create(Ref<VAO>& handle, Ref<VBO>& data, glm::vec2 size, Ref<Material>& material, float UVLimit = 1);
+	static void Resize(Ref<VAO>& handle, Ref<VBO>& data, glm::vec2 size, glm::vec2 start = {0, 0}, glm::vec2 end = {1, 1});
+	static void Resize(Ref<VAO>& handle, Ref<VBO>& data, glm::vec2 size, float UVrepeat);
 };
 
 #endif 

@@ -8,6 +8,7 @@ class EBO {
 public:
 	GLuint handle;
 	EBO(std::vector<GLuint>& indices);
+	static Ref<EBO> Create(std::vector<GLuint>& indices);
 	void Bind();
 	void Unbind();
 	void Delete();

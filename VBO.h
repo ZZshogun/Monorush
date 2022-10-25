@@ -15,6 +15,8 @@ class VBO {
 public:
 	GLuint handle;
 	VBO(std::vector<Vertex>& vertices);
+	static Ref<VBO> Create(std::vector<Vertex>& vertices);
+	void Subdata(std::vector<Vertex>& vertices);
 	void Bind();
 	void Unbind();
 	void Delete();

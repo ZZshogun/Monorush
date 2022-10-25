@@ -23,9 +23,9 @@ public:
 		transform = &GetComponent<TransformComponent>();
 		for (int i = 0; i < count; i++) {
 			Entity entity = Instantiate();
-			entity.AddComponent<CollisionComponent>().drawBox = false;
+			entity.AddComponent<CollisionComponent>().DrawBox(false);
 			auto& sprite = entity.AddComponent<SpriteRendererComponent>();
-			sprite.texture = Texture::library["box"];
+			sprite.SetTexture(Texture::library["box"]);
 			auto& tag = entity.GetComponent<TagComponent>();
 			tag.active = false;
 			tag.tag = "Box " + std::to_string(i + 1);

@@ -29,4 +29,6 @@ void Renderer::DrawSprite(
 	);
 
 	glDrawElements(GL_TRIANGLES, (GLsizei)Sprite::_indices_square.size(), GL_UNSIGNED_INT, (void*)0);
+
+	handle->Unbind();
 }

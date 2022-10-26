@@ -223,6 +223,10 @@ void UI::DrawImage(Ref<Texture>& image, glm::ivec2 screen_pos, glm::ivec2 screen
 	ebo->Unbind();
 }
 
+void UI::DrawImage(glm::ivec2 screen_pos, glm::ivec2 screen_size, glm::vec4 color) {
+	DrawImage(Texture::defaultTex, screen_pos, screen_size, color);
+}
+
 Ref<UI::Button> UI::CreateButton(
 	std::string text,
 	float scale,

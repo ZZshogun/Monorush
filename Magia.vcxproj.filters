@@ -242,6 +242,9 @@
     <ClInclude Include="EnemyController.h">
       <Filter>Header Files\Ext</Filter>
     </ClInclude>
+    <ClInclude Include="GameManager.h">
+      <Filter>Header Files\Ext</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="texture\tile.png">

@@ -57,20 +57,13 @@ private:
 	Entity player;
 	Entity boxSpawner;
 	Ref<UI::Button> menuButton;
-
-	glm::vec4 texCol = Color::Black;
-	float time_left = 301;
-	float outoftimeLimit = 1.3f;
-	float outoftime = 0;
-	float floatOffsetSpeed = 250;
-	float floatOffset = 0;
-
 public:
 	LayerState state{};
 
 	GameLayer();
 	~GameLayer();
 	void OnAttach();
+	void OnStart();
 	void OnUpdate(Time time);
 };
 

@@ -1,4 +1,5 @@
 #include "Layer.h"
+#include "GameManager.h"
 #include "PlayerController.h"
 #include "EnemySpawner.h"
 #include "BoxSpawner.h"
@@ -29,7 +30,8 @@ void GameLayer::OnAttach() {
 
 	// Player
 	player = scene->CreateEntity("Player");
-	player.AddComponent<SpriteRendererComponent>().order = 1;
+	player.GetComponent<TagComponent>().tag = "Player";
+	player.AddComponent<SpriteRendererComponent>().order = 2;
 	auto& anim_player = player.AddComponent<AnimatorComponent>();
 	anim_player.AddAnimation(1, playerIdletex, { 2, 1 }, 3);
 	anim_player.AddAnimation(2, playerRuntex, { 6, 1 }, 6);
@@ -69,35 +71,64 @@ void GameLayer::OnAttach() {
 	UI::EndUI();
 }
 
-void GameLayer::OnUpdate(Time time) {
+PlayerController* playerController = NULL;
+glm::vec4 texCol = Color::Black;
+float outoftimeLimit = 1.3f, outoftime = 0;
+float floatOffsetSpeed = 250, floatOffset = 0;
+float opacityIncSpeed = 3, resetScreenOpacity = 0;
+float resetUIWaitTime = 0.67f, resetCountTime = 0;
+
+void GameLayer::OnStart() {
+	Time time;
 	scene->OnUpdate(time);
 
-	if (time_left > 0) {
-		time_left -= time.deltaTime;
-		time_left = glm::clamp<float>(time_left, 0, INFINITY);
-	}
-	else if (outoftimeLimit <= 5)  {
-		texCol = glm::vec4{ 1, 0.41f, 0.38f, 1 };
+	playerController = &player.GetScript<PlayerController>();
 
-		outoftime += time.deltaTime;
-		if (outoftime >= outoftimeLimit) {
-			floatOffset += time.deltaTime * floatOffsetSpeed;
-		}
-	}
+}
+
+void GameLayer::OnUpdate(Time time) {
+	GameManager::Update(time);
+	scene->OnUpdate(time);
+
+	float time_left = GameManager::remainingTime;
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
-
-	std::string timestr = Time::FormatMinute(time_left);
-	std::string millitimestr = "." + Time::FormatMilli(time_left);
-	UI::Anchor(CENTER);
-	UI::DrawString("- TIME LEFT -", { 0, 500 + floatOffset }, 1.25f, Color::Black);
-	UI::Anchor(RIGHT);
-	UI::DrawString(timestr, { 50, 430 + floatOffset }, 1.2f, texCol);
-	UI::Anchor(LEFT);
-	UI::DrawString(millitimestr, { 55, 430 + floatOffset }, 0.60f, texCol);
-
 	UI::Anchor(CENTER);
 	UI::DrawButton(menuButton, time);
-
 	UI::EndUI();
+
+	if (outoftime <= 5) {
+		if (time_left <= 0) {
+			texCol = glm::vec4{ 1, 0.41f, 0.38f, 1 };
+
+			outoftime += time.deltaTime;
+			if (outoftime >= outoftimeLimit) {
+				floatOffset += time.deltaTime * floatOffsetSpeed;
+			}
+		}
+
+		UI::StartUI(glm::ivec2{ 1920, 1080 });
+
+		std::string timestr = Time::FormatMinute(time_left);
+		std::string millitimestr = "." + Time::FormatMilli(time_left);
+		UI::Anchor(CENTER);
+		UI::DrawString("- TIME LEFT -", { 0, 500 + floatOffset }, 1.25f, Color::Black);
+		UI::Anchor(RIGHT);
+		UI::DrawString(timestr, { 50, 430 + floatOffset }, 1.2f, texCol);
+		UI::Anchor(LEFT);
+		UI::DrawString(millitimestr, { 55, 440 + floatOffset }, 0.60f, texCol);
+
+		if (GameManager::gameOver) {
+			menuButton->active = false;
+			if (resetCountTime >= resetUIWaitTime) {
+				resetScreenOpacity += opacityIncSpeed * time.deltaTime;
+				resetScreenOpacity = glm::min<float>(resetScreenOpacity, 1);
+				UI::Anchor(CENTER);
+				UI::DrawImage({ 0, 0 }, { 1920, 1080 }, { 0, 0, 0, resetScreenOpacity * 0.75f });
+			}
+			else resetCountTime += time.deltaTime;
+		}
+
+		UI::EndUI();
+	}
 }

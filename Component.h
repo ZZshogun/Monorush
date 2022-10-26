@@ -6,8 +6,9 @@
 class ScriptableEntity;
 
 struct TagComponent {
-	std::string tag;
 	bool active = true;
+	std::string name;
+	std::string tag;
 };
 
 struct TransformComponent {
@@ -24,7 +25,7 @@ struct SpriteRendererComponent {
 
 public:
 	void SetTexture(Ref<Texture>& texture) { this->texture = texture; update = true; }
-	void Albedo(glm::vec4 color) {
+	void Color(glm::vec4 color) {
 		if (albedo == color) return;
 		albedo = color;
 		update = true;
@@ -44,9 +45,13 @@ public:
 		update = true; 
 	}
 	
-	bool UpdateRequired() { return update; }
+	bool UpdateRequired() { 
+		bool ret = update;
+		update = false;
+		return ret;
+	}
 	Ref<Texture>& GetTexture() { return texture; }
-	glm::vec4 Albedo() { return albedo; }
+	glm::vec4 Color() { return albedo; }
 	glm::vec2 Size() { return size; }
 	glm::vec2 TextureOffset() { return textureOffset; }
 	float UVRepeat() { return UVrepeat; }
@@ -54,11 +59,11 @@ public:
 	Ref<VBO>& Data() { return data; }
 
 private:
-	bool update = false;
+	bool update = true;
 	Ref<VAO> handle;
 	Ref<VBO> data;
 	Ref<Texture> texture;
-	glm::vec4 albedo = { 1, 1, 1, 1 };
+	glm::vec4 albedo = Color::White;
 	glm::vec2 size = { 1, 1 };
 	glm::vec2 textureOffset = { 0, 0 };
 	float UVrepeat = 1;
@@ -125,7 +130,11 @@ public:
 		update = true;
 	}
 
-	bool UpdateRequired() { return update; }
+	bool UpdateRequired() {
+		bool ret = update;
+		update = false;
+		return ret;
+	}
 	bool DrawBox() { return drawBox; }
 	glm::vec2 Origin() { return origin; }
 	glm::vec2 Size() { return size; }
@@ -134,7 +143,7 @@ public:
 	Ref<Material>& GetMaterial() { return material; }
 
 private:
-	bool update = false;
+	bool update = true;
 	bool drawBox = false;
 	Ref<VAO> handle;
 	Ref<VBO> data;
@@ -172,14 +181,18 @@ public:
 		update = true; 
 	}
 
-	bool UpdateRequired() { return update; }
+	bool UpdateRequired() {
+		bool ret = update;
+		update = false;
+		return ret;
+	}
 	Ref<Texture>& SpriteSheet() { return sheet; }
 	int DrawAtIndex() { return drawIndex; }
 	int SizePerSprite() { return sizePerSprite; }
 	glm::vec2 Size() { return size; }
 
 private:
-	bool update = false;
+	bool update = true;
 	glm::vec2 size = { 1, 1 };
 	int sizePerSprite = 1;
 	int drawIndex = 0;
@@ -215,7 +228,11 @@ struct AnimatorComponent {
 			update = true; 
 		}
 
-		bool UpdateRequired() { return update; }
+		bool UpdateRequired() {
+			bool ret = update;
+			update = false;
+			return ret;
+		}
 		Ref<Texture>& AnimationSheet() { return animation; }
 		glm::vec2 Size() { return size; }
 		int SizePerSprite() { return sizePerSprite; }
@@ -257,10 +274,14 @@ public:
 	AnimatorObject& GetCurrentAnimation() { return animation_map[current_id]; }
 	int GetCurrentIndex() { return current_id; }
 
-	bool UpdateRequired() { return update; }
+	bool UpdateRequired() {
+		bool ret = update;
+		update = false;
+		return ret;
+	}
 
 private:
-	bool update = false;
+	bool update = true;
 	std::map<int, AnimatorObject> animation_map;
 	int current_id = INT_MAX;
 };
@@ -272,12 +293,18 @@ struct NativeScriptComponent {
 	ScriptableEntity*(*InstantiateScript)() = NULL;
 	void(*DestroyScript)(NativeScriptComponent*) = NULL;
 
-	template<typename T>
+	template <typename T>
 	void Bind() {
 		InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
 		DestroyScript = [](NativeScriptComponent* script) { delete script->instance; script->instance = NULL; };
 	
 		InstantiateScript();
+	}
+
+	template <typename T>
+	T& GetScript() {
+		assert(instance);
+		return *static_cast<T*>(instance);
 	}
 };
 

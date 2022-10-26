@@ -8,8 +8,8 @@ void SpriteCreate(entt::registry& registry, entt::entity entity) {
 	auto& sprite = registry.get<SpriteRendererComponent>(entity);
 	if (!sprite.GetTexture()) sprite.SetTexture(Texture::defaultTex);
 	sprite.Pointer() = VAO::Create();
-	Ref<Material> material = Material::Create(sprite.GetTexture(), sprite.Albedo());
-	Sprite::Create(sprite.Pointer(), sprite.Data(), sprite.Albedo(), material);
+	Ref<Material> material = Material::Create(sprite.GetTexture(), sprite.Color());
+	Sprite::Create(sprite.Pointer(), sprite.Data(), sprite.Color(), material);
 }
 
 void SpriteSheetCreate(entt::registry& registry, entt::entity entity) {
@@ -54,7 +54,9 @@ Ref<Scene> Scene::Create() {
 
 Entity Scene::CreateEntity(std::string name) {
 	Entity entity = { this->scene_registry.create(), &(this->scene_registry) };
-	entity.AddComponent<TagComponent>().tag = name.empty() ? "Unnamed Entity" : name;
+	auto& tag = entity.AddComponent<TagComponent>();
+	tag.name = name.empty() ? "Unnamed Entity" : name;
+	tag.tag = "";
 	entity.AddComponent<TransformComponent>();
 	return entity;
 }
@@ -72,7 +74,7 @@ void Scene::OnUpdate(Time time) {
 		}
 	});
 
-	//Rigidbody & Collision
+	// Rigidbody & Collision
 	auto rigidGroup = 
 		scene_registry.group<RigidbodyComponent, CollisionComponent>(entt::get<TransformComponent>);
 	for (auto entity : rigidGroup) {
@@ -80,25 +82,27 @@ void Scene::OnUpdate(Time time) {
 			rigidGroup.get<TransformComponent, RigidbodyComponent, CollisionComponent>(entity);
 		rigidbody.position = transform.position;
 	
-		if (!rigidbody.active || !collision.active || !scene_registry.get<TagComponent>(entity).active) continue;
+		if (!rigidbody.active || !scene_registry.get<TagComponent>(entity).active) continue;
 
 		rigidbody.position += rigidbody.velocity * time.deltaTime;
 		glm::vec2 push_dpos = { 0, 0 };
 
-		CollisionPacket packet = Collision::Check(entity, scene_registry);
-		for (auto& box : packet.boxes) {
-			glm::vec2 push = box.normal * box.depth;
+		if (collision.active) {
+			CollisionPacket packet = Collision::Check(entity, scene_registry);
+			for (auto& box : packet.boxes) {
+				glm::vec2 push = box.normal * box.depth;
 
-			float massMultiplier = 1;
-			if (box.rigidbody && !box.rigidbody->isStatic) {
-				massMultiplier = box.rigidbody->mass / rigidbody.mass;
-				push /= 2.0f;
-				box.rigidbody->position -= glm::vec3(push, 0);
+				float massMultiplier = 1;
+				if (box.rigidbody && !box.rigidbody->isStatic) {
+					massMultiplier = box.rigidbody->mass / rigidbody.mass;
+					push /= 2.0f;
+					box.rigidbody->position -= glm::vec3(push, 0);
+				}
+				push *= massMultiplier;
+
+				if (glm::abs(push_dpos.x) < glm::abs(push.x)) push_dpos.x = push.x;
+				if (glm::abs(push_dpos.y) < glm::abs(push.y)) push_dpos.y = push.y;
 			}
-			push *= massMultiplier;
-
-			if (glm::abs(push_dpos.x) < glm::abs(push.x)) push_dpos.x = push.x;
-			if (glm::abs(push_dpos.y) < glm::abs(push.y)) push_dpos.y = push.y;
 		}
 
 		rigidbody.position += glm::vec3(push_dpos, 0);
@@ -193,7 +197,7 @@ void Scene::OnUpdate(Time time) {
 			if (sprite.parallelTexture)
 				sprite.TextureOffset(glm::vec2{ transform.position.x, transform.position.y } / sprite.UVRepeat());
 
-			Ref<Material> material = Material::Create(sprite.GetTexture(), sprite.Albedo());
+			Ref<Material> material = Material::Create(sprite.GetTexture(), sprite.Color());
 
 			// Sprite sheet resizing
 			if (scene_registry.any_of<SpriteSheetComponent>(entity)) {
@@ -208,14 +212,13 @@ void Scene::OnUpdate(Time time) {
 				else sheetIndex %= (int)(sheetSize.x / sheetSizeP);
 
 				spriteSheet.DrawAtIndex(sheetIndex);
+				material.reset();
+				material = Material::Create(spriteSheet.SpriteSheet(), sprite.Color());
 
 				if (spriteSheet.UpdateRequired()) {
 					float offset = (float)spriteSheet.DrawAtIndex() * spriteSheet.SizePerSprite();
 					glm::vec2 start = glm::vec2{ offset, 0 } / spriteSheet.Size();
 					glm::vec2 end = glm::vec2{ offset + spriteSheet.SizePerSprite(), 1 } / spriteSheet.Size();
-
-					material.reset();
-					material = Material::Create(spriteSheet.SpriteSheet(), sprite.Albedo());
 					Sprite::Resize(sprite.Pointer(), sprite.Data(), sprite.Size(), start, end);
 				}
 			}
@@ -239,14 +242,13 @@ void Scene::OnUpdate(Time time) {
 				else sheetIndex %= (int)(sheetSize.x / sheetSizeP);
 
 				aniObject.DrawAtIndex(sheetIndex);
+				material.reset();
+				material = Material::Create(aniObject.AnimationSheet(), sprite.Color());
 
 				if (aniObject.UpdateRequired() || animator.UpdateRequired()) {
 					float offset = (float)aniObject.DrawAtIndex() * aniObject.SizePerSprite();
 					glm::vec2 start = glm::vec2{ offset, 0 } / aniObject.Size();
 					glm::vec2 end = glm::vec2{ offset + aniObject.SizePerSprite(), 1 } / aniObject.Size();
-
-					material.reset();
-					material = Material::Create(aniObject.AnimationSheet(), sprite.Albedo());
 					Sprite::Resize(sprite.Pointer(), sprite.Data(), sprite.Size(), start, end);
 				}
 			}
@@ -281,6 +283,7 @@ void Scene::OnUpdate(Time time) {
 			);
 		}
 
+		// Script UI Rendering
 		scene_registry.view<NativeScriptComponent>().each([=](auto entity, auto& script) {
 			if (script.active && scene_registry.get<TagComponent>(entity).active) {
 				if (script.instance)

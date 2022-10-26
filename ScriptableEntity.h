@@ -25,7 +25,7 @@ public:
 
 	Entity Instantiate() {
 		Entity e = Entity{ entity.registry->create(), entity.registry };
-		e.AddComponent<TagComponent>().tag = "Unnamed Entity";
+		e.AddComponent<TagComponent>().name = "Unnamed Entity";
 		e.AddComponent<TransformComponent>();
 		return e;
 	}
@@ -35,7 +35,7 @@ public:
 		Entity search;
 		for (auto entity : view) {
 			if (!view.get<TagComponent>(entity).active) continue;
-			if (view.get<TagComponent>(entity).tag == name) {
+			if (view.get<TagComponent>(entity).name == name) {
 				search = { entity, this->entity.registry };
 				break;
 			}

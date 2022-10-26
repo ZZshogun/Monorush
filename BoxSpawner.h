@@ -28,7 +28,7 @@ public:
 			sprite.SetTexture(Texture::library["box"]);
 			auto& tag = entity.GetComponent<TagComponent>();
 			tag.active = false;
-			tag.tag = "Box " + std::to_string(i + 1);
+			tag.name = "Box " + std::to_string(i + 1);
 			entities_pool.push_back(entity);
 			available_index.push(i);
 			indexes.push_back(true);
@@ -38,7 +38,7 @@ public:
 	void OnUpdate(Time time) {
 		glm::vec2 floor_pos = glm::floor(transform->position);
 
-		std::vector<float> noise(size.x * size.y);
+		std::vector<float> noise((size_t)size.x * (size_t)size.y);
 		Noise::GetNoise2D(noise.data(), size, floor_pos);
 
 		for (int i = 0; i < count; i++) {
@@ -60,7 +60,7 @@ public:
 				size_t avail = available_index.front();
 				bool& cur_act = entities_pool[avail].GetComponent<TagComponent>().active;
 
-				if (!cur_act && glm::abs(noise[(size_t)(i + j * size.y)]) > 0.62f) {
+				if (!cur_act && glm::abs(noise[(size_t)(i + j * (size_t)size.y)]) > 0.62f) {
 					auto& ent_tr = entities_pool[avail].GetComponent<TransformComponent>();
 
 					glm::ivec3 pos = glm::ivec3{ floor_pos + glm::vec2{ i - size.x / 2, j - size.y / 2 }, 0 };

@@ -116,6 +116,7 @@ public:
 
 	static void DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm::vec4 color, std::string fontName = "");
 	static void DrawImage(Ref<Texture>& image, glm::ivec2 screen_pos, glm::ivec2 screen_size, glm::vec4 color = Color::White);
+	static void DrawImage(glm::ivec2 screen_pos, glm::ivec2 screen_size, glm::vec4 color);
 	static void DrawButton(Ref<Button>& button, Time time);
 	static void DrawButtons(Time time);
 

@@ -13,7 +13,7 @@ public:
 	int count = 0;
 
 	PlayerController* playerController = NULL;
-	TransformComponent* transform;
+	TransformComponent* transform = NULL;
 
 	void OnCreate() {
 		transform = &GetComponent<TransformComponent>();
@@ -21,6 +21,12 @@ public:
 
 	void OnUpdate(Time time) {
 		if (GameManager::gameOver) return;
+
+		if (GameManager::fury) {
+			max_elapsed = 0.45f;
+		}
+		else max_elapsed = 1.33f;
+
 		elapsed += time.deltaTime;
 		if (elapsed >= max_elapsed) {
 			elapsed = 0;

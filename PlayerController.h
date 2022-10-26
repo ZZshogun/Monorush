@@ -46,15 +46,11 @@ private:
 	Ref<UI::Button> hurtButton;
 	Ref<UI::Button> healButton;
 
-	bool DeathStatus() {
-		death = playerHeath <= 0;
-		return death;
-	}
-
 public:
 
 	void Hurt() {
 		if (playerHeath <= 0) return;
+		playerSpeed = 5;
 		playerHeath = glm::clamp<int>(playerHeath - 1, 0, maxPlayerHealth);
 		heartsCol[(size_t)playerHeath] = glm::vec4{1, 0.11f, 0.28f, 1};
 		hurt = true;
@@ -112,6 +108,7 @@ public:
 			invCountTime += time.deltaTime;
 			if (invCountTime >= invTime) {
 				invincible = false;
+				playerSpeed = 4;
 				invCountTime = 0;
 				playerOpacity = 1;
 				sprite->Color(Color::White);
@@ -140,7 +137,8 @@ public:
 
 		// Death status
 		if (death) return;
-		if (DeathStatus()) {
+		if (playerHeath <= 0 || GameManager::gameOver) {
+			death = true;
 			rigidbody->velocity = { 0, 0, 0 };
 			rigidbody->isStatic = true;
 			hurtButton->active = false;
@@ -201,6 +199,9 @@ public:
 		// Move direction on x axis
 		if (dir.x < 0) transform->scale.x = -1;
 		else if (dir.x > 0) transform->scale.x = 1;
+
+		if (Input::GetKeyDown(Key::Y)) Time::timeScale = 30;
+		else if (Input::GetKeyUp(Key::Y)) Time::timeScale = 1;
 	}
 
 	void OnDrawUI(Time time) {

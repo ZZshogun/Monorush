@@ -11,6 +11,7 @@ GameLayer::GameLayer() {
 }
 
 GameLayer::~GameLayer() {
+	GameManager::Reset();
 	UI::ClearBuffers();
 	Texture::ClearHandles();
 	Audio::ClearBuffers();
@@ -77,6 +78,7 @@ float outoftimeLimit = 1.3f, outoftime = 0;
 float floatOffsetSpeed = 250, floatOffset = 0;
 float opacityIncSpeed = 3, resetScreenOpacity = 0;
 float resetUIWaitTime = 0.67f, resetCountTime = 0;
+float fury_end_time = 0;
 
 void GameLayer::OnStart() {
 	Time time;
@@ -90,15 +92,13 @@ void GameLayer::OnUpdate(Time time) {
 	GameManager::Update(time);
 	scene->OnUpdate(time);
 
-	float time_left = GameManager::remainingTime;
-
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
 	UI::Anchor(CENTER);
 	UI::DrawButton(menuButton, time);
 	UI::EndUI();
 
 	if (outoftime <= 5) {
-		if (time_left <= 0) {
+		if (GameManager::remainingTime <= 0) {
 			texCol = glm::vec4{ 1, 0.41f, 0.38f, 1 };
 
 			outoftime += time.deltaTime;
@@ -109,8 +109,8 @@ void GameLayer::OnUpdate(Time time) {
 
 		UI::StartUI(glm::ivec2{ 1920, 1080 });
 
-		std::string timestr = Time::FormatMinute(time_left);
-		std::string millitimestr = "." + Time::FormatMilli(time_left);
+		std::string timestr = Time::FormatMinute(GameManager::remainingTime);
+		std::string millitimestr = "." + Time::FormatMilli(GameManager::remainingTime);
 		UI::Anchor(CENTER);
 		UI::DrawString("- TIME LEFT -", { 0, 500 + floatOffset }, 1.25f, Color::Black);
 		UI::Anchor(RIGHT);
@@ -118,17 +118,41 @@ void GameLayer::OnUpdate(Time time) {
 		UI::Anchor(LEFT);
 		UI::DrawString(millitimestr, { 55, 440 + floatOffset }, 0.60f, texCol);
 
-		if (GameManager::gameOver) {
-			menuButton->active = false;
-			if (resetCountTime >= resetUIWaitTime) {
-				resetScreenOpacity += opacityIncSpeed * time.deltaTime;
-				resetScreenOpacity = glm::min<float>(resetScreenOpacity, 1);
-				UI::Anchor(CENTER);
-				UI::DrawImage({ 0, 0 }, { 1920, 1080 }, { 0, 0, 0, resetScreenOpacity * 0.75f });
-			}
-			else resetCountTime += time.deltaTime;
-		}
-
 		UI::EndUI();
+
 	}
+
+	UI::StartUI(glm::ivec2{ 1920, 1080 });
+
+	UI::Anchor(CENTER);
+	if (GameManager::fury && GameManager::_furyTimer <= 3) {
+		fury_end_time = 0;
+		UI::DrawString("FURY HAS STARTED!", { 0, 300 }, 1, { 1, 0.41f, 0.38f, 1 });
+	}
+	else if (!GameManager::fury && GameManager::half && fury_end_time <= 3.5f) {
+		fury_end_time += time.deltaTime;
+		UI::DrawString("FURY HAS ENDED... FOR NOW", { 0, 300 }, 1, { 1, 0.41f, 0.38f, 1 });
+	}
+
+	std::stringstream ss;
+	ss << std::setprecision(2) << std::fixed << GameManager::difficulty;
+	UI::Anchor(RIGHT);
+	UI::DrawString("DIFFICULTY : " + ss.str(), {940, 460}, 0.65f, Color::Black);
+	ss.str(std::string());
+	ss << std::setprecision(2) << std::fixed << GameManager::difficultyIncRate;
+	UI::DrawString("DIFFICULTY RATE : " + ss.str(), {940, 420}, 0.65f, Color::Black);
+
+	if (GameManager::gameOver) {
+		menuButton->active = false;
+		if (resetCountTime >= resetUIWaitTime) {
+			resetScreenOpacity += opacityIncSpeed * time.deltaTime;
+			resetScreenOpacity = glm::min<float>(resetScreenOpacity, 1);
+		}
+		else resetCountTime += time.deltaTime;
+
+		UI::Anchor(CENTER);
+		UI::DrawImage({ 0, 0 }, { 1920, 1080 }, { 0, 0, 0, resetScreenOpacity * 0.75f });
+	}
+
+	UI::EndUI();
 }

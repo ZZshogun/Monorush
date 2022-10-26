@@ -9,7 +9,7 @@ class EnemyController : public ScriptableEntity {
 public:
 
 	int healthPoint = 10;
-	float speed = 1.5f;
+	float speed = 2;
 
 	TransformComponent* transform = NULL;
 	TransformComponent* playerTransform = NULL;
@@ -19,6 +19,12 @@ public:
 		playerTransform = &FindEntityOfName("Player").GetComponent<TransformComponent>();
 		transform = &GetComponent<TransformComponent>();
 		rigidBody = &GetComponent<RigidbodyComponent>();
+
+		healthPoint += (int)(GameManager::difficulty * 6);
+		speed += (int)(GameManager::difficulty * 0.3f);
+
+		auto& tag = GetComponent<TagComponent>();
+		std::cout << tag.name << " : health " << healthPoint << ", speed " << speed << "\n";
 	}
 
 	void OnUpdate(Time time) {
@@ -30,7 +36,7 @@ public:
 			speed += time.deltaTime;
 		}
 
-		rigidBody->velocity = glm::normalize(direction) * speed;
+		rigidBody->velocity = glm::normalize(direction) * (float)speed;
 	}
 };
 

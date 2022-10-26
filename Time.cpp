@@ -1,5 +1,7 @@
 #include "Time.h"
 
+float Time::timeScale = 1;
+
 void Time::_UpdateTime(float time) {
 	_prevTime = _currentTime;
 	_currentTime = time;

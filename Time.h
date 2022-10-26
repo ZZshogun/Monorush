@@ -11,7 +11,7 @@ class Time {
 
 	friend class Game;
 public:
-	float timeScale = 1;
+	static float timeScale;
 	float deltaTime = 0;
 	float unscaledDeltaTime = 0;
 

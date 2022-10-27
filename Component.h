@@ -71,7 +71,8 @@ private:
 
 struct CameraComponent {
 	bool active = true;
-	glm::vec2 resolution = { 16, 9 };
+	glm::vec2 cameraResolution = { 16, 9 };
+	glm::vec2 resolution = { 1280, 720 };
 	bool primary = false;
 };
 

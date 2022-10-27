@@ -4,6 +4,14 @@
 #include "Time.h"
 
 class GameManager {
+public:
+	enum GameState {
+		WIN,
+		LOSS,
+		ONGOING,
+		UNKNOWN,
+	};
+
 private:
 	inline static float furyBonusTime = 10;
 
@@ -11,10 +19,13 @@ public:
 	inline static float _furyTimer = 0;
 
 	inline static bool gameOver = false;
-	inline static float remainingTime = 180;
+	inline static float maxRemainingTime = 180;
+	inline static float remainingTime = maxRemainingTime;
 	inline static float difficulty = 1;
 	inline static float difficultyIncRate = 0.02f;
 	inline static bool half = false, fury = false;
+
+	inline static GameState gameState = ONGOING;
 
 	static void Update(Time time) {
 		if (gameOver) return;

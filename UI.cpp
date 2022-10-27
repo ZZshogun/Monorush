@@ -102,6 +102,7 @@ void UI::Anchor(UIAnchor anchorEnum) {
 }
 
 void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm::vec4 color, std::string fontName) {
+	if (string == "") return;
 	if (!inUI) {
 		std::cout << "ERROR UI No starting UI block\n";
 		return;
@@ -309,8 +310,7 @@ void UI::PollsEvent(GLFWwindow* window, Time time) {
 	for (int i = 0; i < buttons.size(); i++) {
 		Ref<Button> button = buttons[i];
 		if (!button->draw) continue;
-		glm::ivec2 rawPos = glm::ivec2(Input::MousePosition()) - resolution / 2;
-		glm::ivec2 clickPos = glm::ivec2{ rawPos.x, -rawPos.y };
+		glm::ivec2 clickPos = glm::ivec2{ Input::MousePosition() };
 		clickPos = glm::vec2{clickPos} / glm::vec2{resolution / 2} * glm::vec2{ button->ref_resolution };
 
 		if (Math::InVec2(clickPos, button->position, button->size)) {
@@ -343,7 +343,7 @@ void UI::PollsEvent(GLFWwindow* window, Time time) {
 			}
 			break;
 		}
-		if (button->hovered && !UI::onEvents) {
+		if (button->hovered && !UI::onEvents && hovering_button.isValid()) {
 			button->hovered = false;
 			*button = hovering_button;
 			hovering_button = null_button;

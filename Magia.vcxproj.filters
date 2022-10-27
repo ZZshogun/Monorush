@@ -245,6 +245,9 @@
     <ClInclude Include="GameManager.h">
       <Filter>Header Files\Ext</Filter>
     </ClInclude>
+    <ClInclude Include="BulletController.h">
+      <Filter>Header Files\Ext</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="texture\tile.png">

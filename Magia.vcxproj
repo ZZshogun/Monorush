@@ -193,6 +193,7 @@
   <ItemGroup>
     <ClInclude Include="Audio.h" />
     <ClInclude Include="BoxSpawner.h" />
+    <ClInclude Include="BulletController.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Core.h" />

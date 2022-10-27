@@ -53,13 +53,11 @@ void Input::ScanMouse(GLFWwindow* window) {
 
 void Input::ScanMouseScroll(GLFWwindow* window, double xoffset, double yoffset) {
 	SetWindowInput(window);
-
 	mouseScrollDelta += glm::vec2(xoffset, yoffset);
 }
 
 void Input::ClearInputBuffer() {
 	if (!mainWindow) return;
-
 	mouseScrollDelta = glm::vec2(0, 0);
 }
 
@@ -80,10 +78,12 @@ bool Input::GetKeyUp(Key key) {
 
 glm::vec2 Input::MousePosition() {
 	if (!mainWindow) return glm::vec2(-1, -1);
-
 	double x, y;
+	int wx, wy;
 	glfwGetCursorPos(mainWindow, &x, &y);
-	return glm::vec2((float)x, (float)y);
+	glfwGetWindowSize(mainWindow, &wx, &wy);
+	glm::vec2 y_inverted = glm::vec2((float)x, (float)y) - glm::vec2{wx, wy} / 2.0f;
+	return glm::vec2{ y_inverted.x, -y_inverted.y };
 }
 
 glm::vec2 Input::MouseScrollDelta() {

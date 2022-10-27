@@ -130,17 +130,19 @@ void Game::ClearLayer(int layerIndex) {
 bool Game::LoadLayer(int layerIndex) {
 	switch (layerIndex) {
 	case 0:
+		this->layerIndex = 0;
 		menuLayer = std::make_shared<MenuLayer>();
 		menuLayer->state.volumeGain = gameVolumeGain;
-		menuLayer->state.currentSceneIndex = this->layerIndex;
+		menuLayer->state.currentSceneIndex = 0;
 		menuLayer->state.fullScreen = this->fullscreen;
 		ProcessLayerState(0);
 		menuLayer->OnAttach();
 		return true;
 	case 1:
+		this->layerIndex = 1;
 		gameLayer = std::make_shared<GameLayer>();
 		gameLayer->state.volumeGain = gameVolumeGain;
-		gameLayer->state.currentSceneIndex = this->layerIndex;
+		gameLayer->state.currentSceneIndex = 1;
 		gameLayer->state.fullScreen = this->fullscreen;
 		ProcessLayerState(1);
 		gameLayer->OnAttach();
@@ -177,6 +179,8 @@ bool Game::ProcessLayerState(int layerIndex) {
 		return false;
 	}
 
+	if (!layerState->update) return true;
+
 	if (layerState->terminate) glfwSetWindowShouldClose(window, true);
 
 	if (layerState->fullScreen != this->fullscreen) {
@@ -185,6 +189,13 @@ bool Game::ProcessLayerState(int layerIndex) {
 
 	if (layerState->volumeGain != this->gameVolumeGain) {
 		SetVolume(layerState->volumeGain);
+	}
+
+	if (layerState->reload) {
+		ClearLayer(layerIndex);
+		if (!LoadLayer(layerIndex)) return false;
+		if (log) std::cout << "RELOAD Scene " << layerIndex << "\n";
+		return true;
 	}
 
 	if (layerState->currentSceneIndex != this->layerIndex) {

@@ -112,7 +112,8 @@ void Scene::OnUpdate(Time time) {
 	// Transform parent inheritance
 	auto transformView = scene_registry.view<TransformComponent>();
 	for (auto entity : transformView) {
-		if (!scene_registry.get<TagComponent>(entity).active) continue;
+		TagComponent* tag = scene_registry.try_get<TagComponent>(entity);
+		if (!tag || !tag->active) continue;
 		auto& transform = transformView.get<TransformComponent>(entity);
 		if (transform.parent) {
 			transform.position = transform.parent->position;
@@ -130,7 +131,7 @@ void Scene::OnUpdate(Time time) {
 		if (camera.active && camera.primary && scene_registry.get<TagComponent>(entity).active) {
 			Transform t = { transform.position, transform.rotation, transform.scale };
 			for (auto& it : Shader::LUT)
-				Camera::Update(t, camera.resolution, it.second);
+				Camera::Update(t, camera.cameraResolution, it.second);
 			foundCamera = true;
 			break;
 		}

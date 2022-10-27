@@ -25,6 +25,7 @@ public:
 
 	template <typename T>
 	bool HasComponent() {
+		assert(IsValid());
 		return this->registry->any_of<T>(this->handle);
 	}
 
@@ -49,6 +50,10 @@ public:
 	template <typename T>
 	size_t RemoveComponent() {
 		return this->registry->remove<T>(this->handle);
+	}
+
+	void Destroy() {
+		this->registry->destroy(this->handle);
 	}
 
 };

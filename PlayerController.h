@@ -3,12 +3,15 @@
 
 #include "ScriptableEntity.h"
 #include "GameManager.h"
+#include "BulletController.h"
 
 class PlayerController : public ScriptableEntity {
 
 public:
 	float playerSpeed = 4;
 	int maxPlayerHealth = 5;
+	int playerHeath = maxPlayerHealth;
+	float shootPower = 12;
 	bool death = false;
 
 private:
@@ -24,7 +27,6 @@ private:
 	glm::vec2 col_run_size = { 0.35f, 0.7f };
 	glm::vec2 col_run_offset = { 0, -0.12f };
 
-	int playerHeath = maxPlayerHealth;
 	int cbullet = 12;
 	const int fullammo = 12;
 
@@ -65,6 +67,31 @@ public:
 		heartsCol[(size_t)playerHeath - 1] = glm::vec4{ 0.11f, 1, 0.28f, 1 };
 		sprite->Color({ 0.12f, 1, 0.12f, playerOpacity });
 		heal = true;
+	}
+
+	void Freeze() {
+		rigidbody->isStatic = true;
+		hurtButton->active = false;
+		healButton->active = false;
+		collider->active = false;
+		rigidbody->velocity = { 0, 0, 0 };
+		animator->SetAnimationIndex(1);
+	}
+
+	void Shoot() {
+		glm::vec2 direction = glm::normalize(Input::MousePosition());
+
+		Entity bullet = Instantiate();
+		bullet.AddComponent<SpriteRendererComponent>().SetTexture(Texture::library["bullet"]);
+		bullet.AddComponent<NativeScriptComponent>().Bind<BulletController>();
+		bullet.GetComponent<TagComponent>().name = "Bullet";
+		bullet.GetComponent<TransformComponent>().position = transform->position + glm::vec3(direction, 0);
+		auto& rb = bullet.AddComponent<RigidbodyComponent>();
+		rb.mass = 0.04f;
+		rb.velocity = glm::vec3(direction, 0) * shootPower;
+		auto& colld = bullet.AddComponent<CollisionComponent>();
+		colld.Size({0.2f, 0.2f});
+		colld.DrawBox(true);
 	}
 
 	void OnCreate() {
@@ -135,17 +162,15 @@ public:
 			}
 		}
 
+		if (GameManager::gameOver) Freeze();
 		// Death status
 		if (death) return;
-		if (playerHeath <= 0 || GameManager::gameOver) {
-			death = true;
-			rigidbody->velocity = { 0, 0, 0 };
-			rigidbody->isStatic = true;
+		if (playerHeath <= 0) {
+			GameManager::gameOver = true;
+			GameManager::gameState = GameManager::LOSS;
 			hurtButton->active = false;
 			healButton->active = false;
-			animator->SetAnimationIndex(1);
-			collider->active = false;
-			GameManager::gameOver = true;
+			death = true;
 			return;
 		}
 
@@ -159,15 +184,17 @@ public:
 		if (!reloading) {
 			if (cdtime >= 1.0f / bulletpersec && Input::GetMouseDown(Button::Mouse_Left)) {
 				cdtime = 0;
-				audio->Play(Audio::AudioBuffers["bounce"]);
-				cbullet--;
-				if (cbullet < 0) {
+				if (cbullet <= 0) {
 					cbullet = 0;
 					reloading = true;
 					gunstate = "RELOADING";
 				}
-				else
+				else {
+					cbullet--;
+					Shoot();
+					audio->Play(Audio::AudioBuffers["bounce"]);
 					gunstate = std::to_string(cbullet) + " | " + std::to_string(fullammo);
+				}
 			}
 
 			if (cbullet < fullammo && Input::GetKeyDown(Key::R)) {

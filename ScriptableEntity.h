@@ -7,10 +7,10 @@
 
 class ScriptableEntity {
 
-	Entity entity;
 	friend class Scene;
 
 protected:
+	Entity entity;
 	virtual void OnCreate() {}
 	virtual void OnUpdate(Time time) {}
 	virtual void OnDrawUI(Time time) {}

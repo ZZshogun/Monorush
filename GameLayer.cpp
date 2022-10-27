@@ -24,6 +24,7 @@ void GameLayer::OnAttach() {
 	Ref<Texture> enemyTex = Texture::Create("enemy", "texture/enemy.png");
 	Ref<Texture> boxtex = Texture::Create("box","texture/box.png");
 	Ref<Texture> heart = Texture::Create("heart","texture/heart.png");
+	Ref<Texture> bullet = Texture::Create("bullet","texture/bullet.png");
 
 	Audio::LoadSound("audio/bounce.wav", "bounce");
 
@@ -69,28 +70,43 @@ void GameLayer::OnAttach() {
 		Color::Black,
 		[]() { UI::on_button->textScale = 1; }
 	);
+	retryButton = UI::CreateButton(
+		"RETRY",
+		1.5f,
+		Color::White,
+		{ 0, -300 },
+		{ 270, 80 },
+		Color::Transparent,
+		[&]() { state.ReloadScene(); },
+		Color::Transparent,
+		[]() { UI::on_button->textScale = 2; }
+	);
+	endMenuButton = UI::CreateButton(
+		"RETURN TO TITLE SCREEN",
+		0.8f,
+		Color::White,
+		{0, -400},
+		{530, 75},
+		Color::Transparent,
+		[&] () { state.SceneAddition(-1); },
+		Color::Transparent,
+		[]() { UI::on_button->textScale = 0.9f; }
+	);
 	UI::EndUI();
-}
 
-PlayerController* playerController = NULL;
-glm::vec4 texCol = Color::Black;
-float outoftimeLimit = 1.3f, outoftime = 0;
-float floatOffsetSpeed = 250, floatOffset = 0;
-float opacityIncSpeed = 3, resetScreenOpacity = 0;
-float resetUIWaitTime = 0.67f, resetCountTime = 0;
-float fury_end_time = 0;
+	OnStart();
+}
 
 void GameLayer::OnStart() {
 	Time time;
 	scene->OnUpdate(time);
 
 	playerController = &player.GetScript<PlayerController>();
-
 }
 
 void GameLayer::OnUpdate(Time time) {
 	GameManager::Update(time);
-	scene->OnUpdate(time);
+	if (!state.update) scene->OnUpdate(time);
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
 	UI::Anchor(CENTER);
@@ -151,7 +167,48 @@ void GameLayer::OnUpdate(Time time) {
 		else resetCountTime += time.deltaTime;
 
 		UI::Anchor(CENTER);
-		UI::DrawImage({ 0, 0 }, { 1920, 1080 }, { 0, 0, 0, resetScreenOpacity * 0.75f });
+		UI::DrawImage({ 0, 0 }, { 1920, 1080 }, { 0, 0, 0, resetScreenOpacity * 0.9f });
+		if (resetScreenOpacity >= 1) {
+
+			switch (GameManager::gameState) {
+			case GameManager::WIN:
+				{
+					std::string winMessage = "YOU WIN!";
+					std::string winDesc = "YOU\'VE SURVIVED FOR 180 SECONDS";
+					if (playerController) {
+						if (playerController->playerHeath == playerController->maxPlayerHealth) {
+							winMessage = "UNTOUCHABLE";
+							winDesc = "THIS IS JUST TOO EZ";
+						}
+						if (playerController->playerHeath == 1) {
+							winMessage = "CLUTCHED";
+							winDesc = "YOU\'VE SURVIVED... BARELY";
+						}
+					}
+
+					UI::DrawString(winMessage, { 0, 350 }, 2, Color::White);
+					UI::DrawString(winDesc, { 0, 280 }, 0.65f, Color::White);
+				}
+				break;
+			case GameManager::LOSS:
+				UI::DrawString("DEFEATED", { 0, 350 }, 2, Color::White);
+				UI::DrawString("THAT\'S UNFORTUNATE...", { 0, 280 }, 0.65f, Color::White);
+				{
+					std::string timestr = 
+						"YOU\'VE SURVIVED FOR " + 
+						std::to_string((int)GameManager::maxRemainingTime - (int)GameManager::remainingTime) + 
+						" SECONDS";
+					UI::DrawString(timestr, { 0, 150 }, 0.85f, Color::White);
+				}
+				break;
+			default:
+				UI::DrawString("HOW CAN THIS BE POSSIBLE?!?", { 0, 350 }, 2, Color::White);
+				break;
+			}
+
+			UI::DrawButton(retryButton, time);
+			UI::DrawButton(endMenuButton, time);
+		}
 	}
 
 	UI::EndUI();

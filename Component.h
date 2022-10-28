@@ -143,6 +143,8 @@ public:
 	Ref<VBO>& Data() { return data; }
 	Ref<Material>& GetMaterial() { return material; }
 
+	std::set<std::string> ignoredTags;
+
 private:
 	bool update = true;
 	bool drawBox = false;
@@ -288,18 +290,30 @@ private:
 };
 
 struct NativeScriptComponent {
-	bool active = true;
-	ScriptableEntity* instance = NULL;
-
+private:
 	ScriptableEntity*(*InstantiateScript)() = NULL;
 	void(*DestroyScript)(NativeScriptComponent*) = NULL;
+
+	friend class Scene;
+public:
+	bool active = true;
+	bool initialized = false;
+	ScriptableEntity* instance = NULL;
 
 	template <typename T>
 	void Bind() {
 		InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
-		DestroyScript = [](NativeScriptComponent* script) { delete script->instance; script->instance = NULL; };
+		DestroyScript = [](NativeScriptComponent* ncs) {
+			ncs->initialized = false;
+			delete ncs->instance;
+			ncs->instance = NULL;
+		};
 	
-		InstantiateScript();
+		instance = InstantiateScript();
+	}
+
+	void Unbind() {
+		if (instance) DestroyScript(this);
 	}
 
 	template <typename T>

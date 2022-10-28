@@ -6,9 +6,6 @@
 class BoxSpawner : public ScriptableEntity {
 
 public:
-
-	TransformComponent* transform = NULL;
-
 	glm::ivec2 size = { 20, 20 };
 	int count = 100;
 	float viewDistance = 20;
@@ -20,7 +17,6 @@ public:
 	std::set<std::pair<int, int>> box_pos;
 
 	void OnCreate() {
-		transform = &GetComponent<TransformComponent>();
 		for (int i = 0; i < count; i++) {
 			Entity entity = Instantiate();
 			entity.AddComponent<CollisionComponent>().DrawBox(false);
@@ -29,6 +25,7 @@ public:
 			auto& tag = entity.GetComponent<TagComponent>();
 			tag.active = false;
 			tag.name = "Box " + std::to_string(i + 1);
+			tag.tag = "Wall";
 			entities_pool.push_back(entity);
 			available_index.push(i);
 			indexes.push_back(true);
@@ -36,7 +33,8 @@ public:
 	}
 
 	void OnUpdate(Time time) {
-		glm::vec2 floor_pos = glm::floor(transform->position);
+		auto& transform = GetComponent<TransformComponent>();
+		glm::vec2 floor_pos = glm::floor(transform.position);
 
 		std::vector<float> noise((size_t)size.x * (size_t)size.y);
 		Noise::GetNoise2D(noise.data(), size, floor_pos);
@@ -45,7 +43,7 @@ public:
 			if (indexes[i]) continue;
 			glm::vec3 pos = entities_pool[i].GetComponent<TransformComponent>().position;
 			bool& active = entities_pool[i].GetComponent<TagComponent>().active;
-			if (active && glm::distance(pos, transform->position) > viewDistance) {
+			if (active && glm::distance(pos, transform.position) > viewDistance) {
 				active = false;
 				box_pos.erase({ (int)pos.x, (int)pos.y });
 				indexes[i] = true;
@@ -67,7 +65,7 @@ public:
 					if (pos == glm::ivec3{ floor_pos, 0 }) continue;
 					ent_tr.position = pos;
 
-					if (glm::distance(ent_tr.position, transform->position) > viewDistance) continue;
+					if (glm::distance(ent_tr.position, transform.position) > viewDistance) continue;
 					if (box_pos.count({pos.x, pos.y})) continue;
 
 					box_pos.insert({ pos.x, pos.y });

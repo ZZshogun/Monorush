@@ -12,15 +12,9 @@ public:
 	float max_elapsed = 1.33f;
 	int count = 0;
 
-	PlayerController* playerController = NULL;
-	TransformComponent* transform = NULL;
-
-	void OnCreate() {
-		transform = &GetComponent<TransformComponent>();
-	}
-
 	void OnUpdate(Time time) {
 		if (GameManager::gameOver) return;
+		auto& transform = GetComponent<TransformComponent>();
 
 		if (GameManager::fury) {
 			max_elapsed = 0.45f;
@@ -33,7 +27,7 @@ public:
 
 			float rx = Math::Random(-5, 5);
 			float ry = Math::Random(-5, 5);
-			glm::vec3 rand_pos = glm::vec3{ rx, ry, 0 } + transform->position;
+			glm::vec3 rand_pos = glm::vec3{ rx, ry, 0 } + transform.position;
 
 			Entity enemy = Instantiate();
 			enemy.AddComponent<SpriteRendererComponent>().order = 1;
@@ -41,7 +35,7 @@ public:
 			spriteSheet.SetSpriteSheet(Texture::library["enemy"]);
 			spriteSheet.Size({2, 1});
 			spriteSheet.SizePerSprite(1);
-			enemy.AddComponent<RigidbodyComponent>().mass = 0.5f;
+			enemy.AddComponent<RigidbodyComponent>().mass = 10;
 			auto& enemy_col = enemy.AddComponent<CollisionComponent>();
 			enemy_col.Size({0.5f, 0.5f});
 			enemy.GetComponent<TransformComponent>().position = rand_pos;

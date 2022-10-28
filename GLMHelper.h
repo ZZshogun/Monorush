@@ -15,6 +15,11 @@ namespace glm {
 	constexpr float max(vec4 vec) {
 		return max(max(max(vec.x, vec.y), vec.z), vec.w);
 	}
+
+	static vec3 lerp(vec3 a, vec3 b, float t) {
+		vec3 interpolate = (b - a) * clamp<float>(t, 0, 1);
+		return a + interpolate;
+	}
 }
 
 #endif

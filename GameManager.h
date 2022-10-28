@@ -54,6 +54,7 @@ public:
 		if (remainingTime <= 0) {
 			remainingTime = 0;
 			gameOver = true;
+			gameState = WIN;
 		}
 	}
 

@@ -9,7 +9,6 @@ class Scene;
 class ScriptableEntity;
 
 class Entity {
-
 	entt::entity handle = entt::null;
 	entt::registry* registry = NULL;
 
@@ -19,24 +18,33 @@ public:
 	Entity();
 	Entity(entt::entity handle, entt::registry* registry);
 
-	bool IsValid() {
+	bool operator<(const Entity& other) const {
+		return this->handle < other.handle;
+	}
+
+	bool IsValid() const {
 		return this->registry->valid(handle);
 	}
 
 	template <typename T>
-	bool HasComponent() {
+	bool HasComponent() const {
 		assert(IsValid());
 		return this->registry->any_of<T>(this->handle);
 	}
 
 	template <typename T>
-	T& GetComponent() {
+	T& GetComponent() const {
 		assert(HasComponent<T>());
 		return this->registry->get<T>(this->handle);
 	}
 
 	template <typename T>
-	T& GetScript() {
+	T* TryGetComponent() const {
+		return this->registry->try_get<T>(this->handle);
+	}
+
+	template <typename T>
+	T& GetScript() const {
 		assert(HasComponent<NativeScriptComponent>());
 		return this->registry->get<NativeScriptComponent>(this->handle).GetScript<T>();
 	}
@@ -48,11 +56,14 @@ public:
 	}
 
 	template <typename T>
-	size_t RemoveComponent() {
-		return this->registry->remove<T>(this->handle);
+	void RemoveComponent() {
+		assert(HasComponent<T>());
+		this->registry->erase<T>(this->handle);
 	}
 
 	void Destroy() {
+		if (HasComponent<NativeScriptComponent>())
+			RemoveComponent<NativeScriptComponent>();
 		this->registry->destroy(this->handle);
 	}
 

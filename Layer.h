@@ -84,7 +84,6 @@ private:
 
 private:
 	Entity player;
-	Entity boxSpawner;
 	Ref<UI::Button> menuButton;
 	Ref<UI::Button> retryButton;
 	Ref<UI::Button> endMenuButton;
@@ -96,7 +95,6 @@ public:
 	GameLayer();
 	~GameLayer();
 	void OnAttach();
-	void OnStart();
 	void OnUpdate(Time time);
 };
 

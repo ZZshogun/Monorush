@@ -38,14 +38,16 @@ void GameLayer::OnAttach() {
 	anim_player.AddAnimation(1, playerIdletex, { 2, 1 }, 3);
 	anim_player.AddAnimation(2, playerRuntex, { 6, 1 }, 6);
 	player.AddComponent<NativeScriptComponent>().Bind<PlayerController>();
-	player.AddComponent<RigidbodyComponent>();
+	player.AddComponent<RigidbodyComponent>().mass = 30;
 	auto& player_col = player.AddComponent<CollisionComponent>();
 	player_col.Size({0.35f, 0.9f});
 	player_col.DrawBox(false);
 	player.AddComponent<AudioSourceComponent>();
 
+	playerController = &player.GetScript<PlayerController>();
+
 	// Box Spawner
-	boxSpawner = scene->CreateEntity("Box Spawner");
+	Entity boxSpawner = scene->CreateEntity("Box Spawner");
 	boxSpawner.AddComponent<NativeScriptComponent>().Bind<BoxSpawner>();
 
 	// Enemy Spawner
@@ -93,15 +95,6 @@ void GameLayer::OnAttach() {
 		[]() { UI::on_button->textScale = 0.9f; }
 	);
 	UI::EndUI();
-
-	OnStart();
-}
-
-void GameLayer::OnStart() {
-	Time time;
-	scene->OnUpdate(time);
-
-	playerController = &player.GetScript<PlayerController>();
 }
 
 void GameLayer::OnUpdate(Time time) {
@@ -135,7 +128,6 @@ void GameLayer::OnUpdate(Time time) {
 		UI::DrawString(millitimestr, { 55, 440 + floatOffset }, 0.60f, texCol);
 
 		UI::EndUI();
-
 	}
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });

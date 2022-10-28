@@ -62,43 +62,45 @@ Entity Scene::CreateEntity(std::string name) {
 }
 
 void Scene::OnUpdate(Time time) {
-	// Native Script Component
-	scene_registry.view<NativeScriptComponent>().each([=](auto entity, auto& script) {
-		if (script.active && scene_registry.get<TagComponent>(entity).active) {
-			if (!script.instance) {
-				script.instance = script.InstantiateScript();
-				script.instance->entity = Entity{ entity, &scene_registry };
-				script.instance->OnCreate();
-			}
-			script.instance->OnUpdate(time);
-		}
-	});
-
-	// Rigidbody & Collision
+	// Rigidbody
 	auto rigidGroup = 
-		scene_registry.group<RigidbodyComponent, CollisionComponent>(entt::get<TransformComponent>);
+		scene_registry.group<RigidbodyComponent>(entt::get<CollisionComponent, TransformComponent, TagComponent>);
 	for (auto entity : rigidGroup) {
-		auto [transform, rigidbody, collision] = 
-			rigidGroup.get<TransformComponent, RigidbodyComponent, CollisionComponent>(entity);
+		auto [transform, rigidbody, collision, tag] = 
+			rigidGroup.get<TransformComponent, RigidbodyComponent, CollisionComponent, TagComponent>(entity);
 		rigidbody.position = transform.position;
 	
-		if (!rigidbody.active || !scene_registry.get<TagComponent>(entity).active) continue;
+		if (!rigidbody.active || !tag.active) continue;
 
 		rigidbody.position += rigidbody.velocity * time.deltaTime;
-		glm::vec2 push_dpos = { 0, 0 };
+		transform.position = rigidbody.position;
+		Collision::Update(entity, scene_registry);
 
+		glm::vec2 push_dpos = { 0, 0 };
 		if (collision.active) {
-			CollisionPacket packet = Collision::Check(entity, scene_registry);
+			CollisionPacket& packet = Collision::Check(entity, scene_registry);
 			for (auto& box : packet.boxes) {
 				glm::vec2 push = box.normal * box.depth;
+				auto box_rb = box.entity.TryGetComponent<RigidbodyComponent>();
 
-				float massMultiplier = 1;
-				if (box.rigidbody && !box.rigidbody->isStatic) {
-					massMultiplier = box.rigidbody->mass / rigidbody.mass;
-					push /= 2.0f;
-					box.rigidbody->position -= glm::vec3(push, 0);
+				if (box_rb && !box_rb->isStatic) {
+					float totalMass = rigidbody.mass + box_rb->mass;
+					box_rb->position -= glm::vec3(push * (rigidbody.mass / totalMass), 0);
+					push *= (box_rb->mass / totalMass);
+					if (tag.tag == "Bullet") {
+						box_rb->velocity += rigidbody.velocity * 0.2f;
+						if (box.normal.x >= 0 && box.normal.y >= 0)
+							rigidbody.velocity *= glm::vec3(-box.normal * 0.4f, 0);
+						else
+							rigidbody.velocity *= glm::vec3(box.normal * 0.4f, 0);
+					}
 				}
-				push *= massMultiplier;
+				else if (tag.tag == "Bullet") {
+					if (box.normal.x >= 0 && box.normal.y >= 0)
+						rigidbody.velocity *= glm::vec3(-box.normal * 0.4f, 0);
+					else 
+						rigidbody.velocity *= glm::vec3(box.normal * 0.4f, 0);
+				}
 
 				if (glm::abs(push_dpos.x) < glm::abs(push.x)) push_dpos.x = push.x;
 				if (glm::abs(push_dpos.y) < glm::abs(push.y)) push_dpos.y = push.y;
@@ -108,6 +110,24 @@ void Scene::OnUpdate(Time time) {
 		rigidbody.position += glm::vec3(push_dpos, 0);
 		transform.position = rigidbody.position;
 	}
+
+	// Native Script Component
+	scene_registry.view<NativeScriptComponent>().each([=](auto entity, auto& script) {
+		if (script.active && scene_registry.get<TagComponent>(entity).active) {
+			if (!script.instance) {
+				script.instance = script.InstantiateScript();
+				script.initialized = false;
+			}
+			if (!script.initialized) {
+				script.initialized = true;
+				script.instance->entity = Entity{ entity, &scene_registry };
+				script.instance->OnCreate();
+			}
+			if (!Collision::Check(entity, scene_registry).empty)
+				script.instance->OnCollision(Collision::Check(entity, scene_registry), time);
+			script.instance->OnUpdate(time);
+		}
+	});
 
 	// Transform parent inheritance
 	auto transformView = scene_registry.view<TransformComponent>();

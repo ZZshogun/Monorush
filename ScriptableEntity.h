@@ -14,9 +14,10 @@ protected:
 	virtual void OnCreate() {}
 	virtual void OnUpdate(Time time) {}
 	virtual void OnDrawUI(Time time) {}
+	virtual void OnCollision(CollisionPacket& entity, Time time) {}
 
 public:
-	virtual ~ScriptableEntity() {}
+	~ScriptableEntity() { GetComponent<NativeScriptComponent>().Unbind(); }
 
 	template <typename T>
 	T& GetComponent() {

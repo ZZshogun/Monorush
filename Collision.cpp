@@ -1,5 +1,8 @@
 #include "Collision.h"
 
+CollisionPacket Collision::emptyPacket = {{}};
+std::map<entt::registry*, Collision::EntityPacket> Collision::collisionMap;
+
 BoxPacket Collision::_BoxCollision(CollisionComponent& a, CollisionComponent& b,
 	glm::vec2 translate_a, glm::vec2 translate_b) 
 {
@@ -37,26 +40,39 @@ BoxPacket Collision::_BoxCollision(CollisionComponent& a, CollisionComponent& b,
 	return {true, glm::abs(depth), normal};
 }
 
-CollisionPacket Collision::Check(entt::entity entity, entt::registry& registry) {
+void Collision::Update(entt::entity entity, entt::registry& registry) {
+	if (!registry.valid(entity)) return;
+
+	auto collisionGroup =
+		registry.group<CollisionComponent>(entt::get<TransformComponent, TagComponent>);
+	auto [a_cold, a_tran, a_tag] =
+		collisionGroup.get<CollisionComponent, TransformComponent, TagComponent>(entity);
+	if (!a_cold.active || !a_tag.active) return;
+
 	CollisionPacket packet;
-	auto view = registry.view<CollisionComponent>();
-	for (auto other : view) {
-		if (entity == other) continue;
-		auto& other_collision = view.get<CollisionComponent>(other);
-		if (!other_collision.active || !registry.get<TagComponent>(other).active) continue;
-		auto& collision = view.get<CollisionComponent>(entity);
-		auto& transformA = registry.get<RigidbodyComponent>(entity);
-		auto& transformB = registry.get<TransformComponent>(other);
-		glm::vec2 translate_a = { transformA.position.x, transformA.position.y };
-		glm::vec2 translate_b = { transformB.position.x, transformB.position.y };
-		BoxPacket boxpacket = _BoxCollision(collision, other_collision, translate_a, translate_b);
+
+	for (auto jt = collisionGroup.begin(); jt != collisionGroup.end(); ++jt) {
+		if (entity == *jt) continue;
+		auto [b_cold, b_tran, b_tag] =
+			collisionGroup.get<CollisionComponent, TransformComponent, TagComponent>(*jt);
+		if (!b_cold.active || !b_tag.active) continue;
+		if (a_cold.ignoredTags.count(b_tag.tag) || b_cold.ignoredTags.count(a_tag.tag)) continue;
+
+		BoxPacket boxpacket = _BoxCollision(a_cold, b_cold, a_tran.position, b_tran.position);
 		if (boxpacket.collided) {
-			boxpacket.rigidbody = registry.try_get<RigidbodyComponent>(other);
-			if (boxpacket.rigidbody && !boxpacket.rigidbody->active) boxpacket.rigidbody = NULL;
-			packet.boxes.push_back(boxpacket);
-			
+			boxpacket.entity = Entity{ *jt, &registry };
+			if (packet.empty) packet.empty = false;
+			packet.boxes.insert(boxpacket);
 		}
 	}
 
-	return packet;
+	collisionMap[&registry][entity] = packet;
+}
+
+CollisionPacket& Collision::Check(entt::entity entity, entt::registry& registry) {
+	if (collisionMap.find(&registry) == collisionMap.end())
+		return emptyPacket;
+	if (collisionMap[&registry].find(entity) == collisionMap[&registry].end())
+		return emptyPacket;
+	return collisionMap[&registry][entity];
 }

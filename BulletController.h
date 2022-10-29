@@ -26,6 +26,10 @@ public:
 		for (auto& box : packet.boxes) {
 			if (box.entity.GetComponent<TagComponent>().tag == "Enemy") {
 				box.entity.GetScript<EnemyController>().Hurt(damage);
+				auto& enemy_rb = box.entity.GetComponent<RigidbodyComponent>();
+				auto& bullet_rb = GetComponent<RigidbodyComponent>();
+				float totalMass = enemy_rb.mass + bullet_rb.mass;
+				enemy_rb.velocity += bullet_rb.velocity * (bullet_rb.mass / totalMass);
 				break;
 			}
 		}

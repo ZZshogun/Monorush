@@ -14,9 +14,10 @@ public:
 	float bulletpersec = 3;
 	float shootPower = 12;
 	int bulletDamage = 10;
+	float bulletImpact = 2;
 
 private:
-	glm::vec2 col_idle_size = { 0.35f, 0.9f };
+	glm::vec2 col_idle_size = { 0.35f, 0.92f };
 	glm::vec2 col_idle_offset = { 0, 0 };
 	glm::vec2 col_run_size = { 0.35f, 0.7f };
 	glm::vec2 col_run_offset = { 0, -0.12f };
@@ -26,7 +27,7 @@ private:
 	int shotFired = 0;
 
 	bool reloading = false;
-	const float reloadTime = 1.5f;
+	const float reloadTime = 1.2f;
 	float _reload = 0;
 	float cdtime = 0;
 	std::string gunstate = std::to_string(cbullet) + " | " + std::to_string(fullammo);
@@ -44,21 +45,22 @@ private:
 
 public:
 
-	void Hurt(SpriteRendererComponent& sprite) {
-		if (playerHeath <= 0 || invincible) return;
+	void Hurt(SpriteRendererComponent& sprite, CollisionComponent& collider) {
+		if (heal || playerHeath <= 0 || invincible) return;
 		playerSpeed = 5;
-		playerHeath = glm::clamp<int>(playerHeath - 1, 0, maxPlayerHealth);
 		heartsCol[(size_t)playerHeath] = glm::vec4{1, 0.11f, 0.28f, 1};
-		hurt = true;
+		playerHeath = glm::clamp<int>(playerHeath - 1, 0, maxPlayerHealth);
 		playerOpacity = 0.6f;
 		sprite.Color({ 1, 0.41f, 0.38f, playerOpacity });
+		collider.ignoredTags.insert("Enemy");
 		invincible = true;
+		hurt = true;
 	}
 
 	void Heal(SpriteRendererComponent& sprite) {
-		if (playerHeath >= maxPlayerHealth) return;
+		if (hurt || playerHeath >= maxPlayerHealth) return;
 		playerHeath = glm::clamp<int>(playerHeath + 1, 0, maxPlayerHealth);
-		heartsCol[(size_t)playerHeath - 1] = glm::vec4{ 0.11f, 1, 0.28f, 1 };
+		heartsCol[(size_t)playerHeath] = glm::vec4{ 0.11f, 1, 0.28f, 1 };
 		sprite.Color({ 0.12f, 1, 0.12f, playerOpacity });
 		heal = true;
 	}
@@ -83,7 +85,7 @@ public:
 		bullet.GetComponent<TagComponent>().tag = "Bullet";
 		bullet.GetComponent<TransformComponent>().position = transform.position + glm::vec3(direction * 0.15f, 0);
 		auto& rb = bullet.AddComponent<RigidbodyComponent>();
-		rb.mass = 2.0f;
+		rb.mass = bulletImpact;
 		rb.velocity = glm::vec3(direction, 0) * shootPower;
 		auto& colld = bullet.AddComponent<CollisionComponent>();
 		colld.ignoredTags.insert("Player");
@@ -91,32 +93,34 @@ public:
 		colld.Size({0.2f, 0.2f});
 		colld.DrawBox(true);
 		bullet.AddComponent<NativeScriptComponent>().Bind<BulletController>();
-		bullet.GetScript<BulletController>().damage = bulletDamage;
+		auto& bCont = bullet.GetScript<BulletController>();
+		bCont.damage = bulletDamage;
 	}
 
 	void OnCreate() {
-		for (int i = 0; i < maxPlayerHealth; i++) heartsCol.emplace_back(0, 0, 0, 1);
+		for (int i = 0; i <= maxPlayerHealth; i++) heartsCol.push_back(Color::Black);
 
 		auto& sprite = GetComponent<SpriteRendererComponent>();
+		auto& collider = GetComponent<CollisionComponent>();
 
 		UI::StartUI(glm::ivec2{ 1920, 1080 });
 		hurtButton = UI::CreateButton(
 			"HURT",
 			1,
-			{ 1, 1, 1, 1 },
+			Color::White,
 			{ -150, -450 },
 			{ 200, 100 },
-			{ 0, 0, 0, 1 },
-			[&]() { Hurt(sprite); },
+			Color::Black,
+			[&]() { Hurt(sprite, collider); },
 			{ 0.3f, 0.3f, 0.3f, 1 }
 		);
 		healButton = UI::CreateButton(
 			"HEAL",
 			1,
-			{ 1, 1, 1, 1 },
+			Color::White,
 			{ 150, -450 },
 			{ 200, 100 },
-			{ 0, 0, 0, 1 },
+			Color::Black,
 			[&]() { Heal(sprite); },
 			{ 0.3f, 0.3f, 0.3f, 1 }
 		);
@@ -137,6 +141,7 @@ public:
 			invCountTime += time.deltaTime;
 			if (invCountTime >= invTime + 0.7f) {
 				invincible = false;
+				collider.ignoredTags.erase("Enemy");
 				playerSpeed = 4;
 				invCountTime = 0;
 			}
@@ -151,7 +156,7 @@ public:
 			if (blinktime >= blink) {
 				blinktime = 0;
 				hurt = false;
-				heartsCol[(size_t)playerHeath] = { 0, 0, 0 , 0.25f };
+				heartsCol[(size_t)playerHeath + 1] = { 0, 0, 0 , 0.25f };
 				sprite.Color({ 1, 1, 1, playerOpacity });
 			}
 		}
@@ -161,7 +166,7 @@ public:
 			if (blinktime >= blink) {
 				blinktime = 0;
 				heal = false;
-				heartsCol[(size_t)playerHeath - 1] = Color::Black;
+				heartsCol[(size_t)playerHeath] = Color::Black;
 				sprite.Color({ 1, 1, 1, playerOpacity });
 			}
 		}
@@ -224,6 +229,7 @@ public:
 		else {
 			animator.SetAnimationIndex(1);
 			collider.Origin(col_idle_offset);
+			collider.Size(col_idle_size);
 		}
 
 		// Move direction on x axis
@@ -240,7 +246,7 @@ public:
 		UI::StartUI(glm::ivec2{ 1920, 1080 });
 
 		UI::Anchor(CENTER);
-		for (int i = 0; i < maxPlayerHealth; i++) {
+		for (int i = 1; i <= maxPlayerHealth; i++) {
 			UI::DrawImage(Texture::library["heart"], { -910 + i * 70, -490 }, { 70, 70 }, heartsCol[i]);
 		}
 
@@ -261,7 +267,7 @@ public:
 	void OnCollision(CollisionPacket& packet, Time time) {
 		for (auto& box : packet.boxes) {
 			if (box.entity.GetComponent<TagComponent>().tag == "Enemy") {
-				Hurt(GetComponent<SpriteRendererComponent>());
+				Hurt(GetComponent<SpriteRendererComponent>(), GetComponent<CollisionComponent>());
 				break;
 			}
 		}

@@ -313,7 +313,7 @@ void UI::PollsEvent(GLFWwindow* window, Time time) {
 		glm::ivec2 clickPos = glm::ivec2{ Input::MousePosition() };
 		clickPos = glm::vec2{clickPos} / glm::vec2{resolution / 2} * glm::vec2{ button->ref_resolution };
 
-		if (Math::InVec2(clickPos, button->position, button->size)) {
+		if (Math::InBox2i(clickPos, button->position, button->size)) {
 			UI::onEvents = true;
 			UI::on_button = button;
 			if (button->active && !button->hovered) {

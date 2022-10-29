@@ -27,7 +27,7 @@ public:
 	void OnCreate() {
 		healthPoint += (int)(GameManager::difficulty * 6);
 		speed += (int)(GameManager::difficulty * 0.3f);
-		turnSpeed += (int)(glm::pow(GameManager::difficulty, 2) * 0.3f);
+		turnSpeed += (int)(glm::pow(GameManager::difficulty, 2) * 3);
 		turnSpeed = glm::min<float>(turnSpeed, 10);
 
 		auto& tag = GetComponent<TagComponent>();
@@ -37,15 +37,13 @@ public:
 	void OnUpdate(Time time) {
 
 		auto& playerTransform = FindEntityOfName("Player").GetComponent<TransformComponent>();
-		auto& transform = GetComponent<TransformComponent>();
 		auto& rigidBody = GetComponent<RigidbodyComponent>();
-		auto& collider = GetComponent<CollisionComponent>();
 
-		glm::vec3 direction = playerTransform.position - transform.position;
+		glm::vec3 direction = playerTransform.position - GetComponent<TransformComponent>().position;
 		if (GameManager::gameOver) {
 			if (!run_once) {
 				run_once = true;
-				collider.active = false;
+				GetComponent<CollisionComponent>().active = false;
 			}
 			direction *= -1;
 			speed += time.deltaTime;
@@ -56,6 +54,7 @@ public:
 				death = true;
 				GetComponent<SpriteSheetComponent>().DrawAtIndex(1);
 				GetComponent<SpriteRendererComponent>().Color({ 1, 1, 1, 0.75f });
+				GetComponent<CollisionComponent>().active = false;
 			}
 			if (_counter >= disposeWaitTime) {
 				entity.Destroy();
@@ -67,7 +66,7 @@ public:
 		glm::vec3 curDir = glm::length(rigidBody.velocity) < 1 ? 
 			rigidBody.velocity : glm::normalize(rigidBody.velocity);
 		glm::vec3 dirNormalize = glm::normalize(direction);
-		direction = glm::lerp(curDir, dirNormalize, turnSpeed * 0.1f);
+		direction = glm::lerp(curDir, dirNormalize, turnSpeed * 0.01f);
 
 		rigidBody.velocity = direction * (float)speed;
 	}

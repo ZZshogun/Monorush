@@ -16,6 +16,7 @@ MenuLayer::~MenuLayer() {
 	UI::ClearBuffers();
 	Texture::ClearHandles();
 	Audio::ClearBuffers();
+	Collision::ClearCollisionData();
 	scene->Destroy();
 }
 

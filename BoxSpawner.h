@@ -19,12 +19,11 @@ public:
 	void OnCreate() {
 		for (int i = 0; i < count; i++) {
 			Entity entity = Instantiate();
-			entity.AddComponent<CollisionComponent>().DrawBox(false);
-			auto& sprite = entity.AddComponent<SpriteRendererComponent>();
-			sprite.SetTexture(Texture::library["box"]);
+			entity.AddComponent<CollisionComponent>().DrawBox(true);
+			entity.AddComponent<SpriteRendererComponent>();
 			auto& tag = entity.GetComponent<TagComponent>();
 			tag.active = false;
-			tag.name = "Box " + std::to_string(i + 1);
+			tag.name = "Wall " + std::to_string(i + 1);
 			tag.tag = "Wall";
 			entities_pool.push_back(entity);
 			available_index.push(i);
@@ -58,7 +57,8 @@ public:
 				size_t avail = available_index.front();
 				bool& cur_act = entities_pool[avail].GetComponent<TagComponent>().active;
 
-				if (!cur_act && glm::abs(noise[(size_t)(i + j * (size_t)size.y)]) > 0.62f) {
+				size_t noise_location = (size_t)i + j * (size_t)size.y;
+				if (!cur_act && glm::abs(noise[noise_location]) > 0.62f) {
 					auto& ent_tr = entities_pool[avail].GetComponent<TransformComponent>();
 
 					glm::ivec3 pos = glm::ivec3{ floor_pos + glm::vec2{ i - size.x / 2, j - size.y / 2 }, 0 };
@@ -67,6 +67,23 @@ public:
 
 					if (glm::distance(ent_tr.position, transform.position) > viewDistance) continue;
 					if (box_pos.count({pos.x, pos.y})) continue;
+
+					auto& sprite = entities_pool[avail].GetComponent<SpriteRendererComponent>();
+					auto& colld = entities_pool[avail].GetComponent<CollisionComponent>();
+					if (abs(noise[noise_location]) < 0.8f) {
+						sprite.SetTexture(Texture::library["box"]);
+						sprite.order = 0;
+						sprite.Size({ 1, 1 });
+						colld.Size({ 1, 1 });
+						colld.Origin({ 0, 0 });
+					}
+					else {
+						sprite.SetTexture(Texture::library["lamppost"]);
+						sprite.order = 3;
+						sprite.Size({ 1, 2 });
+						colld.Size({ 0.25, 0.6f });
+						colld.Origin({ 0, -0.65f });
+					}
 
 					box_pos.insert({ pos.x, pos.y });
 					available_index.pop();

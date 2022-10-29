@@ -15,6 +15,7 @@ GameLayer::~GameLayer() {
 	UI::ClearBuffers();
 	Texture::ClearHandles();
 	Audio::ClearBuffers();
+	Collision::ClearCollisionData();
 	scene->Destroy();
 }
 
@@ -25,6 +26,7 @@ void GameLayer::OnAttach() {
 	Ref<Texture> boxtex = Texture::Create("box","texture/box.png");
 	Ref<Texture> heart = Texture::Create("heart","texture/heart.png");
 	Ref<Texture> bullet = Texture::Create("bullet","texture/bullet.png");
+	Ref<Texture> lamppost = Texture::Create("lamppost", "texture/lamp_post.png");
 
 	Audio::LoadSound("audio/bounce.wav", "bounce");
 
@@ -40,7 +42,7 @@ void GameLayer::OnAttach() {
 	player.AddComponent<NativeScriptComponent>().Bind<PlayerController>();
 	player.AddComponent<RigidbodyComponent>().mass = 30;
 	auto& player_col = player.AddComponent<CollisionComponent>();
-	player_col.Size({0.35f, 0.9f});
+	player_col.Size({0.35f, 0.92f});
 	player_col.DrawBox(false);
 	player.AddComponent<AudioSourceComponent>();
 

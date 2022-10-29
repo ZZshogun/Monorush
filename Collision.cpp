@@ -44,7 +44,7 @@ void Collision::Update(entt::entity entity, entt::registry& registry) {
 	if (!registry.valid(entity)) return;
 
 	auto collisionGroup =
-		registry.group<CollisionComponent>(entt::get<TransformComponent, TagComponent>);
+		registry.group(entt::get<CollisionComponent, TransformComponent, TagComponent>);
 	auto [a_cold, a_tran, a_tag] =
 		collisionGroup.get<CollisionComponent, TransformComponent, TagComponent>(entity);
 	if (!a_cold.active || !a_tag.active) return;
@@ -75,4 +75,10 @@ CollisionPacket& Collision::Check(entt::entity entity, entt::registry& registry)
 	if (collisionMap[&registry].find(entity) == collisionMap[&registry].end())
 		return emptyPacket;
 	return collisionMap[&registry][entity];
+}
+
+void Collision::ClearCollisionData() {
+	for (auto& scene : collisionMap)
+		scene.second.clear();
+	collisionMap.clear();
 }

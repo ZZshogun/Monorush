@@ -32,6 +32,7 @@ class Collision {
 public:
 	static void Update(entt::entity entity, entt::registry& registry);
 	static CollisionPacket& Check(entt::entity entity, entt::registry& registry);
+	static void ClearCollisionData();
 };
 
 #endif

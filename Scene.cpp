@@ -64,7 +64,7 @@ Entity Scene::CreateEntity(std::string name) {
 void Scene::OnUpdate(Time time) {
 	// Rigidbody
 	auto rigidGroup = 
-		scene_registry.group<RigidbodyComponent>(entt::get<CollisionComponent, TransformComponent, TagComponent>);
+		scene_registry.group(entt::get<RigidbodyComponent, CollisionComponent, TransformComponent, TagComponent>);
 	for (auto entity : rigidGroup) {
 		auto [transform, rigidbody, collision, tag] = 
 			rigidGroup.get<TransformComponent, RigidbodyComponent, CollisionComponent, TagComponent>(entity);
@@ -87,19 +87,6 @@ void Scene::OnUpdate(Time time) {
 					float totalMass = rigidbody.mass + box_rb->mass;
 					box_rb->position -= glm::vec3(push * (rigidbody.mass / totalMass), 0);
 					push *= (box_rb->mass / totalMass);
-					if (tag.tag == "Bullet") {
-						box_rb->velocity += rigidbody.velocity * 0.2f;
-						if (box.normal.x >= 0 && box.normal.y >= 0)
-							rigidbody.velocity *= glm::vec3(-box.normal * 0.4f, 0);
-						else
-							rigidbody.velocity *= glm::vec3(box.normal * 0.4f, 0);
-					}
-				}
-				else if (tag.tag == "Bullet") {
-					if (box.normal.x >= 0 && box.normal.y >= 0)
-						rigidbody.velocity *= glm::vec3(-box.normal * 0.4f, 0);
-					else 
-						rigidbody.velocity *= glm::vec3(box.normal * 0.4f, 0);
 				}
 
 				if (glm::abs(push_dpos.x) < glm::abs(push.x)) push_dpos.x = push.x;
@@ -144,22 +131,24 @@ void Scene::OnUpdate(Time time) {
 
 	// Camera Update
 	bool foundCamera = false;
-	auto cameraGroup = scene_registry.group<CameraComponent>(entt::get<TransformComponent>);
+	entt::entity camera;
+	auto cameraGroup = scene_registry.group(entt::get<CameraComponent, TransformComponent>);
 	for (auto entity : cameraGroup) {
-		auto [transform, camera] =
+		auto [transform, cameraC] =
 			cameraGroup.get<TransformComponent, CameraComponent>(entity);
-		if (camera.active && camera.primary && scene_registry.get<TagComponent>(entity).active) {
+		if (cameraC.active && cameraC.primary && scene_registry.get<TagComponent>(entity).active) {
 			Transform t = { transform.position, transform.rotation, transform.scale };
 			for (auto& it : Shader::LUT)
-				Camera::Update(t, camera.cameraResolution, it.second);
+				Camera::Update(t, cameraC.cameraResolution, it.second);
 			foundCamera = true;
+			camera = entity;
 			break;
 		}
 	}
 	
 	// Audio Sources
 	auto audioGroup = 
-		scene_registry.group<AudioSourceComponent>(entt::get<TransformComponent>);
+		scene_registry.group(entt::get<AudioSourceComponent, TransformComponent>);
 	for (auto entity : audioGroup) {
 		auto [audioSource, transform] = 
 			audioGroup.get<AudioSourceComponent, TransformComponent>(entity);
@@ -183,7 +172,7 @@ void Scene::OnUpdate(Time time) {
 
 	// Audio Listener
 	auto listenerGroup = 
-		scene_registry.group<AudioListenerComponent>(entt::get<TransformComponent>);
+		scene_registry.group(entt::get<AudioListenerComponent, TransformComponent>);
 	for (auto entity : listenerGroup) {
 		auto [listener, transform] = 
 			listenerGroup.get<AudioListenerComponent, TransformComponent>(entity);
@@ -198,26 +187,39 @@ void Scene::OnUpdate(Time time) {
 
 	if (foundCamera) {
 
+		auto& cameraTransform = scene_registry.get<TransformComponent>(camera);
+		auto& cameraComponent = scene_registry.get<CameraComponent>(camera);
+
 		// SpriteRenderer
 		auto renderGroup = 
-			scene_registry.group<SpriteRendererComponent>(entt::get<TransformComponent>);
+			scene_registry.group(entt::get<SpriteRendererComponent, TransformComponent, TagComponent>);
 		// Render reordering
 		renderGroup.sort<SpriteRendererComponent>(
-			[](SpriteRendererComponent& a, SpriteRendererComponent& b) {
+			[](const SpriteRendererComponent& a, const SpriteRendererComponent& b) {
 				return a.order < b.order;
 			}
 		);
 		for (auto entity : renderGroup) {
-			auto [transformC, sprite] =
-				renderGroup.get<TransformComponent, SpriteRendererComponent>(entity);
+			auto [sprite, transformC, tag] =
+				renderGroup.get<SpriteRendererComponent, TransformComponent, TagComponent>(entity);
 			
-			if (!sprite.active || !scene_registry.get<TagComponent>(entity).active) continue;
+			if (!sprite.active || !tag.active) continue;
+
+			glm::vec3 cameraPos = cameraTransform.position;
+			glm::vec3 cameraViewDist = glm::vec3(
+				cameraComponent.cameraResolution + sprite.Size() * glm::abs(glm::vec2(transformC.scale)),
+				0);
+
+			if (!Math::InBox2(transformC.position, cameraPos, cameraViewDist))
+				continue;
 
 			Transform transform = { transformC.position, transformC.rotation, transformC.scale };
 
 			if (sprite.parallelTexture)
 				sprite.TextureOffset(glm::vec2{ transform.position.x, transform.position.y } / sprite.UVRepeat());
 
+			if (tag.tag == "Wall" && sprite.Color() == glm::vec4{ 0.12f, 1, 0.12f, 0.6f })
+				std::cout << "What\n";
 			Ref<Material> material = Material::Create(sprite.GetTexture(), sprite.Color());
 
 			// Sprite sheet resizing

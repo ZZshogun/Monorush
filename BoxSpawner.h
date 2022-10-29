@@ -19,7 +19,7 @@ public:
 	void OnCreate() {
 		for (int i = 0; i < count; i++) {
 			Entity entity = Instantiate();
-			entity.AddComponent<CollisionComponent>().DrawBox(true);
+			entity.AddComponent<CollisionComponent>().DrawBox(false);
 			entity.AddComponent<SpriteRendererComponent>();
 			auto& tag = entity.GetComponent<TagComponent>();
 			tag.active = false;
@@ -61,7 +61,7 @@ public:
 				if (!cur_act && glm::abs(noise[noise_location]) > 0.62f) {
 					auto& ent_tr = entities_pool[avail].GetComponent<TransformComponent>();
 
-					glm::ivec3 pos = glm::ivec3{ floor_pos + glm::vec2{ i - size.x / 2, j - size.y / 2 }, 0 };
+					glm::ivec3 pos = glm::ivec3{ floor_pos + glm::vec2{ i - size.x / 2.0f, j - size.y / 2.0f }, 0 };
 					if (pos == glm::ivec3{ floor_pos, 0 }) continue;
 					ent_tr.position = pos;
 

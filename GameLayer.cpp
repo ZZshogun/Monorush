@@ -5,6 +5,8 @@
 #include "BoxSpawner.h"
 
 GameLayer::GameLayer() {
+	state = std::make_shared<LayerState>();
+
 	scene = Scene::Create();
 	camera = scene->CreateEntity("Camera");
 	camera.AddComponent<CameraComponent>().primary = true;
@@ -27,10 +29,22 @@ void GameLayer::OnAttach() {
 	Ref<Texture> heart = Texture::Create("heart","texture/heart.png");
 	Ref<Texture> bullet = Texture::Create("bullet","texture/bullet.png");
 	Ref<Texture> lamppost = Texture::Create("lamppost", "texture/lamp_post.png");
+	Ref<Texture> tile = Texture::Create("tile", "texture/tile.png");
 
 	Audio::LoadSound("audio/bounce.wav", "bounce");
 
 	Noise::RandomSeed();
+
+	// Background
+	Entity background = scene->CreateEntity("Background");
+	auto& bgSprite = background.AddComponent<SpriteRendererComponent>();
+	bgSprite.SetTexture(tile);
+	bgSprite.UVRepeat(16);
+	bgSprite.ScreenSpace(true);
+	bgSprite.Color({ 1, 1, 1, 0.2f });
+	bgSprite.parallelTexture = true;
+	bgSprite.order = -1;
+	bgSprite.shader = "unlit-edgefade";
 
 	// Player
 	player = scene->CreateEntity("Player");
@@ -60,6 +74,7 @@ void GameLayer::OnAttach() {
 	camera.GetComponent<TransformComponent>().parent = &player_transform;
 	boxSpawner.GetComponent<TransformComponent>().parent = &player_transform;
 	enemySpawner.GetComponent<TransformComponent>().parent = &player_transform;
+	background.GetComponent<TransformComponent>().parent = &player_transform;
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
 	UI::Anchor(CENTER);
@@ -70,7 +85,7 @@ void GameLayer::OnAttach() {
 		{ -850, 480 },
 		{ 160, 75 },
 		Color::Black,
-		[&]() { state.SceneAddition(-1); },
+		[&]() { state->SceneAddition(-1); },
 		Color::Black,
 		[]() { UI::on_button->textScale = 1; }
 	);
@@ -81,7 +96,7 @@ void GameLayer::OnAttach() {
 		{ 0, -300 },
 		{ 270, 80 },
 		Color::Transparent,
-		[&]() { state.ReloadScene(); },
+		[&]() { state->ReloadScene(); },
 		Color::Transparent,
 		[]() { UI::on_button->textScale = 2; }
 	);
@@ -92,7 +107,7 @@ void GameLayer::OnAttach() {
 		{0, -400},
 		{530, 75},
 		Color::Transparent,
-		[&] () { state.SceneAddition(-1); },
+		[&] () { state->SceneAddition(-1); },
 		Color::Transparent,
 		[]() { UI::on_button->textScale = 0.9f; }
 	);
@@ -101,7 +116,7 @@ void GameLayer::OnAttach() {
 
 void GameLayer::OnUpdate(Time time) {
 	GameManager::Update(time);
-	if (!state.update) scene->OnUpdate(time);
+	if (!state->update) scene->OnUpdate(state, time);
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
 	UI::Anchor(CENTER);

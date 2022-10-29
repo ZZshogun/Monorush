@@ -73,6 +73,7 @@ void Shader::Init() {
 	LUT["unlit"] = Create("unlit.vert", "unlit.frag");
 	LUT["glyph"] = Create("glyph.vert", "glyph.frag");
 	LUT["image"] = Create("image.vert", "image.frag");
+	LUT["unlit-edgefade"] = Create("unlit.vert", "unlit-edgefade.frag");
 }
 
 void Shader::Bind() {

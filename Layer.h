@@ -5,39 +5,6 @@
 
 class PlayerController;
 
-struct LayerState {
-	// SETTING
-	void ReloadScene() {
-		reload = true;
-		update = true;
-	}
-	void SceneAddition(int addition) { 
-		currentSceneIndex += addition; update = true; 
-	}
-	void SwitchVolume() { 
-		volumeGain += 2.5f; 
-		if (volumeGain > 10) volumeGain = 0; 
-		else if (volumeGain < 0) volumeGain = 10; 
-		update = true;
-	}
-	void ToggleFullScreen() { 
-		fullScreen = !fullScreen; 
-		update = true;
-	}
-	void Terminate() { 
-		terminate = true; 
-		update = true;
-	}
-
-	// RESPONSE
-	bool update = false;
-	int currentSceneIndex = 0;
-	float volumeGain = 10;
-	bool reload = false;
-	bool fullScreen = false;
-	bool terminate = false;
-};
-
 class Layer {
 public:
 	static void SetClearColor(glm::vec4 color);
@@ -61,7 +28,7 @@ private:
 	Ref<UI::Button> backButton;
 
 public:
-	LayerState state{};
+	Ref<LayerState> state;
 
 	MenuLayer();
 	~MenuLayer();
@@ -90,7 +57,7 @@ private:
 
 
 public:
-	LayerState state{};
+	Ref<LayerState> state;
 
 	GameLayer();
 	~GameLayer();

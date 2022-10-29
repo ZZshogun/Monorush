@@ -16,15 +16,51 @@ struct TransformComponent {
 	glm::vec3 position = {0, 0, 0 };
 	glm::vec3 rotation = { 0, 0, 0 };
 	glm::vec3 scale = { 1, 1, 1 };
+
+	glm::vec3 localposition = { 0, 0, 0 };
+	glm::vec3 localrotation = { 0, 0, 0 };
+	glm::vec3 localscale = { 1, 1, 1 };
+
+	glm::mat4 Model() const {
+		glm::mat4 model = glm::mat4(1);
+
+		model = glm::translate(model, localposition);
+
+		model = glm::rotate(model, glm::radians(localrotation.x), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(localrotation.y), glm::vec3(0, 1, 0));
+		model = glm::rotate(model, glm::radians(localrotation.z), glm::vec3(0, 0, 1));
+
+		model = glm::scale(model, localscale);
+
+		model = glm::translate(model, position);
+
+		model = glm::rotate(model, glm::radians(rotation.x), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(rotation.y), glm::vec3(0, 1, 0));
+		model = glm::rotate(model, glm::radians(rotation.z), glm::vec3(0, 0, 1));
+
+		model = glm::scale(model, scale);
+
+		return model;
+	}
 };
 
 struct SpriteRendererComponent {
+public:
 	bool active = true;
 	int order = 0;
 	bool parallelTexture = false;
+	bool flipX = false;
+	bool flipY = false;
+	std::string shader = "unlit";
 
-public:
-	void SetTexture(Ref<Texture>& texture) { this->texture = texture; update = true; }
+	void SetTexture(Ref<Texture>& texture) { 
+		this->texture = texture; 
+		update = true; 
+	}
+	void ScreenSpace(bool status) {
+		this->screenSpace = status;
+		update = true;
+	}
 	void Color(glm::vec4 color) {
 		if (albedo == color) return;
 		albedo = color;
@@ -37,12 +73,18 @@ public:
 	}
 	void TextureOffset(glm::vec2 offset) { 
 		if (textureOffset == offset) return;
-		textureOffset = offset; update = true; 
+		textureOffset = offset; 
+		update = true; 
 	}
 	void UVRepeat(float count) { 
-		if (UVrepeat == count) return;
-		UVrepeat = count; 
+		if (UVrepeat == glm::vec2{ count, count }) return;
+		UVrepeat = { count, count };
 		update = true; 
+	}
+	void UVRepeat(glm::vec2 count) {
+		if (UVrepeat == count) return;
+		UVrepeat = count;
+		update = true;
 	}
 	
 	bool UpdateRequired() { 
@@ -51,22 +93,24 @@ public:
 		return ret;
 	}
 	Ref<Texture>& GetTexture() { return texture; }
+	bool ScreenSpace() { return screenSpace; }
 	glm::vec4 Color() { return albedo; }
 	glm::vec2 Size() { return size; }
 	glm::vec2 TextureOffset() { return textureOffset; }
-	float UVRepeat() { return UVrepeat; }
+	glm::vec2 UVRepeat() { return UVrepeat; }
 	Ref<VAO>& Pointer() { return handle; }
 	Ref<VBO>& Data() { return data; }
 
 private:
 	bool update = true;
+	bool screenSpace = false;
 	Ref<VAO> handle;
 	Ref<VBO> data;
 	Ref<Texture> texture;
 	glm::vec4 albedo = Color::White;
 	glm::vec2 size = { 1, 1 };
 	glm::vec2 textureOffset = { 0, 0 };
-	float UVrepeat = 1;
+	glm::vec2 UVrepeat = { 1, 1 };
 };
 
 struct CameraComponent {

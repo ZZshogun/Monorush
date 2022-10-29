@@ -156,7 +156,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Audio.cpp" />
-    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="EBO.cpp" />
     <ClCompile Include="Entity.cpp" />
@@ -176,7 +175,6 @@
     <ClCompile Include="stb.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Time.cpp" />
-    <ClCompile Include="Transform.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="VAO.cpp" />
     <ClCompile Include="VBO.cpp" />
@@ -194,7 +192,6 @@
     <ClInclude Include="Audio.h" />
     <ClInclude Include="BoxSpawner.h" />
     <ClInclude Include="BulletController.h" />
-    <ClInclude Include="Camera.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="EBO.h" />
@@ -219,7 +216,6 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Time.h" />
-    <ClInclude Include="Transform.h" />
     <ClInclude Include="UI.h" />
     <ClInclude Include="VAO.h" />
     <ClInclude Include="VBO.h" />
@@ -227,6 +223,9 @@
   <ItemGroup>
     <Image Include="texture\man.png" />
     <Image Include="texture\tile.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="unlit-edgefade.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

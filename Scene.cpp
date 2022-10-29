@@ -61,15 +61,17 @@ Entity Scene::CreateEntity(std::string name) {
 	return entity;
 }
 
-void Scene::OnUpdate(Time time) {
+void Scene::OnUpdate(Ref<LayerState>& layerState, Time time) {
+	if (!layerState) return;
+
 	// Rigidbody
-	auto rigidGroup = 
+	auto rigidGroup =
 		scene_registry.group(entt::get<RigidbodyComponent, CollisionComponent, TransformComponent, TagComponent>);
 	for (auto entity : rigidGroup) {
-		auto [transform, rigidbody, collision, tag] = 
+		auto [transform, rigidbody, collision, tag] =
 			rigidGroup.get<TransformComponent, RigidbodyComponent, CollisionComponent, TagComponent>(entity);
 		rigidbody.position = transform.position;
-	
+
 		if (!rigidbody.active || !tag.active) continue;
 
 		rigidbody.position += rigidbody.velocity * time.deltaTime;
@@ -114,7 +116,7 @@ void Scene::OnUpdate(Time time) {
 				script.instance->OnCollision(Collision::Check(entity, scene_registry), time);
 			script.instance->OnUpdate(time);
 		}
-	});
+		});
 
 	// Transform parent inheritance
 	auto transformView = scene_registry.view<TransformComponent>();
@@ -137,13 +139,37 @@ void Scene::OnUpdate(Time time) {
 		auto [transform, cameraC] =
 			cameraGroup.get<TransformComponent, CameraComponent>(entity);
 		if (cameraC.active && cameraC.primary && scene_registry.get<TagComponent>(entity).active) {
-			Transform t = { transform.position, transform.rotation, transform.scale };
-			for (auto& it : Shader::LUT)
-				Camera::Update(t, cameraC.cameraResolution, it.second);
-			foundCamera = true;
-			camera = entity;
-			break;
+
+			cameraC.resolution = layerState->resolution;
+			for (auto& it : Shader::LUT) {
+				glm::mat4 projection = glm::mat4(1.0f);
+				glm::mat4 view = glm::mat4(1.0f);
+
+				glm::vec2 res = cameraC.cameraResolution / 2.0f;
+				projection = glm::ortho<float>(
+					-res.x,
+					res.x,
+					-res.y,
+					res.y,
+					-1000,
+					1000
+					);
+
+				view = glm::translate(view, -transform.position);
+				view = glm::rotate(view, glm::radians(-transform.rotation.x), glm::vec3(1, 0, 0));
+				view = glm::rotate(view, glm::radians(-transform.rotation.y), glm::vec3(0, 1, 0));
+				view = glm::rotate(view, glm::radians(-transform.rotation.z), glm::vec3(0, 0, 1));
+
+				it.second->Bind();
+				glUniformMatrix4fv(glGetUniformLocation(it.second->handle, "proj"), 1, GL_FALSE, glm::value_ptr(projection));
+				glUniformMatrix4fv(glGetUniformLocation(it.second->handle, "view"), 1, GL_FALSE, glm::value_ptr(view));
+				glUniform1f(glGetUniformLocation(it.second->handle, "intensity"), 0.08f);
+				glUniform2f(glGetUniformLocation(it.second->handle, "viewport"), cameraC.resolution.x, cameraC.resolution.y);
+			}
 		}
+		foundCamera = true;
+		camera = entity;
+		break;
 	}
 	
 	// Audio Sources
@@ -200,26 +226,21 @@ void Scene::OnUpdate(Time time) {
 			}
 		);
 		for (auto entity : renderGroup) {
-			auto [sprite, transformC, tag] =
+			auto [sprite, transform, tag] =
 				renderGroup.get<SpriteRendererComponent, TransformComponent, TagComponent>(entity);
 			
 			if (!sprite.active || !tag.active) continue;
 
 			glm::vec3 cameraPos = cameraTransform.position;
 			glm::vec3 cameraViewDist = glm::vec3(
-				cameraComponent.cameraResolution + sprite.Size() * glm::abs(glm::vec2(transformC.scale)),
-				0);
+				cameraComponent.cameraResolution + sprite.Size() * glm::abs(glm::vec2(transform.scale)), 0);
 
-			if (!Math::InBox2(transformC.position, cameraPos, cameraViewDist))
+			if (!Math::InBox2(transform.position, cameraPos, cameraViewDist))
 				continue;
 
-			Transform transform = { transformC.position, transformC.rotation, transformC.scale };
-
 			if (sprite.parallelTexture)
-				sprite.TextureOffset(glm::vec2{ transform.position.x, transform.position.y } / sprite.UVRepeat());
+				sprite.TextureOffset(glm::vec2(transform.position) / sprite.Size() * sprite.UVRepeat());
 
-			if (tag.tag == "Wall" && sprite.Color() == glm::vec4{ 0.12f, 1, 0.12f, 0.6f })
-				std::cout << "What\n";
 			Ref<Material> material = Material::Create(sprite.GetTexture(), sprite.Color());
 
 			// Sprite sheet resizing
@@ -242,7 +263,7 @@ void Scene::OnUpdate(Time time) {
 					float offset = (float)spriteSheet.DrawAtIndex() * spriteSheet.SizePerSprite();
 					glm::vec2 start = glm::vec2{ offset, 0 } / spriteSheet.Size();
 					glm::vec2 end = glm::vec2{ offset + spriteSheet.SizePerSprite(), 1 } / spriteSheet.Size();
-					Sprite::Resize(sprite.Pointer(), sprite.Data(), sprite.Size(), start, end);
+					Sprite::Resize(sprite.Pointer(), sprite.Data(), sprite.Size(), start, end, glm::bvec2{ sprite.flipX, sprite.flipY });
 				}
 			}
 			// Animator resizing
@@ -272,22 +293,27 @@ void Scene::OnUpdate(Time time) {
 					float offset = (float)aniObject.DrawAtIndex() * aniObject.SizePerSprite();
 					glm::vec2 start = glm::vec2{ offset, 0 } / aniObject.Size();
 					glm::vec2 end = glm::vec2{ offset + aniObject.SizePerSprite(), 1 } / aniObject.Size();
-					Sprite::Resize(sprite.Pointer(), sprite.Data(), sprite.Size(), start, end);
+					Sprite::Resize(sprite.Pointer(), sprite.Data(), sprite.Size(), start, end, glm::bvec2{ sprite.flipX, sprite.flipY });
 				}
 			}
-			// Default resizing
 			else if (sprite.UpdateRequired()) {
-				Sprite::Resize(sprite.Pointer(), sprite.Data(), sprite.Size(), sprite.UVRepeat());
+				if (sprite.ScreenSpace()) {
+					glm::vec2 camRes = scene_registry.get<CameraComponent>(camera).cameraResolution;
+					float maxEdge = glm::max(camRes);
+					sprite.Size({ maxEdge, maxEdge });
+				}
+
+				Sprite::Resize(sprite.Pointer(), sprite.Data(), sprite.Size(), sprite.UVRepeat(), glm::bvec2{ sprite.flipX, sprite.flipY });
 			}
 
 			// Collsion box visualization
 			CollisionComponent* collision = scene_registry.try_get<CollisionComponent>(entity);
 			if (collision && collision->DrawBox()) {
-				Transform col_t = transform;
+				TransformComponent col_t = transform;
 				col_t.position += glm::vec3(collision->Origin(), 0);
 
 				if (collision->UpdateRequired())
-					Sprite::Resize(collision->Pointer(), collision->Data(), collision->Size(), 1);
+					Sprite::Resize(collision->Pointer(), collision->Data(), collision->Size());
 
 				Renderer::DrawSprite(
 					collision->Pointer(),
@@ -298,6 +324,7 @@ void Scene::OnUpdate(Time time) {
 			}
 
 			// Draw
+			material->shader = Shader::LUT[sprite.shader];
 			Renderer::DrawSprite(
 				sprite.Pointer(),
 				transform,

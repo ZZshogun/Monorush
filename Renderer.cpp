@@ -3,7 +3,7 @@
 
 void Renderer::DrawSprite(
 	Ref<VAO>& handle,
-	Transform transform, 
+	TransformComponent transform, 
 	Ref<Material>& material, 
 	glm::vec2 texOffset
 ) 

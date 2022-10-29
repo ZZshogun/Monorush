@@ -91,7 +91,6 @@ public:
 		colld.ignoredTags.insert("Player");
 		colld.ignoredTags.insert("Bullet");
 		colld.Size({0.2f, 0.2f});
-		colld.DrawBox(true);
 		bullet.AddComponent<NativeScriptComponent>().Bind<BulletController>();
 		auto& bCont = bullet.GetScript<BulletController>();
 		bCont.damage = bulletDamage;
@@ -233,8 +232,8 @@ public:
 		}
 
 		// Move direction on x axis
-		if (dir.x < 0) transform.scale.x = -1;
-		else if (dir.x > 0) transform.scale.x = 1;
+		if (dir.x < 0) sprite.flipX = true;
+		else if (dir.x > 0) sprite.flipX = false;
 
 		if (Input::GetKeyDown(Key::Y)) Time::timeScale = 30;
 		else if (Input::GetKeyUp(Key::Y)) Time::timeScale = 1;
@@ -247,7 +246,9 @@ public:
 
 		UI::Anchor(CENTER);
 		for (int i = 1; i <= maxPlayerHealth; i++) {
-			UI::DrawImage(Texture::library["heart"], { -910 + i * 70, -490 }, { 70, 70 }, heartsCol[i]);
+			int pos_x = (i - 1) * 70 - 910;
+			int pos_y = -490;
+			UI::DrawImage(Texture::library["heart"], {pos_x, pos_y}, {70, 70}, heartsCol[i]);
 		}
 
 		UI::Anchor(RIGHT);

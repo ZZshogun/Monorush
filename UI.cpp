@@ -319,7 +319,7 @@ void UI::PollsEvent(GLFWwindow* window, Time time) {
 			if (button->active && !button->hovered) {
 				button->hovered = true;
 				UI::hovering_button = *button;
-				button->hover_function();
+				if (button->hover_function) button->hover_function();
 			}
 
 			if (button->active) {
@@ -331,7 +331,7 @@ void UI::PollsEvent(GLFWwindow* window, Time time) {
 					clicked_button = button;
 					if (button->function) button->function();
 					UI::hovering_button = *button;
-					button->hover_function();
+					if (button->hover_function) button->hover_function();
 				}
 				else {
 					button->press -= time.deltaTime;

@@ -7,6 +7,8 @@ void OnButtonHover() {
 }
 
 MenuLayer::MenuLayer() {
+	state = std::make_shared<LayerState>();
+
 	scene = Scene::Create();
 	camera = scene->CreateEntity("Camera");
 	camera.AddComponent<CameraComponent>().primary = true;
@@ -33,7 +35,7 @@ void MenuLayer::OnAttach() {
 		{ 0, -150 },
 		{ 230, 70 },
 		{ 0, 1, 0, 0 },
-		[&]() { state.SceneAddition(1); },
+		[&]() { state->SceneAddition(1); },
 		Color::Transparent,
 		OnButtonHover
 	);
@@ -57,36 +59,36 @@ void MenuLayer::OnAttach() {
 		{ 0, -390 },
 		{ 150, 70 },
 		{ 0, 1, 0, 0 },
-		[&]() { state.Terminate(); },
+		[&]() { state->Terminate(); },
 		Color::Transparent,
 		OnButtonHover
 	);
 
 	fulLScreenButton = UI::CreateButton(
-		state.fullScreen ? "SCREEN : FULLSCREEN" : "SCREEN : WINDOWED",
+		state->fullScreen ? "SCREEN : FULLSCREEN" : "SCREEN : WINDOWED",
 		1.0f,
 		Color::Black,
 		{ 0, 100 },
 		{ 550, 65 },
 		{ 0, 1, 0, 0 },
 		[&]() { 
-			state.ToggleFullScreen();
-			UI::clicked_button->text = state.fullScreen ? "SCREEN : FULLSCREEN" : "SCREEN : WINDOWED";
+			state->ToggleFullScreen();
+			UI::clicked_button->text = state->fullScreen ? "SCREEN : FULLSCREEN" : "SCREEN : WINDOWED";
 		},
 		Color::Transparent,
 		OnButtonHover
 	);
 
 	volumeButton = UI::CreateButton(
-		"VOLUME : " + std::to_string((int)(state.volumeGain * 10)) + "%",
+		"VOLUME : " + std::to_string((int)(state->volumeGain * 10)) + "%",
 		1.0f,
 		Color::Black,
 		{ 0, 0 },
 		{ 400, 65 },
 		{ 0, 1, 0, 0 },
 		[&]() { 
-			state.SwitchVolume();
-			UI::clicked_button->text = "VOLUME : " + std::to_string((int)(state.volumeGain * 10)) + "%";
+			state->SwitchVolume();
+			UI::clicked_button->text = "VOLUME : " + std::to_string((int)(state->volumeGain * 10)) + "%";
 		},
 		Color::Transparent,
 		OnButtonHover
@@ -108,7 +110,7 @@ void MenuLayer::OnAttach() {
 }
 
 void MenuLayer::OnUpdate(Time time) {
-	scene->OnUpdate(time);
+	scene->OnUpdate(state, time);
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
 

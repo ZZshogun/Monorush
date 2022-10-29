@@ -2,6 +2,7 @@
 #define RENDERER_H
 
 #include "Magia.h"
+#include "Component.h"
 
 class Renderer {
 
@@ -11,7 +12,7 @@ public:
 
 	static void DrawSprite(
 		Ref<VAO>& handle,
-		Transform transform,
+		TransformComponent transform,
 		Ref<Material>& material,
 		glm::vec2 texOffset = { 0, 0 }
 	);

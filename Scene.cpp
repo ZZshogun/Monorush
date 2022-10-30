@@ -160,11 +160,14 @@ void Scene::OnUpdate(Ref<LayerState>& layerState, Time time) {
 				view = glm::rotate(view, glm::radians(-transform.rotation.y), glm::vec3(0, 1, 0));
 				view = glm::rotate(view, glm::radians(-transform.rotation.z), glm::vec3(0, 0, 1));
 
-				it.second->Bind();
-				glUniformMatrix4fv(glGetUniformLocation(it.second->handle, "proj"), 1, GL_FALSE, glm::value_ptr(projection));
-				glUniformMatrix4fv(glGetUniformLocation(it.second->handle, "view"), 1, GL_FALSE, glm::value_ptr(view));
-				glUniform1f(glGetUniformLocation(it.second->handle, "intensity"), 0.08f);
-				glUniform2f(glGetUniformLocation(it.second->handle, "viewport"), cameraC.resolution.x, cameraC.resolution.y);
+				if (it.first == "unlit" || it.first == "unlit-edgefade") {
+					it.second->UniformMat4("proj", projection);
+					it.second->UniformMat4("view", view);
+					if (it.first == "unlit-edgefade") {
+						it.second->UniformFloat("intensity", 0.08f);
+						it.second->UniformVec2("viewport", cameraC.resolution);
+					}
+				}
 			}
 		}
 		foundCamera = true;

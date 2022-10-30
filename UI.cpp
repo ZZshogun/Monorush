@@ -112,7 +112,7 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 	Ref<Shader>& shader = Shader::LUT[glyphShader];
 	shader->Bind();
 
-	glUniform4f(glGetUniformLocation(shader->handle, "fColor"), color.r, color.g, color.b, color.a);
+	shader->UniformVec4("fColor", color);
 	glActiveTexture(GL_TEXTURE0);
 
 	float offsetx = 0;
@@ -156,7 +156,7 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 		};
 		glBindTexture(GL_TEXTURE_2D, ftChar.texID);
 		//Texture::defaultTex->Bind();
-		glUniform1i(glGetUniformLocation(shader->handle, "tex0"), 0);
+		shader->UniformUint("tex0", 0);
 
 		vbo->Subdata(vertices);
 		vbo->Bind();
@@ -205,7 +205,7 @@ void UI::DrawImage(Ref<Texture>& image, glm::ivec2 screen_pos, glm::ivec2 screen
 	Ref<Shader>& shader = Shader::LUT[imageShader];
 	shader->Bind();
 
-	glUniform4f(glGetUniformLocation(shader->handle, "fColor"), color.r, color.g, color.b, color.a);
+	shader->UniformVec4("fColor", color);
 	glActiveTexture(GL_TEXTURE0);
 
 	image->Bind();

@@ -1,7 +1,7 @@
 #include "Collision.h"
 
 CollisionPacket Collision::emptyPacket = {{}};
-std::map<entt::registry*, Collision::EntityPacket> Collision::collisionMap;
+std::unordered_map<entt::registry*, Collision::EntityPacket> Collision::collisionMap;
 
 BoxPacket Collision::_BoxCollision(CollisionComponent& a, CollisionComponent& b,
 	glm::vec2 translate_a, glm::vec2 translate_b) 

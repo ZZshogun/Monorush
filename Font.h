@@ -12,8 +12,8 @@ struct FontChar {
 };
 
 class Font {
-	using FontFace = std::map<char, FontChar>;
-	static std::map<std::string, FontFace> fonts_map;
+	using FontFace = std::unordered_map<char, FontChar>;
+	static std::unordered_map<std::string, FontFace> fonts_map;
 
 public:
 	static bool log;

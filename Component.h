@@ -329,7 +329,7 @@ public:
 
 private:
 	bool update = true;
-	std::map<int, AnimatorObject> animation_map;
+	std::unordered_map<int, AnimatorObject> animation_map;
 	int current_id = INT_MAX;
 };
 

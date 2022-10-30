@@ -68,9 +68,7 @@ void Texture::ClearHandles() {
 }
 
 void Texture::TexUnit(Ref<Shader>& shader, const char* uniform, GLuint unit) {
-	shader->Bind();
-	int location = glGetUniformLocation(shader->handle, uniform);
-	glUniform1i(location, unit);
+	shader->UniformUint(uniform, unit);
 }
 
 void Texture::Bind() {

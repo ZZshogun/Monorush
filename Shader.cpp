@@ -1,6 +1,6 @@
 #include "Shader.h"
 
-std::map<std::string, Ref<Shader>> Shader::LUT;
+std::unordered_map<std::string, Ref<Shader>> Shader::LUT;
 bool Shader::log = true;
 
 std::string Read_from_file(const char* filepath) {
@@ -66,6 +66,25 @@ Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 	glDeleteShader(vert);
 	glDeleteShader(frag);
 
+	const GLsizei bufSize = 16;
+	GLint location, count, varsize, length;
+	GLenum type;
+	GLchar name[bufSize];
+
+	glGetProgramiv(handle, GL_ACTIVE_ATTRIBUTES, &count);
+	for (location = 0; location < count; location++)
+	{
+		glGetActiveAttrib(handle, (GLuint)location, bufSize, &length, &varsize, &type, name);
+		attribLocation[name] = GLVariable{ location, type, name };
+	}
+
+	glGetProgramiv(handle, GL_ACTIVE_UNIFORMS, &count);
+	for (location = 0; location < count; location++)
+	{
+		glGetActiveUniform(handle, (GLuint)location, bufSize, &length, &varsize, &type, name);
+		uniformLocation[name] = GLVariable{ location, type, name };
+	}
+
 	if (Shader::log) std::cout << "CREATE Shader " << handle << " " << vertexfile << " " << fragmentfile << "\n";
 }
 
@@ -78,6 +97,53 @@ void Shader::Init() {
 
 void Shader::Bind() {
 	glUseProgram(handle);
+}
+
+Shader::GLVariable& Shader::GetAttribLocation(std::string attrib) {
+	assert(attribLocation.find(attrib) != attribLocation.end());
+	return attribLocation[attrib];
+}
+
+Shader::GLVariable& Shader::GetUniformLocation(std::string uniform) {
+	assert(uniformLocation.find(uniform) != uniformLocation.end());
+	return uniformLocation[uniform];
+}
+
+void Shader::UniformUint(std::string uniform, unsigned int value) {
+	Bind();
+	auto& uni = GetUniformLocation(uniform);
+	assert(uni.type == GL_UNSIGNED_INT);
+	glUniform1i(uni.location, value);
+}
+void Shader::UniformFloat(std::string uniform, float value) {
+	Bind();
+	auto& uni = GetUniformLocation(uniform);
+	assert(uni.type == GL_FLOAT);
+	glUniform1f(uni.location, value);
+}
+void Shader::UniformVec2(std::string uniform, glm::vec2 vec) {
+	Bind();
+	auto& uni = GetUniformLocation(uniform);
+	assert(uni.type == GL_FLOAT_VEC2);
+	glUniform2f(uni.location, vec.x, vec.y);
+}
+void Shader::UniformVec3(std::string uniform, glm::vec3 vec) {
+	Bind();
+	auto& uni = GetUniformLocation(uniform);
+	assert(uni.type == GL_FLOAT_VEC3);
+	glUniform3f(uni.location, vec.x, vec.y, vec.z);
+}
+void Shader::UniformVec4(std::string uniform, glm::vec4 vec) {
+	Bind();
+	auto& uni = GetUniformLocation(uniform);
+	assert(uni.type == GL_FLOAT_VEC4);
+	glUniform4f(uni.location, vec.x, vec.y, vec.z, vec.w);
+}
+void Shader::UniformMat4(std::string uniform, glm::mat4 mat) {
+	Bind();
+	auto& uni = GetUniformLocation(uniform);
+	assert(uni.type == GL_FLOAT_MAT4);
+	glUniformMatrix4fv(uni.location, 1, GL_FALSE, glm::value_ptr(mat));
 }
 
 Shader::~Shader() {

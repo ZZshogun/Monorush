@@ -27,8 +27,8 @@ class Collision {
 
 	static CollisionPacket emptyPacket;
 
-	using EntityPacket = std::map<entt::entity, CollisionPacket>;
-	static std::map<entt::registry*, EntityPacket> collisionMap;
+	using EntityPacket = std::unordered_map<entt::entity, CollisionPacket>;
+	static std::unordered_map<entt::registry*, EntityPacket> collisionMap;
 public:
 	static void Update(entt::entity entity, entt::registry& registry);
 	static CollisionPacket& Check(entt::entity entity, entt::registry& registry);

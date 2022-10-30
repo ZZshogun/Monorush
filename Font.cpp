@@ -1,6 +1,6 @@
 #include "Font.h"
 
-std::map<std::string, Font::FontFace> Font::fonts_map;
+std::unordered_map<std::string, Font::FontFace> Font::fonts_map;
 bool Font::log = true;
 
 void Font::LoadFont(std::string name, std::string path, glm::ivec2 charsetsSize) {

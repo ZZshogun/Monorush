@@ -42,6 +42,8 @@ void Game::Setup() {
 	glfwSetScrollCallback(window, Input::ScanMouseScroll);
 	Input::SetWindowInput(window);
 
+	//glfwSwapInterval(0);
+
 	glViewport(0, 0, (int)ScreenResolution.x, (int)ScreenResolution.y);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -97,9 +99,12 @@ void Game::SetFullscreen(bool status) {
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		auto mode = glfwGetVideoMode(monitor);
 		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
+		prevScreenResolution = ScreenResolution;
+		ScreenResolution = { mode->width, mode->height };
 		glViewport(0, 0, mode->width, mode->height);
 	}
 	else {
+		ScreenResolution = prevScreenResolution;
 		glfwSetWindowMonitor(window, NULL, WindowPos.x, WindowPos.y,
 			ScreenResolution.x, ScreenResolution.y, GLFW_DONT_CARE);
 		glViewport(0, 0, ScreenResolution.x, ScreenResolution.y);

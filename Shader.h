@@ -31,7 +31,7 @@ public:
 	GLVariable& GetAttribLocation(std::string attrib);
 	GLVariable& GetUniformLocation(std::string uniform);
 
-	void UniformUint(std::string uniform, unsigned int value);
+	void UniformSampler2D(std::string uniform, unsigned int value);
 	void UniformFloat(std::string uniform, float value);
 	void UniformVec2(std::string uniform, glm::vec2 vec);
 	void UniformVec3(std::string uniform, glm::vec3 vec);

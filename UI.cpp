@@ -156,7 +156,7 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 		};
 		glBindTexture(GL_TEXTURE_2D, ftChar.texID);
 		//Texture::defaultTex->Bind();
-		shader->UniformUint("tex0", 0);
+		shader->UniformSampler2D("tex0", 0);
 
 		vbo->Subdata(vertices);
 		vbo->Bind();

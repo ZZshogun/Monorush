@@ -21,6 +21,7 @@ private:
 
 	glm::ivec2 WindowPos = { 0, 0 };
 	glm::ivec2 ScreenResolution = { 1280, 720 };
+	glm::ivec2 prevScreenResolution = { 1280, 720 };
 
 	void ClearLayer(int layerIndex);
 	bool LoadLayer(int layerIndex);

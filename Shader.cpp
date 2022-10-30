@@ -89,10 +89,10 @@ Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 }
 
 void Shader::Init() {
-	LUT["unlit"] = Create("unlit.vert", "unlit.frag");
-	LUT["glyph"] = Create("glyph.vert", "glyph.frag");
-	LUT["image"] = Create("image.vert", "image.frag");
-	LUT["unlit-edgefade"] = Create("unlit.vert", "unlit-edgefade.frag");
+	LUT["unlit"] = Create("shaders/unlit.vert", "shaders/unlit.frag");
+	LUT["glyph"] = Create("shaders/glyph.vert", "shaders/glyph.frag");
+	LUT["image"] = Create("shaders/image.vert", "shaders/image.frag");
+	LUT["unlit-edgefade"] = Create("shaders/unlit.vert", "shaders/unlit-edgefade.frag");
 }
 
 void Shader::Bind() {
@@ -109,10 +109,10 @@ Shader::GLVariable& Shader::GetUniformLocation(std::string uniform) {
 	return uniformLocation[uniform];
 }
 
-void Shader::UniformUint(std::string uniform, unsigned int value) {
+void Shader::UniformSampler2D(std::string uniform, unsigned int value) {
 	Bind();
 	auto& uni = GetUniformLocation(uniform);
-	assert(uni.type == GL_UNSIGNED_INT);
+	assert(uni.type == GL_SAMPLER_2D);
 	glUniform1i(uni.location, value);
 }
 void Shader::UniformFloat(std::string uniform, float value) {

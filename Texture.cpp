@@ -68,7 +68,7 @@ void Texture::ClearHandles() {
 }
 
 void Texture::TexUnit(Ref<Shader>& shader, const char* uniform, GLuint unit) {
-	shader->UniformUint(uniform, unit);
+	shader->UniformSampler2D(uniform, unit);
 }
 
 void Texture::Bind() {

@@ -25,8 +25,8 @@ public:
 	}
 
 	void OnCreate() {
-		healthPoint += (int)(GameManager::difficulty * 6);
-		speed += (int)(GameManager::difficulty * 0.3f);
+		healthPoint += (int)(GameManager::difficulty * 5);
+		speed += (int)(GameManager::difficulty * 0.5f);
 		turnSpeed += (int)(glm::pow(GameManager::difficulty, 2) * 3);
 		turnSpeed = glm::min<float>(turnSpeed, 10);
 

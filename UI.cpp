@@ -292,14 +292,6 @@ void UI::PollsEvent(GLFWwindow* window, Time time) {
 	glm::ivec2 resolution = { 1280, 720 };
 	glfwGetWindowSize(window, &resolution.x, &resolution.y);
 
-	if (glfwGetWindowAttrib(window, GLFW_MAXIMIZED)) {
-		resolution = Math::ScaleToAspectRatio(resolution, 16, 9);
-	}
-	else {
-		int yOffset = (int)(resolution.y - resolution.x * (9.0f / 16.0f));
-		resolution.y -= yOffset;
-	}
-
 	UI::onEvents = false;
 	UI::on_button = NULL;
 	for (int i = 0; i < buttons.size(); i++) {

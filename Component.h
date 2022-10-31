@@ -17,20 +17,8 @@ struct TransformComponent {
 	glm::vec3 rotation = { 0, 0, 0 };
 	glm::vec3 scale = { 1, 1, 1 };
 
-	glm::vec3 localposition = { 0, 0, 0 };
-	glm::vec3 localrotation = { 0, 0, 0 };
-	glm::vec3 localscale = { 1, 1, 1 };
-
 	glm::mat4 Model() const {
 		glm::mat4 model = glm::mat4(1);
-
-		model = glm::translate(model, localposition);
-
-		model = glm::rotate(model, glm::radians(localrotation.x), glm::vec3(1, 0, 0));
-		model = glm::rotate(model, glm::radians(localrotation.y), glm::vec3(0, 1, 0));
-		model = glm::rotate(model, glm::radians(localrotation.z), glm::vec3(0, 0, 1));
-
-		model = glm::scale(model, localscale);
 
 		model = glm::translate(model, position);
 
@@ -51,6 +39,7 @@ public:
 	bool parallelTexture = false;
 	bool flipX = false;
 	bool flipY = false;
+	glm::vec2 textureOffset = { 0, 0 };
 	std::string shader = "unlit";
 
 	void SetTexture(Ref<Texture>& texture) { 
@@ -69,11 +58,6 @@ public:
 	void Size(glm::vec2 size) { 
 		if (this->size == size) return;
 		this->size = size; 
-		update = true; 
-	}
-	void TextureOffset(glm::vec2 offset) { 
-		if (textureOffset == offset) return;
-		textureOffset = offset; 
 		update = true; 
 	}
 	void UVRepeat(float count) { 
@@ -96,7 +80,6 @@ public:
 	bool ScreenSpace() { return screenSpace; }
 	glm::vec4 Color() { return albedo; }
 	glm::vec2 Size() { return size; }
-	glm::vec2 TextureOffset() { return textureOffset; }
 	glm::vec2 UVRepeat() { return UVrepeat; }
 	Ref<VAO>& Pointer() { return handle; }
 	Ref<VBO>& Data() { return data; }
@@ -109,15 +92,18 @@ private:
 	Ref<Texture> texture;
 	glm::vec4 albedo = Color::White;
 	glm::vec2 size = { 1, 1 };
-	glm::vec2 textureOffset = { 0, 0 };
 	glm::vec2 UVrepeat = { 1, 1 };
 };
 
 struct CameraComponent {
 	bool active = true;
-	glm::vec2 cameraResolution = { 16, 9 };
+	float orthographicSize = 5;
 	glm::vec2 resolution = { 1280, 720 };
 	bool primary = false;
+
+	float aspectRatio() {
+		return resolution.x / resolution.y;
+	}
 };
 
 struct AudioListenerComponent {

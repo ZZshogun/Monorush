@@ -114,7 +114,7 @@ void Scene::OnUpdate(Ref<LayerState>& layerState, Time time) {
 			}
 			if (!Collision::Check(entity, scene_registry).empty)
 				script.instance->OnCollision(Collision::Check(entity, scene_registry), time);
-			script.instance->OnUpdate(time);
+			if (scene_registry.valid(entity)) script.instance->OnUpdate(time);
 		}
 		});
 
@@ -145,15 +145,15 @@ void Scene::OnUpdate(Ref<LayerState>& layerState, Time time) {
 				glm::mat4 projection = glm::mat4(1.0f);
 				glm::mat4 view = glm::mat4(1.0f);
 
-				glm::vec2 res = cameraC.cameraResolution / 2.0f;
+				float aspectRatio = cameraC.resolution.x / cameraC.resolution.y * cameraC.orthographicSize;
 				projection = glm::ortho<float>(
-					-res.x,
-					res.x,
-					-res.y,
-					res.y,
+					-aspectRatio,
+					aspectRatio,
+					-cameraC.orthographicSize,
+					cameraC.orthographicSize,
 					-1000,
 					1000
-					);
+				);
 
 				view = glm::translate(view, -transform.position);
 				view = glm::rotate(view, glm::radians(-transform.rotation.x), glm::vec3(1, 0, 0));
@@ -164,7 +164,7 @@ void Scene::OnUpdate(Ref<LayerState>& layerState, Time time) {
 					it.second->UniformMat4("proj", projection);
 					it.second->UniformMat4("view", view);
 					if (it.first == "unlit-edgefade") {
-						it.second->UniformFloat("intensity", 0.12f);
+						it.second->UniformFloat("intensity", 0.1f);
 						it.second->UniformVec2("viewport", cameraC.resolution);
 
 						glm::ivec2 fullViewport = { 1280, 720 };
@@ -240,13 +240,14 @@ void Scene::OnUpdate(Ref<LayerState>& layerState, Time time) {
 
 			glm::vec3 cameraPos = cameraTransform.position;
 			glm::vec3 cameraViewDist = glm::vec3(
-				cameraComponent.cameraResolution + sprite.Size() * glm::abs(glm::vec2(transform.scale)), 0);
+				glm::vec2{ cameraComponent.aspectRatio(), 1 } * cameraComponent.orthographicSize * 2.0f +
+				sprite.Size() * glm::abs(glm::vec2(transform.scale)), 0);
 
 			if (!Math::InBox2(transform.position, cameraPos, cameraViewDist))
 				continue;
 
 			if (sprite.parallelTexture)
-				sprite.TextureOffset(glm::vec2(transform.position) / sprite.Size() * sprite.UVRepeat());
+				sprite.textureOffset = glm::vec2(transform.position) / sprite.Size() * sprite.UVRepeat();
 
 			Ref<Material> material = Material::Create(sprite.GetTexture(), sprite.Color());
 
@@ -303,13 +304,9 @@ void Scene::OnUpdate(Ref<LayerState>& layerState, Time time) {
 					Sprite::Resize(sprite.Pointer(), sprite.Data(), sprite.Size(), start, end, glm::bvec2{ sprite.flipX, sprite.flipY });
 				}
 			}
+			// Default resizing
 			else if (sprite.UpdateRequired()) {
-				if (sprite.ScreenSpace()) {
-					glm::vec2 camRes = scene_registry.get<CameraComponent>(camera).cameraResolution;
-					float maxEdge = glm::max(camRes);
-					sprite.Size({ maxEdge, maxEdge });
-				}
-
+				if (sprite.ScreenSpace()) sprite.Size({ 24, 24 });
 				Sprite::Resize(sprite.Pointer(), sprite.Data(), sprite.Size(), sprite.UVRepeat(), glm::bvec2{ sprite.flipX, sprite.flipY });
 			}
 
@@ -336,7 +333,7 @@ void Scene::OnUpdate(Ref<LayerState>& layerState, Time time) {
 				sprite.Pointer(),
 				transform,
 				material,
-				sprite.TextureOffset()
+				sprite.textureOffset
 			);
 		}
 

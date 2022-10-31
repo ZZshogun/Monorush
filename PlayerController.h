@@ -13,8 +13,8 @@ public:
 	int playerHeath = maxPlayerHealth;
 	float bulletpersec = 3;
 	float shootPower = 12;
-	int bulletDamage = 10;
-	float bulletImpact = 2;
+	int bulletDamage = 15;
+	float bulletImpact = 2.4f;
 
 private:
 	glm::vec2 col_idle_size = { 0.35f, 0.92f };
@@ -94,6 +94,7 @@ public:
 		bullet.AddComponent<NativeScriptComponent>().Bind<BulletController>();
 		auto& bCont = bullet.GetScript<BulletController>();
 		bCont.damage = bulletDamage;
+		bCont.speed = shootPower * 100.0f;
 	}
 
 	void OnCreate() {

@@ -39,7 +39,7 @@ void GameLayer::OnAttach() {
 	Entity background = scene->CreateEntity("Background");
 	auto& bgSprite = background.AddComponent<SpriteRendererComponent>();
 	bgSprite.SetTexture(tile);
-	bgSprite.UVRepeat(16);
+	bgSprite.UVRepeat(18);
 	bgSprite.ScreenSpace(true);
 	bgSprite.Color({ 1, 1, 1, 0.2f });
 	bgSprite.parallelTexture = true;

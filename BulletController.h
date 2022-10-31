@@ -10,9 +10,11 @@ public:
 	float despawnTime = 5;
 	float _counter = 0;
 	int damage = 0;
+	float speed = 0;
 
 	void OnUpdate(Time time) {
 		if (!despawned) {
+			GetComponent<TransformComponent>().rotation.z -= speed * time.deltaTime;
 			if (_counter >= despawnTime) {
 				despawned = true;
 				entity.Destroy();

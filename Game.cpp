@@ -1,8 +1,18 @@
 #include "Game.h"
 
+Game::Game(bool logging) {
+	ScreenResolution = {0, 0};
+	prevScreenResolution = {0, 0};
+	log = logging;
+}
+
 Game::Game(glm::vec2 screen_resolution, bool logging) {
 	ScreenResolution = screen_resolution;
+	prevScreenResolution = screen_resolution;
 	log = logging;
+}
+
+void Game::Run() {
 	Setup();
 }
 
@@ -11,7 +21,16 @@ void Game::Setup() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
+	GLFWvidmode mode = *glfwGetVideoMode(glfwGetPrimaryMonitor());
+	if (ScreenResolution.x > mode.width || ScreenResolution.y > mode.height) {
+		ScreenResolution = { mode.width, (int)(mode.width * (9.0f / 16.0f)) };
+	}
+	else if (ScreenResolution.x <= 0 || ScreenResolution.y <= 0) {
+		glm::vec2 initialSize = glm::vec2{ mode.width, (int)(mode.width * (9.0f / 16.0f)) } * 0.8f;
+		if (initialSize.x < 640 || initialSize.y < 360) initialSize = { 640, 360 };
+		ScreenResolution = initialSize;
+	}
 
 	GLFWmonitor* monitor = NULL;
 	window = 
@@ -31,7 +50,6 @@ void Game::Setup() {
 	glfwMakeContextCurrent(window);
 	gladLoadGL();
 
-	GLFWvidmode mode = *glfwGetVideoMode(glfwGetPrimaryMonitor());
 	WindowPos = glm::vec2{ (int)(mode.width - ScreenResolution.x), (int)(mode.height - ScreenResolution.y) } / 2.0f;
 	glfwSetWindowPos(
 		window, 
@@ -39,9 +57,12 @@ void Game::Setup() {
 		(int)WindowPos.y
 	);
 
+	glfwSetWindowSizeCallback(window, Game::WindowResizeCallback);
 	glfwSetScrollCallback(window, Input::ScanMouseScroll);
 	Input::SetWindowInput(window);
 
+	glfwSetWindowSizeLimits(window, 640, 360, GLFW_DONT_CARE, GLFW_DONT_CARE);
+	glfwSetWindowAspectRatio(window, 16, 9);
 	//glfwSwapInterval(0);
 
 	glViewport(0, 0, (int)ScreenResolution.x, (int)ScreenResolution.y);
@@ -93,15 +114,26 @@ void Game::Loop() {
 	UI::Destroy();
 }
 
+void Game::WindowResizeCallback(GLFWwindow* window, int x, int y) {
+	glm::ivec2 scaled = Math::ScaleToAspectRatio(glm::vec2{ x, y }, 16, 9);
+	glm::ivec2 offset = (glm::ivec2{ x, y } - scaled) / 2;
+	glViewport(offset.x, offset.y, x - offset.x * 2, y - offset.y * 2);
+}
+
 void Game::SetFullscreen(bool status) {
 	fullscreen = status;
 	if (fullscreen) {
 		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 		auto mode = glfwGetVideoMode(monitor);
-		glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
+		glm::ivec2 sz = { mode->width, mode->height };
+		glm::ivec2 winPos = {0, 0};
+		glfwGetWindowPos(window, &winPos.x, &winPos.y);
+		WindowPos = winPos;
+		glfwSetWindowMonitor(window, monitor, 0, 0, sz.x, sz.y, GLFW_DONT_CARE);
 		prevScreenResolution = ScreenResolution;
-		ScreenResolution = { mode->width, mode->height };
-		glViewport(0, 0, mode->width, mode->height);
+		ScreenResolution = sz;
+		int yOffset = (int)(sz.y - sz.x * (9.0f / 16.0f));
+		glViewport(0, yOffset / 2, sz.x, sz.y - yOffset);
 	}
 	else {
 		ScreenResolution = prevScreenResolution;
@@ -137,20 +169,14 @@ bool Game::LoadLayer(int layerIndex) {
 	case 0:
 		this->layerIndex = 0;
 		menuLayer = std::make_shared<MenuLayer>();
-		menuLayer->state->volumeGain = gameVolumeGain;
-		menuLayer->state->currentSceneIndex = 0;
-		menuLayer->state->fullScreen = this->fullscreen;
-		menuLayer->state->resolution = this->ScreenResolution;
+		UpdatePacket(*menuLayer->state);
 		ProcessLayerState(0);
 		menuLayer->OnAttach();
 		return true;
 	case 1:
 		this->layerIndex = 1;
 		gameLayer = std::make_shared<GameLayer>();
-		gameLayer->state->volumeGain = gameVolumeGain;
-		gameLayer->state->currentSceneIndex = 1;
-		gameLayer->state->fullScreen = this->fullscreen;
-		gameLayer->state->resolution = this->ScreenResolution;
+		UpdatePacket(*gameLayer->state);
 		ProcessLayerState(1);
 		gameLayer->OnAttach();
 		return true;
@@ -172,6 +198,24 @@ void Game::UpdateLayer(int layerIndex, Time time) {
 	}
 }
 
+void Game::UpdatePacket(LayerState& state) {
+	// Calculate actual viewport size
+	glm::ivec2 winSize = { 1280, 720 };
+	glfwGetWindowSize(window, &winSize.x, &winSize.y);
+
+	if (glfwGetWindowAttrib(window, GLFW_MAXIMIZED))
+		winSize = Math::ScaleToAspectRatio(winSize, 16, 9);
+	else if (!fullscreen && ScreenResolution != winSize)
+		prevScreenResolution = winSize;
+
+	ScreenResolution = winSize;
+	state.window = window;
+	state.volumeGain = gameVolumeGain;
+	state.currentSceneIndex = layerIndex;
+	state.fullScreen = fullscreen;
+	state.resolution = ScreenResolution;
+}
+
 bool Game::ProcessLayerState(int layerIndex) {
 	Ref<LayerState> layerState = NULL;
 
@@ -187,10 +231,7 @@ bool Game::ProcessLayerState(int layerIndex) {
 	}
 
 	if (!layerState->update) {
-		layerState->volumeGain = gameVolumeGain;
-		layerState->currentSceneIndex = this->layerIndex;
-		layerState->fullScreen = this->fullscreen;
-		layerState->resolution = this->ScreenResolution;
+		UpdatePacket(*layerState);
 		return true;
 	}
 
@@ -221,9 +262,6 @@ bool Game::ProcessLayerState(int layerIndex) {
 
 	layerState.reset();
 	layerState = std::make_shared<LayerState>();
-	layerState->volumeGain = gameVolumeGain;
-	layerState->currentSceneIndex = this->layerIndex;
-	layerState->fullScreen = this->fullscreen;
-	layerState->resolution = this->ScreenResolution;
+	UpdatePacket(*layerState);
 	return true;
 }

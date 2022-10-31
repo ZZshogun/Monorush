@@ -5,11 +5,6 @@
 
 class PlayerController;
 
-class Layer {
-public:
-	static void SetClearColor(glm::vec4 color);
-};
-
 class MenuLayer {
 private:
 	Ref<Scene> scene;

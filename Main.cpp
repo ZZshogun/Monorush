@@ -2,6 +2,13 @@
 #include "Game.h"
 
 int main() {
-	Game game({ 1600, 900 }, true);
+	Game game;
+	game.Run();
+	return 0;
+}
+
+int WinMain() {
+	Game game;
+	game.Run();
 	return 0;
 }

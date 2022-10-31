@@ -69,10 +69,7 @@ void UI::Destroy() {
 }
 
 void UI::StartUI(glm::ivec2 ref_resolution, std::string fontName, std::string shader) {
-	if (inUI) {
-		std::cout << "ERROR UI Already started UI block\n";
-		return;
-	}
+	assert(!inUI);
 
 	UI::ref_resolution = ref_resolution / 2;
 	if (fontName != "") UI::font_name = fontName;
@@ -94,19 +91,13 @@ void UI::StartUI() {
 }
 
 void UI::Anchor(UIAnchor anchorEnum) {
-	if (!inUI) {
-		std::cout << "ERROR UI No starting UI block\n";
-		return;
-	}
+	assert(inUI);
 	anchorMode = anchorEnum;
 }
 
 void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm::vec4 color, std::string fontName) {
+	assert(inUI);
 	if (string == "") return;
-	if (!inUI) {
-		std::cout << "ERROR UI No starting UI block\n";
-		return;
-	}
 
 	std::string ftname = fontName == "" ? font_name : fontName;
 	Ref<Shader>& shader = Shader::LUT[glyphShader];
@@ -176,10 +167,7 @@ void UI::DrawString(std::string string, glm::ivec2 screen_pos, float scale, glm:
 }
 
 void UI::DrawImage(Ref<Texture>& image, glm::ivec2 screen_pos, glm::ivec2 screen_size, glm::vec4 color) {
-	if (!inUI) {
-		std::cout << "ERROR UI No starting UI block\n";
-		return;
-	}
+	assert(inUI);
 
 	glm::vec2 scr_pos = ratioRef(screen_pos);
 	glm::vec2 scr_size = ratioRef(screen_size);
@@ -262,6 +250,8 @@ Ref<UI::Button> UI::CreateButton(
 }
 
 void UI::DrawButton(Ref<Button>& button, Time time) {
+	assert(inUI);
+
 	if (!button) return;
 	button->draw = true;
 	Ref<Texture> tex = button->texture ? button->texture : Texture::defaultTex;
@@ -289,10 +279,7 @@ void UI::DrawButtons(Time time) {
 }
 
 void UI::EndUI() {
-	if (!inUI) {
-		std::cout << "ERROR UI No starting UI block\n";
-		return;
-	}
+	assert(inUI);
 
 	ref_resolution = { -1, -1 };
 	vao->Unbind();
@@ -302,8 +289,16 @@ void UI::EndUI() {
 }
 
 void UI::PollsEvent(GLFWwindow* window, Time time) {
-	glm::ivec2 resolution = {0, 0};
+	glm::ivec2 resolution = { 1280, 720 };
 	glfwGetWindowSize(window, &resolution.x, &resolution.y);
+
+	if (glfwGetWindowAttrib(window, GLFW_MAXIMIZED)) {
+		resolution = Math::ScaleToAspectRatio(resolution, 16, 9);
+	}
+	else {
+		int yOffset = (int)(resolution.y - resolution.x * (9.0f / 16.0f));
+		resolution.y -= yOffset;
+	}
 
 	UI::onEvents = false;
 	UI::on_button = NULL;

@@ -23,8 +23,6 @@ MenuLayer::~MenuLayer() {
 }
 
 void MenuLayer::OnAttach() {
-	Layer::SetClearColor({ 0.95f, 0.97f, 1, 1 });
-
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
 
 	UI::Anchor(CENTER);
@@ -102,8 +100,7 @@ void MenuLayer::OnAttach() {
 		{ 160, 75 },
 		Color::Black,
 		[&]() { in_setting = false; },
-		Color::Black,
-		OnButtonHover
+		Color::Black
 	);
 
 	UI::EndUI();

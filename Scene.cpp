@@ -164,8 +164,12 @@ void Scene::OnUpdate(Ref<LayerState>& layerState, Time time) {
 					it.second->UniformMat4("proj", projection);
 					it.second->UniformMat4("view", view);
 					if (it.first == "unlit-edgefade") {
-						it.second->UniformFloat("intensity", 0.08f);
+						it.second->UniformFloat("intensity", 0.12f);
 						it.second->UniformVec2("viewport", cameraC.resolution);
+
+						glm::ivec2 fullViewport = { 1280, 720 };
+						glfwGetWindowSize(layerState->window, &fullViewport.x, &fullViewport.y);
+						it.second->UniformVec2("viewportOffset", (glm::vec2(fullViewport) - cameraC.resolution) / 2.0f);
 					}
 				}
 			}

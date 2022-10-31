@@ -34,6 +34,7 @@ struct LayerState {
 
 	// RESPONSE
 	bool update = false;
+	GLFWwindow* window = NULL;
 	int currentSceneIndex = 0;
 	float volumeGain = 10;
 	bool reload = false;

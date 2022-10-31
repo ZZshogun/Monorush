@@ -6,13 +6,14 @@ uniform vec4 fColor;
 uniform sampler2D tex0;
 
 uniform vec2 viewport;
+uniform vec2 viewportOffset;
 uniform float intensity;
 
 out vec4 glColor;
 
 void main() {
     float ratio = viewport.x / viewport.y;
-    vec2 uv = gl_FragCoord.xy / viewport.xy;
+    vec2 uv = (gl_FragCoord.xy - viewportOffset) / viewport.xy;
 
 	vec4 color = fColor * texture(tex0, fTexCoord);
 

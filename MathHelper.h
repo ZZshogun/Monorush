@@ -30,6 +30,16 @@ namespace Math {
 	static int Sign(T val) {
 		return (T(0) < val) - (val < T(0));
 	}
+
+	static glm::vec2 ScaleToAspectRatio(glm::vec2 vec, int ratioX, int ratioY) {
+		float xCap = vec.x;
+		float yCap = vec.x * ((float)ratioY / ratioX);
+		if (yCap > vec.y) {
+			yCap = vec.y;
+			xCap = vec.y * ((float)ratioX / ratioY);
+		}
+		return glm::vec2{ xCap, yCap };
+	}
 }
 
 #endif

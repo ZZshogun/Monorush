@@ -4,7 +4,7 @@
 #include "Layer.h"
 
 class Game {
-	GLFWwindow* window;
+	GLFWwindow* window = NULL;
 
 	void Setup();
 	void Loop();
@@ -15,8 +15,8 @@ private:
 	bool fullscreen = false;
 	float gameVolumeGain = 10;
 
-	Ref<MenuLayer> menuLayer;
-	Ref<GameLayer> gameLayer;
+	Ref<MenuLayer> menuLayer = NULL;
+	Ref<GameLayer> gameLayer = NULL;
 	Time time;
 
 	glm::ivec2 WindowPos = { 0, 0 };
@@ -27,12 +27,17 @@ private:
 	bool LoadLayer(int layerIndex);
 	void UpdateLayer(int layerIndex, Time time);
 	bool ProcessLayerState(int layerIndex);
+	void UpdatePacket(LayerState& state);
 
 	void SetFullscreen(bool status);
 	void SetVolume(float volume);
 
+	static void WindowResizeCallback(GLFWwindow* window, int x, int y);
+
 public:
+	Game(bool logging = true);
 	Game(glm::vec2 screen_resolution, bool logging = true);
+	void Run();
 };
 
 #endif

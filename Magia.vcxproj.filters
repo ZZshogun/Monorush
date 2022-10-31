@@ -75,7 +75,7 @@
     <ClCompile Include="Game.cpp">
       <Filter>Source Files\Magia</Filter>
     </ClCompile>
-    <ClCompile Include="Main.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files\Magia</Filter>
     </ClCompile>
     <ClCompile Include="Entity.cpp">
@@ -117,33 +117,33 @@
     <ClCompile Include="MenuLayer.cpp">
       <Filter>Source Files\Magia</Filter>
     </ClCompile>
-    <ClCompile Include="Layer.cpp">
-      <Filter>Source Files\Magia</Filter>
-    </ClCompile>
     <ClCompile Include="Noise.cpp">
       <Filter>Source Files\Magia</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="unlit.vert">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="unlit.frag">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="glyph.vert">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="glyph.frag">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="image.vert">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
-    <None Include="image.frag">
-      <Filter>Resource Files\Shaders</Filter>
-    </None>
     <None Include="cpp.hint" />
+    <None Include="shaders\image.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\image.vert">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\unlit.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\unlit.vert">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\unlit-edgefade.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\glyph.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="shaders\glyph.vert">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Component.h">
@@ -244,10 +244,5 @@
     <Image Include="texture\man.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="unlit-edgefade.frag">
-      <Filter>Resource Files\Shaders</Filter>
-    </Text>
   </ItemGroup>
 </Project>

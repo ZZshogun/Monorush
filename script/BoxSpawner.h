@@ -1,7 +1,7 @@
 #ifndef BOX_SPAWNER_H
 #define BOX_SPAWNER_H
 
-#include "ScriptableEntity.h"
+#include "../header/ScriptableEntity.h"
 
 class BoxSpawner : public ScriptableEntity {
 

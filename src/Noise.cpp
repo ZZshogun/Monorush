@@ -1,4 +1,4 @@
-#include "Noise.h"
+#include "../header/Noise.h"
 
 FastNoise::SmartNode<> Noise::boxGenerator;
 Noise::RNG Noise::rng;

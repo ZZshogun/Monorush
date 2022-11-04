@@ -1,4 +1,4 @@
-#include "Sprite.h"
+#include "../header/Sprite.h"
 
 Material::Material(Ref<Texture>& texture, glm::vec4 color, const char* shaderName) {
 	this->color = color;

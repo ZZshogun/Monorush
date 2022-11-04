@@ -1,4 +1,4 @@
-#include "Input.h"
+#include "../header/Input.h"
 
 GLFWwindow* Input::mainWindow = NULL;
 GLuint Input::keyCode[GLFW_KEY_LAST + 1] = { Input::KeyState::KEY_RELEASE };

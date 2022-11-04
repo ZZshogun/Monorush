@@ -1,7 +1,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "ScriptableEntity.h"
+#include "../header/ScriptableEntity.h"
 #include "GameManager.h"
 #include "BulletController.h"
 

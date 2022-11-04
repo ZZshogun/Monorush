@@ -1,4 +1,4 @@
-#include "Shader.h"
+#include "../header/shader.h"
 
 std::unordered_map<std::string, Ref<Shader>> Shader::LUT;
 bool Shader::log = true;
@@ -89,10 +89,10 @@ Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 }
 
 void Shader::Init() {
-	LUT["unlit"] = Create("shaders/unlit.vert", "shaders/unlit.frag");
-	LUT["glyph"] = Create("shaders/glyph.vert", "shaders/glyph.frag");
-	LUT["image"] = Create("shaders/image.vert", "shaders/image.frag");
-	LUT["unlit-edgefade"] = Create("shaders/unlit.vert", "shaders/unlit-edgefade.frag");
+	LUT["unlit"] = Create("../shaders/unlit.vert", "../shaders/unlit.frag");
+	LUT["glyph"] = Create("../shaders/glyph.vert", "../shaders/glyph.frag");
+	LUT["image"] = Create("../shaders/image.vert", "../shaders/image.frag");
+	LUT["unlit-edgefade"] = Create("../shaders/unlit.vert", "../shaders/unlit-edgefade.frag");
 }
 
 void Shader::Bind() {

@@ -1,8 +1,8 @@
-#include "Layer.h"
-#include "GameManager.h"
-#include "PlayerController.h"
-#include "EnemySpawner.h"
-#include "BoxSpawner.h"
+#include "../header/Layer.h"
+#include "../script/GameManager.h"
+#include "../script/PlayerController.h"
+#include "../script/EnemySpawner.h"
+#include "../script/BoxSpawner.h"
 
 GameLayer::GameLayer() {
 	state = std::make_shared<LayerState>();
@@ -22,14 +22,14 @@ GameLayer::~GameLayer() {
 }
 
 void GameLayer::OnAttach() {
-	Ref<Texture> playerIdletex = Texture::Create("playerIdle", "texture/player_idle_sheet.png");
-	Ref<Texture> playerRuntex = Texture::Create("playerRun", "texture/player_run_sheet.png");
-	Ref<Texture> enemyTex = Texture::Create("enemy", "texture/enemy.png");
-	Ref<Texture> boxtex = Texture::Create("box","texture/box.png");
-	Ref<Texture> heart = Texture::Create("heart","texture/heart.png");
-	Ref<Texture> bullet = Texture::Create("bullet","texture/bullet.png");
-	Ref<Texture> lamppost = Texture::Create("lamppost", "texture/lamp_post.png");
-	Ref<Texture> tile = Texture::Create("tile", "texture/tile.png");
+	Ref<Texture> playerIdletex = Texture::Create("playerIdle", "../texture/player_idle_sheet.png");
+	Ref<Texture> playerRuntex = Texture::Create("playerRun", "../texture/player_run_sheet.png");
+	Ref<Texture> enemyTex = Texture::Create("enemy", "../texture/enemy.png");
+	Ref<Texture> boxtex = Texture::Create("box","../texture/box.png");
+	Ref<Texture> heart = Texture::Create("heart","../texture/heart.png");
+	Ref<Texture> bullet = Texture::Create("bullet","../texture/bullet.png");
+	Ref<Texture> lamppost = Texture::Create("lamppost", "../texture/lamp_post.png");
+	Ref<Texture> tile = Texture::Create("tile", "../texture/tile.png");
 
 	Audio::LoadSound("audio/bounce.wav", "bounce");
 

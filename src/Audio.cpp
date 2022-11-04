@@ -1,4 +1,4 @@
-#include "Audio.h"
+#include "../header/Audio.h"
 
 bool AudioBuffer::log = true;
 
@@ -136,6 +136,8 @@ void Audio::Init() {
 
 	AudioBuffer::log = log;
 	AudioSource::log = log;
+
+	LoadSound("../audio/bounce.wav", "bounce");
 
 	if (log)
 		std::cout << "INIT Audio Version : " << alGetString(AL_VERSION) << "\n";

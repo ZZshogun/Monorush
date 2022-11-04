@@ -1,4 +1,4 @@
-#include "Renderer.h"
+#include "../header/Renderer.h"
 
 void Renderer::DrawSprite(Ref<VAO>& handle, TransformComponent transform, Ref<Material>& material, glm::vec2 texOffset) {	
 	material->shader->Bind();

@@ -159,28 +159,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Audio.cpp" />
-    <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="EBO.cpp" />
-    <ClCompile Include="Entity.cpp" />
-    <ClCompile Include="Font.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="glad.c" />
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="GameLayer.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="MenuLayer.cpp" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="Noise.cpp" />
-    <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="stb.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="Time.cpp" />
-    <ClCompile Include="UI.cpp" />
-    <ClCompile Include="VAO.cpp" />
-    <ClCompile Include="VBO.cpp" />
+    <ClCompile Include="..\glad.c" />
+    <ClCompile Include="..\src\Audio.cpp" />
+    <ClCompile Include="..\src\Collision.cpp" />
+    <ClCompile Include="..\src\EBO.cpp" />
+    <ClCompile Include="..\src\Entity.cpp" />
+    <ClCompile Include="..\src\Font.cpp" />
+    <ClCompile Include="..\src\Game.cpp" />
+    <ClCompile Include="..\src\GameLayer.cpp" />
+    <ClCompile Include="..\src\Input.cpp" />
+    <ClCompile Include="..\src\Main.cpp" />
+    <ClCompile Include="..\src\MenuLayer.cpp" />
+    <ClCompile Include="..\src\Noise.cpp" />
+    <ClCompile Include="..\src\Renderer.cpp" />
+    <ClCompile Include="..\src\Scene.cpp" />
+    <ClCompile Include="..\src\Shader.cpp" />
+    <ClCompile Include="..\src\Sprite.cpp" />
+    <ClCompile Include="..\src\Texture.cpp" />
+    <ClCompile Include="..\src\Time.cpp" />
+    <ClCompile Include="..\src\UI.cpp" />
+    <ClCompile Include="..\src\VAO.cpp" />
+    <ClCompile Include="..\src\VBO.cpp" />
+    <ClCompile Include="..\stb.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="cpp.hint" />
@@ -193,40 +193,40 @@
     <None Include="shaders\unlit.vert" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Audio.h" />
-    <ClInclude Include="BoxSpawner.h" />
-    <ClInclude Include="BulletController.h" />
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="Core.h" />
-    <ClInclude Include="EBO.h" />
-    <ClInclude Include="EnemyController.h" />
-    <ClInclude Include="EnemySpawner.h" />
-    <ClInclude Include="Entity.h" />
-    <ClInclude Include="Font.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="Collision.h" />
-    <ClInclude Include="GameManager.h" />
-    <ClInclude Include="GLMHelper.h" />
-    <ClInclude Include="MathHelper.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="Layer.h" />
-    <ClInclude Include="Magia.h" />
-    <ClInclude Include="Noise.h" />
-    <ClInclude Include="PlayerController.h" />
-    <ClInclude Include="Renderer.h" />
-    <ClInclude Include="ScriptableEntity.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="Time.h" />
-    <ClInclude Include="UI.h" />
-    <ClInclude Include="VAO.h" />
-    <ClInclude Include="VBO.h" />
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="texture\man.png" />
     <Image Include="texture\tile.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\header\Audio.h" />
+    <ClInclude Include="..\header\Collision.h" />
+    <ClInclude Include="..\header\Component.h" />
+    <ClInclude Include="..\header\Core.h" />
+    <ClInclude Include="..\header\EBO.h" />
+    <ClInclude Include="..\header\Entity.h" />
+    <ClInclude Include="..\header\Font.h" />
+    <ClInclude Include="..\header\Game.h" />
+    <ClInclude Include="..\header\GLMHelper.h" />
+    <ClInclude Include="..\header\Input.h" />
+    <ClInclude Include="..\header\Layer.h" />
+    <ClInclude Include="..\header\Magia.h" />
+    <ClInclude Include="..\header\MathHelper.h" />
+    <ClInclude Include="..\header\Noise.h" />
+    <ClInclude Include="..\header\Renderer.h" />
+    <ClInclude Include="..\header\Scene.h" />
+    <ClInclude Include="..\header\ScriptableEntity.h" />
+    <ClInclude Include="..\header\Shader.h" />
+    <ClInclude Include="..\header\Sprite.h" />
+    <ClInclude Include="..\header\Texture.h" />
+    <ClInclude Include="..\header\Time.h" />
+    <ClInclude Include="..\header\UI.h" />
+    <ClInclude Include="..\header\VAO.h" />
+    <ClInclude Include="..\header\VBO.h" />
+    <ClInclude Include="..\script\BoxSpawner.h" />
+    <ClInclude Include="..\script\BulletController.h" />
+    <ClInclude Include="..\script\EnemyController.h" />
+    <ClInclude Include="..\script\EnemySpawner.h" />
+    <ClInclude Include="..\script\GameManager.h" />
+    <ClInclude Include="..\script\PlayerController.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

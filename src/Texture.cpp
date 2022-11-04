@@ -1,11 +1,11 @@
-#include "Texture.h"
+#include "../header/Texture.h"
 
 Ref<Texture> Texture::defaultTex;
 bool Texture::log = true;
 std::map <std::string, Ref<Texture>> Texture::library;
 
 void Texture::Init() {
-	defaultTex = Texture::Create("sprite_default", "texture/sprite_default.png");
+	defaultTex = Texture::Create("sprite_default", "../texture/sprite_default.png");
 }
 
 Texture::Texture(std::string name, const char* file, GLuint slot) {

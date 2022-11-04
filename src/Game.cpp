@@ -1,4 +1,4 @@
-#include "Game.h"
+#include "../header/Game.h"
 
 Game::Game(bool logging) {
 	ScreenResolution = {0, 0};

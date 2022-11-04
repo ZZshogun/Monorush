@@ -1,7 +1,7 @@
 #ifndef GAME_MANAGER_H
 #define GAME_MANAGER_H
 
-#include "Time.h"
+#include "../header/Time.h"
 
 class GameManager {
 public:

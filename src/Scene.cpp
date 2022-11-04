@@ -1,4 +1,4 @@
-#include "Scene.h"
+#include "../header/Scene.h"
 
 void CameraCreate(entt::registry& registry, entt::entity entity) {
 	registry.emplace<AudioListenerComponent>(entity);

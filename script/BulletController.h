@@ -1,7 +1,7 @@
 #ifndef BULLET_CONTROLLER_H
 #define BULLET_CONTROLLER_H
 
-#include "ScriptableEntity.h"
+#include "../header/ScriptableEntity.h"
 #include "EnemyController.h"
 
 class BulletController : public ScriptableEntity {

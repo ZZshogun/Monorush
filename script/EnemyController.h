@@ -1,7 +1,7 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
-#include "ScriptableEntity.h"
+#include "../header/ScriptableEntity.h"
 #include "GameManager.h"
 
 class EnemyController : public ScriptableEntity {
@@ -40,7 +40,7 @@ public:
 		healthPoint = glm::min<int>(healthPoint, 45);
 
 		auto& tag = GetComponent<TagComponent>();
-		std::cout << tag.name << " : health " << healthPoint << ", speed " << speed << ", turnSpeed " << turnSpeed << "\n";
+		//std::cout << tag.name << " : health " << healthPoint << ", speed " << speed << ", turnSpeed " << turnSpeed << "\n";
 	}
 
 	void OnUpdate(Time time) {

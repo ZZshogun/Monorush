@@ -1,4 +1,4 @@
-#include "Collision.h"
+#include "../header/Collision.h"
 
 CollisionPacket Collision::emptyPacket = {{}};
 std::unordered_map<entt::registry*, Collision::EntityPacket> Collision::collisionMap;

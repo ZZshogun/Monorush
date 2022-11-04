@@ -1,7 +1,7 @@
 #ifndef ENEMY_SPAWNER_H
 #define ENEMY_SPAWNER_H
 
-#include "ScriptableEntity.h"
+#include "../header/ScriptableEntity.h"
 #include "GameManager.h"
 #include "EnemyController.h"
 #include "PlayerController.h"

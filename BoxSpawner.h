@@ -24,7 +24,6 @@ public:
 			auto& tag = entity.GetComponent<TagComponent>();
 			tag.active = false;
 			tag.name = "Wall " + std::to_string(i + 1);
-			tag.tag = "Wall";
 			entities_pool.push_back(entity);
 			available_index.push(i);
 			indexes.push_back(true);
@@ -70,12 +69,14 @@ public:
 
 					auto& sprite = entities_pool[avail].GetComponent<SpriteRendererComponent>();
 					auto& colld = entities_pool[avail].GetComponent<CollisionComponent>();
+					auto& tag = entities_pool[avail].GetComponent<TagComponent>();
 					if (abs(noise[noise_location]) < 0.8f) {
 						sprite.SetTexture(Texture::library["box"]);
 						sprite.order = 0;
 						sprite.Size({ 1, 1 });
 						colld.Size({ 1, 1 });
 						colld.Origin({ 0, 0 });
+						tag.tag = "Box";
 					}
 					else {
 						sprite.SetTexture(Texture::library["lamppost"]);
@@ -83,6 +84,7 @@ public:
 						sprite.Size({ 1, 2 });
 						colld.Size({ 0.25, 0.6f });
 						colld.Origin({ 0, -0.65f });
+						tag.tag = "Lamp";
 					}
 
 					box_pos.insert({ pos.x, pos.y });

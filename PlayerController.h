@@ -80,7 +80,7 @@ public:
 		Entity bullet = Instantiate();
 		auto& renderer = bullet.AddComponent<SpriteRendererComponent>();
 		renderer.SetTexture(Texture::library["bullet"]);
-		renderer.order = 3;
+		renderer.order = 999;
 		bullet.GetComponent<TagComponent>().name = "Bullet" + std::to_string(++shotFired);
 		bullet.GetComponent<TagComponent>().tag = "Bullet";
 		bullet.GetComponent<TransformComponent>().position = transform.position + glm::vec3(direction * 0.15f, 0);
@@ -89,6 +89,7 @@ public:
 		rb.velocity = glm::vec3(direction, 0) * shootPower;
 		auto& colld = bullet.AddComponent<CollisionComponent>();
 		colld.ignoredTags.insert("Player");
+		colld.ignoredTags.insert("Lamp");
 		colld.ignoredTags.insert("Bullet");
 		colld.Size({0.2f, 0.2f});
 		bullet.AddComponent<NativeScriptComponent>().Bind<BulletController>();

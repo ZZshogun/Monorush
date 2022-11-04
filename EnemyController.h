@@ -13,12 +13,18 @@ public:
 	float turnSpeed = 2;
 	bool run_once = false;
 	bool death = false;
+	bool hurt = false;
 
 	float disposeWaitTime = 0.4f, _counter = 0;
+	float hurtWaitTime = 0.25f, _hcounter = 0;
 
 	void Hurt(int damage) {
 		healthPoint -= damage;
 		healthPoint = glm::max(0, healthPoint);
+
+		hurt = true;
+		_hcounter = 0;
+		GetComponent<SpriteSheetComponent>().DrawAtIndex(1);
 
 		auto& tag = GetComponent<TagComponent>();
 		std::cout << tag.name << " : health " << healthPoint << ", " << damage << " damage\n";
@@ -28,7 +34,10 @@ public:
 		healthPoint += (int)(GameManager::difficulty * 5);
 		speed += (int)(GameManager::difficulty * 0.5f);
 		turnSpeed += (int)(glm::pow(GameManager::difficulty, 2) * 3);
+
 		turnSpeed = glm::min<float>(turnSpeed, 10);
+		speed = glm::min<float>(speed, 4.25f);
+		healthPoint = glm::min<int>(healthPoint, 45);
 
 		auto& tag = GetComponent<TagComponent>();
 		std::cout << tag.name << " : health " << healthPoint << ", speed " << speed << ", turnSpeed " << turnSpeed << "\n";
@@ -38,6 +47,7 @@ public:
 
 		auto& playerTransform = FindEntityOfName("Player").GetComponent<TransformComponent>();
 		auto& rigidBody = GetComponent<RigidbodyComponent>();
+		auto& spritesheet = GetComponent<SpriteSheetComponent>();
 
 		glm::vec3 direction = playerTransform.position - GetComponent<TransformComponent>().position;
 		if (GameManager::gameOver) {
@@ -52,7 +62,9 @@ public:
 		if (healthPoint <= 0) {
 			if (!death) {
 				death = true;
-				GetComponent<SpriteSheetComponent>().DrawAtIndex(1);
+				if (GameManager::fury) GameManager::score += 100;
+				else GameManager::score += 50;
+				spritesheet.DrawAtIndex(2);
 				GetComponent<SpriteRendererComponent>().Color({ 1, 1, 1, 0.75f });
 				GetComponent<CollisionComponent>().active = false;
 			}
@@ -61,6 +73,14 @@ public:
 			}
 			else _counter += time.deltaTime;
 			return;
+		}
+
+		if (hurt) {
+			_hcounter += time.deltaTime;
+			if (_hcounter >= hurtWaitTime) {
+				hurt = false;
+				spritesheet.DrawAtIndex(0);
+			}
 		}
 
 		glm::vec3 curDir = glm::length(rigidBody.velocity) < 1 ? 

@@ -201,7 +201,6 @@ public:
 				else {
 					cbullet--;
 					Shoot(transform);
-					audio.Play(Audio::AudioBuffers["bounce"]);
 				}
 			}
 

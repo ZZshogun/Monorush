@@ -131,7 +131,7 @@ void Audio::Init() {
 	alListenerfv(AL_ORIENTATION, forwardAndUp);
 	SetListenerPosition({ 0, 0, 0 });
 	SetListenerVelocity({ 0, 0, 0 });
-	SetListenerGain(10);
+	SetListenerGain(1);
 	SetListenerPitch(1);
 
 	AudioBuffer::log = log;

@@ -7,8 +7,8 @@
 #include "PlayerController.h"
 
 class EnemySpawner : public ScriptableEntity {
-	const float spawnInterval = 1.22f;
-	const float spawnFuryInterval = 0.45f;
+	const float spawnInterval = 0.67f;
+	const float spawnFuryInterval = 0.4f;
 public:
 	float elapsed = 0;
 	float max_elapsed = spawnInterval;
@@ -49,7 +49,7 @@ public:
 			enemy.AddComponent<SpriteRendererComponent>().order = 1;
 			auto& spriteSheet = enemy.AddComponent<SpriteSheetComponent>();
 			spriteSheet.SetSpriteSheet(Texture::library["enemy"]);
-			spriteSheet.Size({2, 1});
+			spriteSheet.Size({3, 1});
 			spriteSheet.SizePerSprite(1);
 			enemy.AddComponent<RigidbodyComponent>().mass = 10;
 			auto& enemy_col = enemy.AddComponent<CollisionComponent>();

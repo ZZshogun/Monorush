@@ -6,9 +6,9 @@
 class BoxSpawner : public ScriptableEntity {
 
 public:
-	glm::ivec2 size = { 20, 20 };
+	glm::ivec2 size = { 24, 24 };
 	int count = 100;
-	float viewDistance = 20;
+	float viewDistance = 24;
 
 	std::vector<Entity> entities_pool;
 	std::queue<size_t> available_index;
@@ -50,7 +50,7 @@ public:
 			}
 		}
 
-		for (int j = 0; j < size.y; j++) {
+		for (int j = size.y - 1, order = 3; j >= 0; j--, order++) {
 			for (int i = 0; i < size.x; i++) {
 				if (available_index.empty()) continue;
 
@@ -79,7 +79,7 @@ public:
 					}
 					else {
 						sprite.SetTexture(Texture::library["lamppost"]);
-						sprite.order = 3;
+						sprite.order = order;
 						sprite.Size({ 1, 2 });
 						colld.Size({ 0.25, 0.6f });
 						colld.Origin({ 0, -0.65f });

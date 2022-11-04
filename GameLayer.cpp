@@ -119,9 +119,9 @@ void GameLayer::OnUpdate(Time time) {
 	if (!state->update) scene->OnUpdate(state, time);
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
+
 	UI::Anchor(CENTER);
 	UI::DrawButton(menuButton, time);
-	UI::EndUI();
 
 	if (outoftime <= 5) {
 		if (GameManager::remainingTime <= 0) {
@@ -132,22 +132,11 @@ void GameLayer::OnUpdate(Time time) {
 				floatOffset += time.deltaTime * floatOffsetSpeed;
 			}
 		}
-
-		UI::StartUI(glm::ivec2{ 1920, 1080 });
-
-		std::string timestr = Time::FormatMinute(GameManager::remainingTime);
-		std::string millitimestr = "." + Time::FormatMilli(GameManager::remainingTime);
+		std::string scorestr = std::to_string(GameManager::score);
 		UI::Anchor(CENTER);
-		UI::DrawString("- TIME LEFT -", { 0, 500 + floatOffset }, 1.25f, Color::Black);
-		UI::Anchor(RIGHT);
-		UI::DrawString(timestr, { 50, 430 + floatOffset }, 1.2f, texCol);
-		UI::Anchor(LEFT);
-		UI::DrawString(millitimestr, { 55, 440 + floatOffset }, 0.60f, texCol);
-
-		UI::EndUI();
+		UI::DrawString("- SCORE -", { 0, 500 + floatOffset }, 1.25f, Color::Black);
+		UI::DrawString(scorestr, { 0, 450 + floatOffset }, 1.25f, Color::Black);
 	}
-
-	UI::StartUI(glm::ivec2{ 1920, 1080 });
 
 	UI::Anchor(CENTER);
 	if (GameManager::fury && GameManager::_furyTimer <= 3) {
@@ -159,13 +148,23 @@ void GameLayer::OnUpdate(Time time) {
 		UI::DrawString("FURY HAS ENDED... FOR NOW", { 0, 300 }, 1, { 1, 0.41f, 0.38f, 1 });
 	}
 
-	std::stringstream ss;
-	ss << std::setprecision(2) << std::fixed << GameManager::difficulty;
-	UI::Anchor(RIGHT);
-	UI::DrawString("DIFFICULTY : " + ss.str(), {940, 460}, 0.65f, Color::Black);
-	ss.str(std::string());
-	ss << std::setprecision(2) << std::fixed << GameManager::difficultyIncRate;
-	UI::DrawString("DIFFICULTY RATE : " + ss.str(), {940, 420}, 0.65f, Color::Black);
+	if (Input::GetKeyDown(Key::Tab)) GameManager::f3 = !GameManager::f3;
+
+	if (GameManager::f3) {
+		std::stringstream ss;
+		ss << std::setprecision(2) << std::fixed << GameManager::difficulty;
+		UI::Anchor(RIGHT);
+		UI::DrawString("DIFFICULTY : " + ss.str(), { 940, 460 }, 0.65f, Color::Black);
+		ss.str(std::string());
+		ss << std::setprecision(2) << std::fixed << GameManager::difficultyIncRate;
+		UI::DrawString("DIFFICULTY RATE : " + ss.str(), { 940, 420 }, 0.65f, Color::Black);
+	}
+	else {
+		std::string timestr = Time::FormatMinute(GameManager::remainingTime);
+		std::string millitimestr = "." + Time::FormatMilli(GameManager::remainingTime);
+		UI::Anchor(RIGHT);
+		UI::DrawString("TIME LEFT " + timestr + millitimestr, { 940, 460 }, 0.65f, Color::Black);
+	}
 
 	if (GameManager::gameOver) {
 		menuButton->active = false;
@@ -197,6 +196,7 @@ void GameLayer::OnUpdate(Time time) {
 
 					UI::DrawString(winMessage, { 0, 350 }, 2, Color::White);
 					UI::DrawString(winDesc, { 0, 280 }, 0.65f, Color::White);
+					UI::DrawString("THANKS FOR PLAYING!", {0, 150}, 0.85f, Color::White);
 				}
 				break;
 			case GameManager::LOSS:
@@ -215,6 +215,8 @@ void GameLayer::OnUpdate(Time time) {
 				break;
 			}
 
+			UI::DrawString("TOTAL SCORE", { 0, 0 }, 0.85f, Color::White);
+			UI::DrawString(std::to_string(GameManager::score), { 0, -50 }, 0.85f, Color::White);
 			UI::DrawButton(retryButton, time);
 			UI::DrawButton(endMenuButton, time);
 		}

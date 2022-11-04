@@ -124,7 +124,7 @@ void MenuLayer::OnUpdate(Time time) {
 	}
 	else {
 		UI::Anchor(CENTER);
-		UI::DrawString("== THE GAME ==", { 0, 400 }, 2, Color::Black);
+		UI::DrawString("== MONORUSH ==", { 0, 400 }, 2, Color::Black);
 		UI::Anchor(LEFT);
 		UI::DrawString("VERSION 0.1A", { -950, -525 }, 0.45f, Color::Black, "Arial");
 		UI::Anchor(RIGHT);

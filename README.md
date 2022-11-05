@@ -1,6 +1,7 @@
 # Monorush
 A 2D shooter game where you, the player, try to survive waves of black blobs trying to steal your color. <br/>
-This game isn't finished yet. <br/>
+Fight or run! It's your choice to make. <br/><br/>
+**This game isn't finished yet.** <br/>
 
 # Purpose
 To learn about graphics programming. <br/>

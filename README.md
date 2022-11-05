@@ -9,7 +9,6 @@ And I like game especially roguelike genre. That's why. <br/>
 
 # Library
 [GLFW](https://www.glfw.org/) <br/>
-[GLAD](https://glad.dav1d.de/) <br/>
 [glm](https://github.com/g-truc/glm) <br/>
 [EnTT](https://github.com/skypjack/entt) <br/>
 [OpenAL soft](https://github.com/kcat/openal-soft) <br/>

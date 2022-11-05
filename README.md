@@ -5,7 +5,7 @@ Fight or run! It's your choice to make. <br/><br/>
 
 # Purpose
 To learn about graphics programming. <br/>
-And I like game especially roguelike. That's why. <br/>
+And I like game especially roguelike genre. That's why. <br/>
 
 # Library
 [GLFW](https://www.glfw.org/) <br/>

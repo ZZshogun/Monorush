@@ -53,4 +53,8 @@ namespace Color {
 	const glm::vec4 White = { 1, 1, 1, 1 };
 }
 
+#if 1
+#define MAGIA_DEBUG
+#endif
+
 #endif

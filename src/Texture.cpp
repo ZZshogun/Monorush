@@ -5,7 +5,11 @@ bool Texture::log = true;
 std::map <std::string, Ref<Texture>> Texture::library;
 
 void Texture::Init() {
+#ifdef MAGIA_DEBUG
 	defaultTex = Texture::Create("sprite_default", "../texture/sprite_default.png");
+#else
+	defaultTex = Texture::Create("sprite_default", "texture/sprite_default.png");
+#endif
 }
 
 Texture::Texture(std::string name, const char* file, GLuint slot) {

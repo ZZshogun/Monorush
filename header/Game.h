@@ -23,6 +23,8 @@ private:
 	glm::ivec2 ScreenResolution = { 1280, 720 };
 	glm::ivec2 prevScreenResolution = { 1280, 720 };
 
+	void SetIcon(std::string file);
+
 	void ClearLayer(int layerIndex);
 	bool LoadLayer(int layerIndex);
 	void UpdateLayer(int layerIndex, Time time);

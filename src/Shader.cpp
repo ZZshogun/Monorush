@@ -89,10 +89,17 @@ Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 }
 
 void Shader::Init() {
+#ifdef MAGIA_DEBUG
 	LUT["unlit"] = Create("../shaders/unlit.vert", "../shaders/unlit.frag");
 	LUT["glyph"] = Create("../shaders/glyph.vert", "../shaders/glyph.frag");
 	LUT["image"] = Create("../shaders/image.vert", "../shaders/image.frag");
 	LUT["unlit-edgefade"] = Create("../shaders/unlit.vert", "../shaders/unlit-edgefade.frag");
+#else
+	LUT["unlit"] = Create("shaders/unlit.vert", "shaders/unlit.frag");
+	LUT["glyph"] = Create("shaders/glyph.vert", "shaders/glyph.frag");
+	LUT["image"] = Create("shaders/image.vert", "shaders/image.frag");
+	LUT["unlit-edgefade"] = Create("shaders/unlit.vert", "shaders/unlit-edgefade.frag");
+#endif
 }
 
 void Shader::Bind() {

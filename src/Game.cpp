@@ -33,7 +33,7 @@ void Game::Setup() {
 		glfwCreateWindow(
 			(int)ScreenResolution.x, 
 			(int)ScreenResolution.y, 
-			"Game", 
+			"Monorush", 
 			monitor, 
 			NULL
 		);
@@ -60,6 +60,12 @@ void Game::Setup() {
 	glfwSetWindowSizeLimits(window, 640, 360, GLFW_DONT_CARE, GLFW_DONT_CARE);
 	glfwSetWindowAspectRatio(window, 16, 9);
 	//glfwSwapInterval(0);
+
+#ifdef MAGIA_DEBUG
+	SetIcon("../texture/icon.png");
+#else
+	SetIcon("texture/icon.png");
+#endif
 
 	glViewport(0, 0, (int)ScreenResolution.x, (int)ScreenResolution.y);
 	glEnable(GL_BLEND);
@@ -112,6 +118,15 @@ void Game::Loop() {
 
 void Game::WindowResizeCallback(GLFWwindow* window, int x, int y) {
 	glViewport(0, 0, x, y);
+}
+
+void Game::SetIcon(std::string file) {
+	if (log) std::cout << "LOAD Icon " << file << "\n";
+	GLFWimage image{};
+	image.pixels = stbi_load(file.c_str(), &image.width, &image.height, 0, 4);
+	assert(image.pixels);
+	glfwSetWindowIcon(window, 1, &image);
+	stbi_image_free(image.pixels);
 }
 
 void Game::SetFullscreen(bool status) {

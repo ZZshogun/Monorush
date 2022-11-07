@@ -4,6 +4,7 @@ std::unordered_map<std::string, Font::FontFace> Font::fonts_map;
 bool Font::log = true;
 
 void Font::LoadFont(std::string name, std::string path, glm::ivec2 charsetsSize) {
+	std::string file = MAGIA_PATH(path);
 
 	if (fonts_map.find(name) != fonts_map.end()) return;
 
@@ -14,7 +15,7 @@ void Font::LoadFont(std::string name, std::string path, glm::ivec2 charsetsSize)
 		std::cout << "ERROR FreeType_library code " << ftFail << "\n";
 	}
 	FT_Face face;
-	ftFail = FT_New_Face(ftLibrary, path.c_str(), 0, &face);
+	ftFail = FT_New_Face(ftLibrary, file.c_str(), 0, &face);
 	if (ftFail) {
 		std::cout << "ERROR FreeType_FontFace code " << ftFail << "\n";
 	}
@@ -55,7 +56,7 @@ void Font::LoadFont(std::string name, std::string path, glm::ivec2 charsetsSize)
 	FT_Done_Face(face);
 	FT_Done_FreeType(ftLibrary);
 
-	if (log) std::cout << "CREATE Font " << name << " " << path << "\n";
+	if (log) std::cout << "CREATE Font " << name << " " << file << "\n";
 }
 
 Font::FontFace& Font::GetFont(std::string fontName) {

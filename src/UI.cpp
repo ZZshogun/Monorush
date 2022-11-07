@@ -30,13 +30,8 @@ glm::vec2 UI::ratioRef(glm::ivec2 screen_pos) {
 void UI::Init() {
 
 	if (!log) Font::log = false;
-#ifdef MAGIA_DEBUG
-	Font::LoadFont("Arial", "../font/arial.ttf", {0, 48});
-	Font::LoadFont("PixelGameFont", "../font/PixelGameFont.ttf", {0, 48});
-#else
-	Font::LoadFont("Arial", "font/arial.ttf", { 0, 48 });
-	Font::LoadFont("PixelGameFont", "font/PixelGameFont.ttf", { 0, 48 });
-#endif
+	Font::LoadFont("Arial", "font/arial.ttf", {0, 48});
+	Font::LoadFont("PixelGameFont", "font/PixelGameFont.ttf", {0, 48});
 
 	std::vector<GLuint> indices = {
 		0, 3, 1,

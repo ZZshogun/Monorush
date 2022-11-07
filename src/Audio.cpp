@@ -137,8 +137,6 @@ void Audio::Init() {
 	AudioBuffer::log = log;
 	AudioSource::log = log;
 
-	LoadSound("../audio/bounce.wav", "bounce");
-
 	if (log)
 		std::cout << "INIT Audio Version : " << alGetString(AL_VERSION) << "\n";
 }
@@ -168,22 +166,24 @@ void Audio::Destroy() {
 }
 
 void Audio::LoadSound(std::string file, std::string name) {
+	std::string path = MAGIA_PATH(file);
+
 	if (name != "" && AudioBuffers.find(name) != AudioBuffers.end()) {
 		AudioBuffers[name].reset();
 	}
-	else if (AudioBuffers.find(file) != AudioBuffers.end()) {
-		AudioBuffers[file].reset();
+	else if (AudioBuffers.find(path) != AudioBuffers.end()) {
+		AudioBuffers[path].reset();
 	}
 
-	Ref<AudioBuffer> buffer = AudioBuffer::Create(file);
+	Ref<AudioBuffer> buffer = AudioBuffer::Create(path);
 
 	if (name != "") {
 		Audio::AudioBuffers[name] = buffer;
 		if (log) std::cout << "CREATE Audio " << buffer->handle << " " << name << "\n";
 	}
 	else {
-		Audio::AudioBuffers[file] = buffer;
-		if (log) std::cout << "CREATE Audio " << buffer->handle << " " << file << "\n";
+		Audio::AudioBuffers[path] = buffer;
+		if (log) std::cout << "CREATE Audio " << buffer->handle << " " << path << "\n";
 	}
 }
 

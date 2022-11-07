@@ -22,27 +22,17 @@ GameLayer::~GameLayer() {
 }
 
 void GameLayer::OnAttach() {
-#ifdef MAGIA_DEBUG
-	Ref<Texture> playerIdletex = Texture::Create("playerIdle", "../texture/player_idle_sheet.png");
-	Ref<Texture> playerRuntex = Texture::Create("playerRun", "../texture/player_run_sheet.png");
-	Ref<Texture> enemyTex = Texture::Create("enemy", "../texture/enemy.png");
-	Ref<Texture> boxtex = Texture::Create("box","../texture/box.png");
-	Ref<Texture> heart = Texture::Create("heart","../texture/heart.png");
-	Ref<Texture> bullet = Texture::Create("bullet","../texture/bullet.png");
-	Ref<Texture> lamppost = Texture::Create("lamppost", "../texture/lamp_post.png");
-	Ref<Texture> tile = Texture::Create("tile", "../texture/tile.png");
-	Audio::LoadSound("audio/bounce.wav", "bounce");
-#else 
-	Ref<Texture> playerIdletex = Texture::Create("playerIdle", "texture/player_idle_sheet.png");
-	Ref<Texture> playerRuntex = Texture::Create("playerRun", "texture/player_run_sheet.png");
+	Ref<Texture> playerIdletex = Texture::Create("playerIdleBody", "texture/player_idle_body.png");
+	Ref<Texture> playerIdlecapetex = Texture::Create("playerIdleCape", "texture/player_idle_cape.png");
+	Ref<Texture> playerRuntex = Texture::Create("playerRunBody", "texture/player_run_body.png");
+	Ref<Texture> playerRuncapetex = Texture::Create("playerRunCape", "texture/player_run_cape.png");
 	Ref<Texture> enemyTex = Texture::Create("enemy", "texture/enemy.png");
-	Ref<Texture> boxtex = Texture::Create("box", "texture/box.png");
-	Ref<Texture> heart = Texture::Create("heart", "texture/heart.png");
-	Ref<Texture> bullet = Texture::Create("bullet", "texture/bullet.png");
+	Ref<Texture> boxtex = Texture::Create("box","texture/box.png");
+	Ref<Texture> heart = Texture::Create("heart","texture/heart.png");
+	Ref<Texture> bullet = Texture::Create("bullet","texture/bullet.png");
 	Ref<Texture> lamppost = Texture::Create("lamppost", "texture/lamp_post.png");
 	Ref<Texture> tile = Texture::Create("tile", "texture/tile.png");
 	Audio::LoadSound("audio/bounce.wav", "bounce");
-#endif
 
 	Noise::RandomSeed();
 
@@ -56,6 +46,14 @@ void GameLayer::OnAttach() {
 	bgSprite.parallelTexture = true;
 	bgSprite.order = -1;
 	bgSprite.shader = "unlit-edgefade";
+
+	// Player cape
+	Entity playerCape = scene->CreateEntity("Player cape");
+	auto& playerCaperenderer = playerCape.AddComponent<SpriteRendererComponent>();
+	playerCaperenderer.order = 3;
+	auto& anim_player_cape = playerCape.AddComponent<AnimatorComponent>();
+	anim_player_cape.AddAnimation(1, playerIdlecapetex, { 2, 1 }, 3);
+	anim_player_cape.AddAnimation(2, playerRuncapetex, { 6, 1 }, 6);
 
 	// Player
 	player = scene->CreateEntity("Player");
@@ -86,6 +84,7 @@ void GameLayer::OnAttach() {
 	boxSpawner.GetComponent<TransformComponent>().parent = &player_transform;
 	enemySpawner.GetComponent<TransformComponent>().parent = &player_transform;
 	background.GetComponent<TransformComponent>().parent = &player_transform;
+	playerCape.GetComponent<TransformComponent>().parent = &player_transform;
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
 	UI::Anchor(CENTER);

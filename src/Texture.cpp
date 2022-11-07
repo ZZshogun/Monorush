@@ -5,20 +5,18 @@ bool Texture::log = true;
 std::map <std::string, Ref<Texture>> Texture::library;
 
 void Texture::Init() {
-#ifdef MAGIA_DEBUG
-	defaultTex = Texture::Create("sprite_default", "../texture/sprite_default.png");
-#else
 	defaultTex = Texture::Create("sprite_default", "texture/sprite_default.png");
-#endif
 }
 
 Texture::Texture(std::string name, const char* file, GLuint slot) {
 	this->unit = slot;
 	this->name = name;
 
+	std::string path = MAGIA_PATH(std::string(file));
+
 	int imgW, imgH, imgCh;
 	stbi_set_flip_vertically_on_load(true);
-	unsigned char* bytes = stbi_load(file, &imgW, &imgH, &imgCh, 0);
+	unsigned char* bytes = stbi_load(path.c_str(), &imgW, &imgH, &imgCh, 0);
 
 	glGenTextures(1, &handle);
 	glActiveTexture(GL_TEXTURE0 + slot);

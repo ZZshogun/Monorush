@@ -5,7 +5,8 @@ bool Shader::log = true;
 
 std::string Read_from_file(const char* filepath) {
 	std::string ret = "";
-	std::ifstream file(filepath);
+	std::string path = MAGIA_PATH(std::string(filepath));
+	std::ifstream file(path);
 
 	std::string tmp;
 	while (std::getline(file, tmp)) {
@@ -89,17 +90,10 @@ Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 }
 
 void Shader::Init() {
-#ifdef MAGIA_DEBUG
-	LUT["unlit"] = Create("../shaders/unlit.vert", "../shaders/unlit.frag");
-	LUT["glyph"] = Create("../shaders/glyph.vert", "../shaders/glyph.frag");
-	LUT["image"] = Create("../shaders/image.vert", "../shaders/image.frag");
-	LUT["unlit-edgefade"] = Create("../shaders/unlit.vert", "../shaders/unlit-edgefade.frag");
-#else
 	LUT["unlit"] = Create("shaders/unlit.vert", "shaders/unlit.frag");
 	LUT["glyph"] = Create("shaders/glyph.vert", "shaders/glyph.frag");
 	LUT["image"] = Create("shaders/image.vert", "shaders/image.frag");
 	LUT["unlit-edgefade"] = Create("shaders/unlit.vert", "shaders/unlit-edgefade.frag");
-#endif
 }
 
 void Shader::Bind() {

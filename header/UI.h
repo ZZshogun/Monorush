@@ -118,7 +118,6 @@ public:
 	static void DrawImage(Ref<Texture>& image, glm::ivec2 screen_pos, glm::ivec2 screen_size, glm::vec4 color = Color::White);
 	static void DrawImage(glm::ivec2 screen_pos, glm::ivec2 screen_size, glm::vec4 color);
 	static void DrawButton(Ref<Button>& button, Time time);
-	static void DrawButtons(Time time);
 
 	static Ref<Button> CreateButton(
 		std::string text,

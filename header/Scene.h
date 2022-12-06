@@ -18,9 +18,9 @@ struct LayerState {
 		currentSceneIndex += addition; update = true;
 	}
 	void SwitchVolume() {
-		volumeGain += 2.5f;
-		if (volumeGain > 10) volumeGain = 0;
-		else if (volumeGain < 0) volumeGain = 10;
+		volumeGain += 0.25f;
+		if (volumeGain > 1) volumeGain = 0;
+		else if (volumeGain < 0) volumeGain = 1;
 		update = true;
 	}
 	void ToggleFullScreen() {
@@ -36,7 +36,7 @@ struct LayerState {
 	bool update = false;
 	GLFWwindow* window = NULL;
 	int currentSceneIndex = 0;
-	float volumeGain = 10;
+	float volumeGain = 1;
 	bool reload = false;
 	bool fullScreen = false;
 	bool terminate = false;
@@ -54,7 +54,7 @@ public:
 	
 	Entity CreateEntity(std::string name = "");
 
-	void OnUpdate(Ref<LayerState>& layerState, Time time);
+	void OnUpdate(Ref<LayerState>& layerState, Time& time);
 };
 
 #endif

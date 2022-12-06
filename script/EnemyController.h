@@ -44,7 +44,7 @@ public:
 	}
 
 	void OnUpdate(Time time) {
-
+		if (GameManager::pause) return;
 		auto& playerTransform = FindEntityOfName("Player").GetComponent<TransformComponent>();
 		auto& rigidBody = GetComponent<RigidbodyComponent>();
 		auto& spritesheet = GetComponent<SpriteSheetComponent>();

@@ -28,7 +28,7 @@ public:
 	MenuLayer();
 	~MenuLayer();
 	void OnAttach();
-	void OnUpdate(Time time);
+	void OnUpdate(Time& time);
 };
 
 class GameLayer {
@@ -46,10 +46,15 @@ private:
 
 private:
 	Entity player;
+	Ref<UI::Button> pauseButton;
+	Ref<UI::Button> resumeButton;
+	Ref<UI::Button> settingButton;
 	Ref<UI::Button> menuButton;
 	Ref<UI::Button> retryButton;
 	Ref<UI::Button> endMenuButton;
-
+	Ref<UI::Button> fulLScreenButton;
+	Ref<UI::Button> volumeButton;
+	Ref<UI::Button> backButton;
 
 public:
 	Ref<LayerState> state;
@@ -57,7 +62,7 @@ public:
 	GameLayer();
 	~GameLayer();
 	void OnAttach();
-	void OnUpdate(Time time);
+	void OnUpdate(Time& time);
 };
 
 #endif

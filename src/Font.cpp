@@ -65,7 +65,7 @@ Font::FontFace& Font::GetFont(std::string fontName) {
 
 FontChar& Font::GetFontChar(std::string fontName, char character) {
 	if (fonts_map.find(fontName) == fonts_map.end()) {
-		throw std::exception("Font Face not found");
+		throw std::runtime_error("Font Face not found");
 	}
 	return fonts_map[fontName][character];
 }

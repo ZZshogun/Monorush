@@ -27,6 +27,8 @@ public:
 	inline static bool half = false, fury = false;
 
 	inline static bool f3 = false;
+	inline static bool pause = false;
+	inline static bool setting = false;
 
 	inline static GameState gameState = ONGOING;
 
@@ -63,12 +65,17 @@ public:
 
 	static void Reset() {
 		_furyTimer = 0;
+		score = 0;
 		gameOver = false;
-		remainingTime = 180;
+		maxRemainingTime = 180;
+		remainingTime = maxRemainingTime;
 		difficulty = 1;
 		difficultyIncRate = 0.02f;
 		half = false;
 		fury = false;
+		f3 = false;
+		pause = false;
+		setting = false;
 	}
 };
 

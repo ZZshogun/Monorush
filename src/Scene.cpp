@@ -61,7 +61,7 @@ Entity Scene::CreateEntity(std::string name) {
 	return entity;
 }
 
-void Scene::OnUpdate(Ref<LayerState>& layerState, Time time) {
+void Scene::OnUpdate(Ref<LayerState>& layerState, Time& time) {
 	if (!layerState) return;
 
 	// Rigidbody

@@ -15,10 +15,10 @@ public:
 	GLuint handle;
 	GLuint unit;
 	std::string name;
-	Texture(std::string name, const char* file, GLuint slot);
+	Texture(std::string name, const char* file, GLuint slot, bool absolutePath = false);
 	~Texture();
 	static Ref<Texture> Create();
-	static Ref<Texture> Create(std::string name, std::string file, GLuint slot = 0);
+	static Ref<Texture> Create(std::string name, std::string file, bool absolutePath = false, GLuint slot = 0);
 	static void Init();
 	static void ClearHandles();
 	void TexUnit(Ref<Shader>& shader, const char* uniform, GLuint unit);

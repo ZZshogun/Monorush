@@ -42,7 +42,7 @@ void UI::Init() {
 			Vertex{ glm::vec3{ 0, 0, 0 }, glm::vec2{ 0, 1 } },
 			Vertex{ glm::vec3{ 0, 1, 0 }, glm::vec2{ 0, 0 } },
 			Vertex{ glm::vec3{ 1, 1, 0 }, glm::vec2{ 1, 0 } },
-			Vertex{ glm::vec3{ 0, 1, 0 }, glm::vec2{ 1, 1} },
+			Vertex{ glm::vec3{ 1, 0, 0 }, glm::vec2{ 1, 1 } },
 	};
 
 	vao = VAO::Create();
@@ -257,7 +257,7 @@ void UI::DrawButton(Ref<Button>& button, Time time) {
 	Ref<Texture> tex = button->texture ? button->texture : Texture::defaultTex;
 	
 	if (button->blink > 0 && button->cur_color == button->presscolor) {
-		button->blink -= time.deltaTime;
+		button->blink -= time.unscaledDeltaTime;
 	}
 	else if (button->cur_color == button->presscolor) {
 		button->blink = 0;
@@ -269,13 +269,6 @@ void UI::DrawButton(Ref<Button>& button, Time time) {
 	DrawImage(tex, button->position, button->size, button->cur_color);
 	DrawString(button->text, button->position, button->textScale, button->textColor);
 	ref_resolution = f_ref;
-}
-
-void UI::DrawButtons(Time time) {
-	for (Ref<Button>& button : buttons) {
-		if (button->isValid())
-			DrawButton(button, time);
-	}
 }
 
 void UI::EndUI() {

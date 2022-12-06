@@ -2,6 +2,7 @@
 #define BOX_SPAWNER_H
 
 #include "../header/ScriptableEntity.h"
+#include "GameManager.h"
 
 class BoxSpawner : public ScriptableEntity {
 
@@ -31,6 +32,8 @@ public:
 	}
 
 	void OnUpdate(Time time) {
+		if (GameManager::pause) return;
+
 		auto& transform = GetComponent<TransformComponent>();
 		glm::vec2 floor_pos = glm::floor(transform.position);
 

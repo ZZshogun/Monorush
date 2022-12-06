@@ -75,16 +75,16 @@
     <LibraryPath>D:\Rachata\Desktop\Source\Code\C++\Magia\libraries\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\Rachata\Desktop\Source\Code\C++\Magia\libraries\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Rachata\Desktop\Source\Code\C++\Magia\libraries\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Rachata\Source\Code\C++\Monorush\libraries\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Rachata\Source\Code\C++\Monorush\libraries\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>D:\Rachata\Desktop\Source\Code\C++\Magia\libraries\include;$(IncludePath)</IncludePath>
     <LibraryPath>D:\Rachata\Desktop\Source\Code\C++\Magia\libraries\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>D:\Rachata\Desktop\Source\Code\C++\Magia\libraries\include;$(IncludePath)</IncludePath>
-    <LibraryPath>D:\Rachata\Desktop\Source\Code\C++\Magia\libraries\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>D:\Rachata\Source\Code\C++\Monorush\libraries\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\Rachata\Source\Code\C++\Monorush\libraries\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -183,18 +183,14 @@
     <ClCompile Include="..\stb.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\shaders\glyph.frag" />
+    <None Include="..\shaders\glyph.vert" />
+    <None Include="..\shaders\image.frag" />
+    <None Include="..\shaders\image.vert" />
+    <None Include="..\shaders\unlit-edgefade.frag" />
+    <None Include="..\shaders\unlit.frag" />
+    <None Include="..\shaders\unlit.vert" />
     <None Include="cpp.hint" />
-    <None Include="shaders\glyph.frag" />
-    <None Include="shaders\glyph.vert" />
-    <None Include="shaders\image.frag" />
-    <None Include="shaders\image.vert" />
-    <None Include="shaders\unlit-edgefade.frag" />
-    <None Include="shaders\unlit.frag" />
-    <None Include="shaders\unlit.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="texture\man.png" />
-    <Image Include="texture\tile.png" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\header\Audio.h" />

@@ -13,7 +13,7 @@ private:
 	int layerIndex = 0;
 	bool log = true;
 	bool fullscreen = false;
-	float gameVolumeGain = 10;
+	float gameVolumeGain = 1;
 
 	Ref<MenuLayer> menuLayer = NULL;
 	Ref<GameLayer> gameLayer = NULL;
@@ -27,14 +27,12 @@ private:
 
 	void ClearLayer(int layerIndex);
 	bool LoadLayer(int layerIndex);
-	void UpdateLayer(int layerIndex, Time time);
+	void UpdateLayer(int layerIndex, Time& time);
 	bool ProcessLayerState(int layerIndex);
-	void UpdatePacket(LayerState& state);
-
-	void SetFullscreen(bool status);
-	void SetVolume(float volume);
+	void UpdatePacket(Ref<LayerState>& state);
 
 	static void WindowResizeCallback(GLFWwindow* window, int x, int y);
+	static void WindowErrorCallback(int err, const char* str);
 
 public:
 	Game(bool logging = true);

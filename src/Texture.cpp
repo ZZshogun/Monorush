@@ -8,11 +8,14 @@ void Texture::Init() {
 	defaultTex = Texture::Create("sprite_default", "texture/sprite_default.png");
 }
 
-Texture::Texture(std::string name, const char* file, GLuint slot) {
+Texture::Texture(std::string name, const char* file, GLuint slot, bool absolutePath) {
 	this->unit = slot;
 	this->name = name;
 
-	std::string path = MAGIA_PATH(std::string(file));
+	std::string path = std::string();
+
+	if (absolutePath) path = file;
+	else path = MAGIA_PATH(std::string(file));
 
 	int imgW, imgH, imgCh;
 	stbi_set_flip_vertically_on_load(true);
@@ -44,7 +47,7 @@ Texture::Texture(std::string name, const char* file, GLuint slot) {
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	if (log) std::cout << "CREATE Texture " << handle << " " << file << "\n";
+	if (log) std::cout << "CREATE Texture " << handle << " " << path << "\n";
 
 	stbi_image_free(bytes);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -54,9 +57,9 @@ Ref<Texture> Texture::Create() {
 	return defaultTex;
 }
 
-Ref<Texture> Texture::Create(std::string name, std::string file, GLuint slot) {
+Ref<Texture> Texture::Create(std::string name, std::string file, bool abs, GLuint slot) {
 	if (library.find(name) != library.end()) library[name]->Delete();
-	library[name] = std::make_shared<Texture>(name, file.c_str(), slot);
+	library[name] = std::make_shared<Texture>(name, file.c_str(), slot, abs);
 	return library[name];
 }
 

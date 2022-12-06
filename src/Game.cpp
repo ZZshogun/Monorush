@@ -24,7 +24,7 @@ void Game::Setup() {
 
 	GLFWvidmode mode = *glfwGetVideoMode(glfwGetPrimaryMonitor());
 	if (ScreenResolution.x <= 0 || ScreenResolution.y <= 0) {
-		ScreenResolution = glm::vec2{ mode.width, mode.height } *0.8f;
+		ScreenResolution = glm::vec2{ mode.width, mode.height } * 0.8f;
 		prevScreenResolution = ScreenResolution;
 	}
 
@@ -53,6 +53,7 @@ void Game::Setup() {
 		(int)WindowPos.y
 	);
 
+	glfwSetErrorCallback(Game::WindowErrorCallback);
 	glfwSetWindowSizeCallback(window, Game::WindowResizeCallback);
 	glfwSetScrollCallback(window, Input::ScanMouseScroll);
 	Input::SetWindowInput(window);
@@ -61,19 +62,15 @@ void Game::Setup() {
 	glfwSetWindowAspectRatio(window, 16, 9);
 	//glfwSwapInterval(0);
 
-#ifdef MAGIA_DEBUG
-	SetIcon("../texture/icon.png");
-#else
 	SetIcon("texture/icon.png");
-#endif
 
 	glViewport(0, 0, (int)ScreenResolution.x, (int)ScreenResolution.y);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	Audio::log = true;
-	UI::log = false;
-	Texture::log = false;
+	UI::log = true;
+	Texture::log = true;
 	Shader::log = true;
 	Noise::log = true;
 
@@ -90,7 +87,7 @@ void Game::Loop() {
 	if (!LoadLayer(layerIndex)) return;
 
 	while (!glfwWindowShouldClose(window)) {
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT);
 		
 		time._UpdateTime((float)glfwGetTime());
 
@@ -116,49 +113,24 @@ void Game::Loop() {
 	UI::Destroy();
 }
 
+void Game::WindowErrorCallback(int err, const char* str) {
+	if (err) {
+		std::cout << "ERROR GL " << err << "\n";
+	}
+}
+
 void Game::WindowResizeCallback(GLFWwindow* window, int x, int y) {
 	glViewport(0, 0, x, y);
 }
 
 void Game::SetIcon(std::string file) {
-	if (log) std::cout << "LOAD Icon " << file << "\n";
+	std::string path = MAGIA_PATH(file);
+	if (log) std::cout << "LOAD Icon " << path << "\n";
 	GLFWimage image{};
-	image.pixels = stbi_load(file.c_str(), &image.width, &image.height, 0, 4);
+	image.pixels = stbi_load(path.c_str(), &image.width, &image.height, 0, 4);
 	assert(image.pixels);
 	glfwSetWindowIcon(window, 1, &image);
 	stbi_image_free(image.pixels);
-}
-
-void Game::SetFullscreen(bool status) {
-	fullscreen = status;
-	if (fullscreen) {
-		glm::ivec2 winPos = {0, 0};
-		glfwGetWindowPos(window, &winPos.x, &winPos.y);
-		WindowPos = winPos;
-
-		GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-		auto mode = glfwGetVideoMode(monitor);
-		glm::ivec2 sz = { mode->width, mode->height };
-		glfwSetWindowMonitor(window, monitor, 0, 0, sz.x, sz.y, GLFW_DONT_CARE);
-
-		prevScreenResolution = ScreenResolution;
-		ScreenResolution = sz;
-		glViewport(0, 0, sz.x, sz.y);
-	}
-	else {
-		ScreenResolution = prevScreenResolution;
-		glfwSetWindowMonitor(window, NULL, WindowPos.x, WindowPos.y,
-			ScreenResolution.x, ScreenResolution.y, GLFW_DONT_CARE);
-		glViewport(0, 0, ScreenResolution.x, ScreenResolution.y);
-	}
-}
-
-void Game::SetVolume(float volume) {
-	gameVolumeGain = volume;
-	if (gameVolumeGain < 0) gameVolumeGain = 10;
-	else if (gameVolumeGain > 10) gameVolumeGain = 0;
-
-	Audio::SetListenerGain(gameVolumeGain);
 }
 
 void Game::ClearLayer(int layerIndex) {
@@ -175,19 +147,18 @@ void Game::ClearLayer(int layerIndex) {
 }
 
 bool Game::LoadLayer(int layerIndex) {
+	this->layerIndex = layerIndex;
 	switch (layerIndex) {
 	case 0:
-		this->layerIndex = 0;
 		menuLayer = std::make_shared<MenuLayer>();
-		UpdatePacket(*menuLayer->state);
-		ProcessLayerState(0);
+		UpdatePacket(menuLayer->state);
+		ProcessLayerState(layerIndex);
 		menuLayer->OnAttach();
 		return true;
 	case 1:
-		this->layerIndex = 1;
 		gameLayer = std::make_shared<GameLayer>();
-		UpdatePacket(*gameLayer->state);
-		ProcessLayerState(1);
+		UpdatePacket(gameLayer->state);
+		ProcessLayerState(layerIndex);
 		gameLayer->OnAttach();
 		return true;
 	default:
@@ -195,7 +166,7 @@ bool Game::LoadLayer(int layerIndex) {
 	}
 }
 
-void Game::UpdateLayer(int layerIndex, Time time) {
+void Game::UpdateLayer(int layerIndex, Time& time) {
 	switch (layerIndex) {
 	case 0:
 		menuLayer->OnUpdate(time);
@@ -208,7 +179,7 @@ void Game::UpdateLayer(int layerIndex, Time time) {
 	}
 }
 
-void Game::UpdatePacket(LayerState& state) {
+void Game::UpdatePacket(Ref<LayerState>& state) {
 	glm::ivec2 winSize = { 1280, 720 };
 	glfwGetWindowSize(window, &winSize.x, &winSize.y);
 
@@ -216,11 +187,12 @@ void Game::UpdatePacket(LayerState& state) {
 		prevScreenResolution = winSize;
 	ScreenResolution = winSize;
 
-	state.window = window;
-	state.volumeGain = gameVolumeGain;
-	state.currentSceneIndex = layerIndex;
-	state.fullScreen = fullscreen;
-	state.resolution = ScreenResolution;
+	state->update = false;
+	state->window = window;
+	state->volumeGain = gameVolumeGain;
+	state->currentSceneIndex = layerIndex;
+	state->fullScreen = fullscreen;
+	state->resolution = ScreenResolution;
 }
 
 bool Game::ProcessLayerState(int layerIndex) {
@@ -238,18 +210,41 @@ bool Game::ProcessLayerState(int layerIndex) {
 	}
 
 	if (!layerState->update) {
-		UpdatePacket(*layerState);
+		UpdatePacket(layerState);
 		return true;
 	}
 
 	if (layerState->terminate) glfwSetWindowShouldClose(window, true);
 
 	if (layerState->fullScreen != this->fullscreen) {
-		SetFullscreen(layerState->fullScreen);
+		fullscreen = layerState->fullScreen;
+		if (fullscreen) {
+			glm::ivec2 winPos = { 0, 0 };
+			glfwGetWindowPos(window, &winPos.x, &winPos.y);
+			WindowPos = winPos;
+
+			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+			auto mode = glfwGetVideoMode(monitor);
+			glm::ivec2 sz = { mode->width, mode->height };
+			glfwSetWindowMonitor(window, monitor, 0, 0, sz.x, sz.y, GLFW_DONT_CARE);
+
+			prevScreenResolution = ScreenResolution;
+			ScreenResolution = sz;
+			glViewport(0, 0, sz.x, sz.y);
+		}
+		else {
+			ScreenResolution = prevScreenResolution;
+			glfwSetWindowMonitor(window, NULL, WindowPos.x, WindowPos.y,
+				ScreenResolution.x, ScreenResolution.y, GLFW_DONT_CARE);
+			glViewport(0, 0, ScreenResolution.x, ScreenResolution.y);
+		}
 	}
 
 	if (layerState->volumeGain != this->gameVolumeGain) {
-		SetVolume(layerState->volumeGain);
+		gameVolumeGain = layerState->volumeGain;
+		if (gameVolumeGain < 0) gameVolumeGain = 1;
+		else if (gameVolumeGain > 1) gameVolumeGain = 0;
+		Audio::SetListenerGain(gameVolumeGain);
 	}
 
 	if (layerState->reload) {
@@ -267,8 +262,6 @@ bool Game::ProcessLayerState(int layerIndex) {
 		if (!LoadLayer(this->layerIndex)) return false;
 	}
 
-	layerState.reset();
-	layerState = std::make_shared<LayerState>();
-	UpdatePacket(*layerState);
+	UpdatePacket(layerState);
 	return true;
 }

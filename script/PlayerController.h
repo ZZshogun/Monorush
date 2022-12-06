@@ -155,6 +155,8 @@ public:
 	}
 
 	void OnUpdate(Time time){
+		if (GameManager::pause) return;
+
 		auto& transform = GetComponent<TransformComponent>();
 		auto& rigidbody = GetComponent<RigidbodyComponent>();
 		auto& animator = GetComponent<AnimatorComponent>();

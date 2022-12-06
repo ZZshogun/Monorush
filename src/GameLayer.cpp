@@ -32,7 +32,6 @@ void GameLayer::OnAttach() {
 	Ref<Texture> bullet = Texture::Create("bullet","texture/bullet.png");
 	Ref<Texture> lamppost = Texture::Create("lamppost", "texture/lamp_post.png");
 	Ref<Texture> tile = Texture::Create("tile", "texture/tile.png");
-	Audio::LoadSound("audio/bounce.wav", "bounce");
 
 	Noise::RandomSeed();
 
@@ -88,17 +87,106 @@ void GameLayer::OnAttach() {
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
 	UI::Anchor(CENTER);
-	menuButton = UI::CreateButton(
-		"MENU",
+
+	auto OnButtonHover = []() {
+		auto& button = UI::on_button;
+		button->textScale *= 1.2f;
+		button->text = "- " + button->text + " -";
+	};
+
+	// Pause screen
+	pauseButton = UI::CreateButton(
+		"PAUSE",
 		0.75f,
 		Color::White,
 		{ -850, 480 },
 		{ 160, 75 },
 		Color::Black,
-		[&]() { state->SceneAddition(-1); },
+		[&]() { GameManager::pause = true; },
 		Color::Black,
-		[]() { UI::on_button->textScale = 1; }
+		[]() { UI::on_button->textScale = 0.85f; }
 	);
+
+	resumeButton = UI::CreateButton(
+		"RESUME",
+		1.25f,
+		Color::Black,
+		{ 0, 0 },
+		{ 270, 60 },
+		{ 0, 1, 0, 1 },
+		[&]() { GameManager::pause = false; GameManager::setting = false; },
+		Color::White,
+		OnButtonHover
+	);
+
+	settingButton = UI::CreateButton(
+		"SETTING",
+		1.25f,
+		Color::Black,
+		{ 0, -100 },
+		{ 280, 60 },
+		{ 0, 1, 0, 1 },
+		[&]() { GameManager::setting = true; },
+		Color::White,
+		OnButtonHover
+	);
+
+	menuButton = UI::CreateButton(
+		"MENU",
+		1.25f,
+		Color::Black,
+		{ 0, -200 },
+		{ 190, 60 },
+		{ 0, 1, 0, 1 },
+		[&]() { state->SceneAddition(-1); },
+		Color::White,
+		OnButtonHover
+	);
+
+	// Setting screen
+	fulLScreenButton = UI::CreateButton(
+		state->fullScreen ? "SCREEN : FULLSCREEN" : "SCREEN : WINDOWED",
+		1.0f,
+		Color::Black,
+		{ 0, 100 },
+		{ 550, 65 },
+		{ 0, 1, 0, 1 },
+		[&]() {
+			state->ToggleFullScreen();
+			UI::clicked_button->text = state->fullScreen ? "SCREEN : FULLSCREEN" : "SCREEN : WINDOWED";
+		},
+		Color::Transparent,
+			OnButtonHover
+	);
+
+	volumeButton = UI::CreateButton(
+		"VOLUME : " + std::to_string((int)(state->volumeGain * 100)) + "%",
+		1.0f,
+		Color::Black,
+		{ 0, 0 },
+		{ 400, 65 },
+		{ 0, 1, 0, 1 },
+		[&]() {
+			state->SwitchVolume();
+			UI::clicked_button->text = "VOLUME : " + std::to_string((int)(state->volumeGain * 100)) + "%";
+		},
+		Color::Transparent,
+			OnButtonHover
+	);
+
+	backButton = UI::CreateButton(
+		"BACK",
+		0.75f,
+		Color::White,
+		{ -850, 480 },
+		{ 160, 75 },
+		Color::Black,
+		[&]() { GameManager::setting = false; },
+		Color::Black,
+		[]() { UI::on_button->textScale = 1.0f; }
+	);
+
+	// End screen
 	retryButton = UI::CreateButton(
 		"RETRY",
 		1.5f,
@@ -124,15 +212,16 @@ void GameLayer::OnAttach() {
 	UI::EndUI();
 }
 
-void GameLayer::OnUpdate(Time time) {
+void GameLayer::OnUpdate(Time& time) {
 	GameManager::Update(time);
 	if (!state->update) scene->OnUpdate(state, time);
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
 
 	UI::Anchor(CENTER);
-	UI::DrawButton(menuButton, time);
+	UI::DrawButton(pauseButton, time);
 
+	// score display
 	if (outoftime <= 5) {
 		if (GameManager::remainingTime <= 0) {
 			texCol = glm::vec4{ 1, 0.41f, 0.38f, 1 };
@@ -148,6 +237,7 @@ void GameLayer::OnUpdate(Time time) {
 		UI::DrawString(scorestr, { 0, 450 + floatOffset }, 1.25f, Color::Black);
 	}
 
+	// fury event display
 	UI::Anchor(CENTER);
 	if (GameManager::fury && GameManager::_furyTimer <= 3) {
 		fury_end_time = 0;
@@ -159,7 +249,9 @@ void GameLayer::OnUpdate(Time time) {
 	}
 
 	if (Input::GetKeyDown(Key::Tab)) GameManager::f3 = !GameManager::f3;
+	if (Input::GetKeyDown(Key::Escape)) GameManager::pause = !GameManager::pause;
 
+	// display info
 	if (GameManager::f3) {
 		std::stringstream ss;
 		ss << std::setprecision(2) << std::fixed << GameManager::difficulty;
@@ -176,13 +268,16 @@ void GameLayer::OnUpdate(Time time) {
 		UI::DrawString("TIME LEFT " + timestr + millitimestr, { 940, 460 }, 0.65f, Color::Black);
 	}
 
+	// gameover
 	if (GameManager::gameOver) {
 		menuButton->active = false;
+		GameManager::pause = false;
+		GameManager::setting = false;
 		if (resetCountTime >= resetUIWaitTime) {
-			resetScreenOpacity += opacityIncSpeed * time.deltaTime;
+			resetScreenOpacity += opacityIncSpeed * time.unscaledDeltaTime;
 			resetScreenOpacity = glm::min<float>(resetScreenOpacity, 1);
 		}
-		else resetCountTime += time.deltaTime;
+		else resetCountTime += time.unscaledDeltaTime;
 
 		UI::Anchor(CENTER);
 		UI::DrawImage({ 0, 0 }, { 1920, 1080 }, { 0, 0, 0, resetScreenOpacity * 0.9f });
@@ -230,6 +325,39 @@ void GameLayer::OnUpdate(Time time) {
 			UI::DrawButton(retryButton, time);
 			UI::DrawButton(endMenuButton, time);
 		}
+	}
+
+	UI::Anchor(CENTER);
+	if (GameManager::pause) {
+		if (GameManager::setting) {
+			UI::DrawImage({ 0, 0 }, { 1920, 1080 }, Color::White);
+			UI::DrawButton(backButton, time);
+			UI::DrawButton(fulLScreenButton, time);
+			UI::DrawButton(volumeButton, time);
+			UI::DrawString("== SETTING ==", { 0, 400 }, 1.5f, Color::Black);
+		}
+		else {
+			time.timeScale = 0;
+			pauseButton->active = false;
+
+			UI::DrawImage({ 0, 0 }, { 1920, 1080 }, { 0, 0, 0, 0.6f });
+			UI::DrawImage({ 0, 0 }, { 600, 540 }, Color::White);
+
+			UI::DrawString("PAUSED", { 0, 150 }, 2, Color::Black);
+
+			UI::DrawButton(resumeButton, time);
+			UI::DrawButton(settingButton, time);
+			UI::DrawButton(menuButton, time);
+		}
+	}
+	if (!GameManager::pause && !GameManager::setting && time.timeScale == 0) {
+		time.timeScale = 1;
+		pauseButton->active = true;
+	}
+	else if (!GameManager::pause && GameManager::setting) {
+		time.timeScale = 1;
+		GameManager::setting = false;
+		pauseButton->active = true;
 	}
 
 	UI::EndUI();

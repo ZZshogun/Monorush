@@ -1,11 +1,5 @@
 #include "../header/Layer.h"
 
-void OnButtonHover() {
-	auto& button = UI::on_button;
-	button->textScale *= 1.2f;
-	button->text = "- " + button->text + " -";
-}
-
 MenuLayer::MenuLayer() {
 	state = std::make_shared<LayerState>();
 
@@ -23,6 +17,12 @@ MenuLayer::~MenuLayer() {
 }
 
 void MenuLayer::OnAttach() {
+	auto OnButtonHover = []() {
+		auto& button = UI::on_button;
+		button->textScale *= 1.2f;
+		button->text = "- " + button->text + " -";
+	};
+
 	UI::StartUI(glm::ivec2{ 1920, 1080 });
 
 	UI::Anchor(CENTER);
@@ -78,7 +78,7 @@ void MenuLayer::OnAttach() {
 	);
 
 	volumeButton = UI::CreateButton(
-		"VOLUME : " + std::to_string((int)(state->volumeGain * 10)) + "%",
+		"VOLUME : " + std::to_string((int)(state->volumeGain * 100)) + "%",
 		1.0f,
 		Color::Black,
 		{ 0, 0 },
@@ -86,7 +86,7 @@ void MenuLayer::OnAttach() {
 		{ 0, 1, 0, 0 },
 		[&]() { 
 			state->SwitchVolume();
-			UI::clicked_button->text = "VOLUME : " + std::to_string((int)(state->volumeGain * 10)) + "%";
+			UI::clicked_button->text = "VOLUME : " + std::to_string((int)(state->volumeGain * 100)) + "%";
 		},
 		Color::Transparent,
 		OnButtonHover
@@ -106,7 +106,7 @@ void MenuLayer::OnAttach() {
 	UI::EndUI();
 }
 
-void MenuLayer::OnUpdate(Time time) {
+void MenuLayer::OnUpdate(Time& time) {
 	scene->OnUpdate(state, time);
 
 	UI::StartUI(glm::ivec2{ 1920, 1080 });

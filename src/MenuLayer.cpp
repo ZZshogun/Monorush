@@ -1,4 +1,5 @@
 #include "../header/Layer.h"
+#include "../script/GameManager.h"
 
 MenuLayer::MenuLayer() {
 	state = std::make_shared<LayerState>();
@@ -9,6 +10,7 @@ MenuLayer::MenuLayer() {
 }
 
 MenuLayer::~MenuLayer() {
+	GameManager::Reset();
 	UI::ClearBuffers();
 	Texture::ClearHandles();
 	Audio::ClearBuffers();
@@ -100,7 +102,8 @@ void MenuLayer::OnAttach() {
 		{ 160, 75 },
 		Color::Black,
 		[&]() { in_setting = false; },
-		Color::Black
+		Color::Black,
+		[]() { UI::on_button->textScale = 1; }
 	);
 
 	UI::EndUI();
@@ -126,7 +129,7 @@ void MenuLayer::OnUpdate(Time& time) {
 		UI::Anchor(CENTER);
 		UI::DrawString("== MONORUSH ==", { 0, 400 }, 2, Color::Black);
 		UI::Anchor(LEFT);
-		UI::DrawString("VERSION 0.1A", { -950, -525 }, 0.45f, Color::Black, "Arial");
+		UI::DrawString("VERSION 0.1.1A", { -950, -525 }, 0.45f, Color::Black, "Arial");
 		UI::Anchor(RIGHT);
 		UI::DrawString("MADE BY RACHATA K.", { 950, -525 }, 0.45f, Color::Black, "Arial");
 

@@ -138,9 +138,9 @@ public:
 		glm::ivec2 screen_pos, 
 		glm::ivec2 screen_size, 
 		glm::vec4 color,
-		std::function<void()> function = []() {},
+		std::function<void()> function = [](){},
 		glm::vec4 presscolor = Color::White,
-		std::function<void()> hover_function = []() {}
+		std::function<void()> hover_function = [](){}
 	);
 };
 

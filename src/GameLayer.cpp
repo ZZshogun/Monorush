@@ -113,7 +113,7 @@ void GameLayer::OnAttach() {
 		Color::Black,
 		{ 0, 0 },
 		{ 270, 60 },
-		{ 0, 1, 0, 1 },
+		{ 0, 1, 0, 0 },
 		[&]() { GameManager::pause = false; GameManager::setting = false; },
 		Color::White,
 		OnButtonHover
@@ -125,7 +125,7 @@ void GameLayer::OnAttach() {
 		Color::Black,
 		{ 0, -100 },
 		{ 280, 60 },
-		{ 0, 1, 0, 1 },
+		{ 0, 1, 0, 0 },
 		[&]() { GameManager::setting = true; },
 		Color::White,
 		OnButtonHover
@@ -137,7 +137,7 @@ void GameLayer::OnAttach() {
 		Color::Black,
 		{ 0, -200 },
 		{ 190, 60 },
-		{ 0, 1, 0, 1 },
+		{ 0, 1, 0, 0 },
 		[&]() { state->SceneAddition(-1); },
 		Color::White,
 		OnButtonHover
@@ -150,13 +150,13 @@ void GameLayer::OnAttach() {
 		Color::Black,
 		{ 0, 100 },
 		{ 550, 65 },
-		{ 0, 1, 0, 1 },
+		{ 0, 1, 0, 0 },
 		[&]() {
 			state->ToggleFullScreen();
 			UI::clicked_button->text = state->fullScreen ? "SCREEN : FULLSCREEN" : "SCREEN : WINDOWED";
 		},
 		Color::Transparent,
-			OnButtonHover
+		OnButtonHover
 	);
 
 	volumeButton = UI::CreateButton(
@@ -165,13 +165,13 @@ void GameLayer::OnAttach() {
 		Color::Black,
 		{ 0, 0 },
 		{ 400, 65 },
-		{ 0, 1, 0, 1 },
+		{ 0, 1, 0, 0 },
 		[&]() {
 			state->SwitchVolume();
 			UI::clicked_button->text = "VOLUME : " + std::to_string((int)(state->volumeGain * 100)) + "%";
 		},
 		Color::Transparent,
-			OnButtonHover
+		OnButtonHover
 	);
 
 	backButton = UI::CreateButton(
@@ -183,7 +183,7 @@ void GameLayer::OnAttach() {
 		Color::Black,
 		[&]() { GameManager::setting = false; },
 		Color::Black,
-		[]() { UI::on_button->textScale = 1.0f; }
+		[]() { UI::on_button->textScale = 1; }
 	);
 
 	// End screen
@@ -249,7 +249,10 @@ void GameLayer::OnUpdate(Time& time) {
 	}
 
 	if (Input::GetKeyDown(Key::Tab)) GameManager::f3 = !GameManager::f3;
-	if (Input::GetKeyDown(Key::Escape)) GameManager::pause = !GameManager::pause;
+	if (Input::GetKeyDown(Key::Escape)) {
+		if (GameManager::setting) GameManager::setting = false;
+		else GameManager::pause = !GameManager::pause;
+	}
 
 	// display info
 	if (GameManager::f3) {
@@ -330,6 +333,7 @@ void GameLayer::OnUpdate(Time& time) {
 	UI::Anchor(CENTER);
 	if (GameManager::pause) {
 		if (GameManager::setting) {
+			pauseButton->draw = false;
 			UI::DrawImage({ 0, 0 }, { 1920, 1080 }, Color::White);
 			UI::DrawButton(backButton, time);
 			UI::DrawButton(fulLScreenButton, time);
@@ -339,6 +343,8 @@ void GameLayer::OnUpdate(Time& time) {
 		else {
 			time.timeScale = 0;
 			pauseButton->active = false;
+			pauseButton->draw = true;
+			GameManager::setting = false;
 
 			UI::DrawImage({ 0, 0 }, { 1920, 1080 }, { 0, 0, 0, 0.6f });
 			UI::DrawImage({ 0, 0 }, { 600, 540 }, Color::White);

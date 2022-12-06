@@ -68,11 +68,11 @@ void Game::Setup() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	Audio::log = true;
-	UI::log = true;
-	Texture::log = true;
-	Shader::log = true;
-	Noise::log = true;
+	Audio::log = log;
+	UI::log = log;
+	Texture::log = log;
+	Shader::log = log;
+	Noise::log = log;
 
 	Shader::Init();
 	Audio::Init();
@@ -136,9 +136,11 @@ void Game::SetIcon(std::string file) {
 void Game::ClearLayer(int layerIndex) {
 	switch (layerIndex) {
 		case 0:
+			menuLayer.~shared_ptr();
 			menuLayer.reset();
 			break;
 		case 1:
+			gameLayer.~shared_ptr();
 			gameLayer.reset();
 			break;
 		default:

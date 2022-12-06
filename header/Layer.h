@@ -46,12 +46,16 @@ private:
 
 private:
 	Entity player;
+	// game screen
 	Ref<UI::Button> pauseButton;
+	// pause menu
 	Ref<UI::Button> resumeButton;
 	Ref<UI::Button> settingButton;
 	Ref<UI::Button> menuButton;
+	// end
 	Ref<UI::Button> retryButton;
 	Ref<UI::Button> endMenuButton;
+	// settings menu
 	Ref<UI::Button> fulLScreenButton;
 	Ref<UI::Button> volumeButton;
 	Ref<UI::Button> backButton;

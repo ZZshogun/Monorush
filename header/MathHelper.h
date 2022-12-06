@@ -15,8 +15,8 @@ namespace Math {
 	static bool InBox2i(glm::ivec2 point, glm::ivec2 box_origin, glm::ivec2 box_size) {
 		glm::ivec2 start = box_origin - box_size / 2;
 		glm::ivec2 end = box_origin + box_size / 2;
-		if (start.x <= point.x && start.y <= point.y && point.x <= end.x && point.y <= end.y) return true;
-		else return false;
+		if (start.x > point.x || start.y > point.y || point.x > end.x || point.y > end.y) return false;
+		else return true;
 	}
 
 	static bool InBox2(glm::vec2 point, glm::vec2 box_origin, glm::vec2 box_size) {

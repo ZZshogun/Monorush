@@ -73,24 +73,18 @@ Shader::Shader(const char* vertexfile, const char* fragmentfile) {
 	GLchar name[bufSize];
 
 	glGetProgramiv(handle, GL_ACTIVE_ATTRIBUTES, &count);
-	std::cout << "Shader " << handle << " Attrib ";
 	for (location = 0; location < count; location++)
 	{
 		glGetActiveAttrib(handle, (GLuint)location, bufSize, &length, &varsize, &type, name);
 		attribLocation[name] = GLVariable{ location, type, name };
-		std::cout << name << " ";
 	}
-	std::cout << "\n";
 
 	glGetProgramiv(handle, GL_ACTIVE_UNIFORMS, &count);
-	std::cout << "Shader " << handle << " Uni ";
 	for (location = 0; location < count; location++)
 	{
 		glGetActiveUniform(handle, (GLuint)location, bufSize, &length, &varsize, &type, name);
 		uniformLocation[name] = GLVariable{ location, type, name };
-		std::cout << name << " ";
 	}
-	std::cout << "\n";
 
 	if (Shader::log) std::cout << "CREATE Shader " << handle << " " << vertexfile << " " << fragmentfile << "\n";
 }

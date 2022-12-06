@@ -231,7 +231,7 @@ Ref<UI::Button> UI::CreateButton(
 	Ref<Button> ref = std::make_shared<Button>
 		(text, scale, textColor, screen_pos, screen_size, color, 
 			presscolor, image, ref_resolution, hover_function, function);
-	UI::buttons.emplace_back(ref);
+	UI::buttons.push_back(ref);
 	return ref;
 }
 
@@ -296,26 +296,26 @@ void UI::PollsEvent(GLFWwindow* window, Time time) {
 		if (Math::InBox2i(clickPos, button->position, button->size)) {
 			UI::onEvents = true;
 			UI::on_button = button;
-			if (button->active && !button->hovered) {
-				button->hovered = true;
-				UI::hovering_button = *button;
-				if (button->hover_function) button->hover_function();
-			}
 
 			if (button->active) {
+				if (!button->hovered) {
+					button->hovered = true;
+					UI::hovering_button = *button;
+					button->hover_function();
+				}
 				if (!button->press && Input::mouseCode[Mouse_Left] == Input::KeyState::KEY_DOWN) {
 					button->blink = button->resetBlink;
 					button->press = button->resetPress;
 					*button = hovering_button;
 					hovering_button = null_button;
 					clicked_button = button;
-					if (button->function) button->function();
+					button->function();
 					UI::hovering_button = *button;
-					if (button->hover_function) button->hover_function();
+					button->hover_function();
 				}
 				else {
-					button->press -= time.deltaTime;
-					if (button->press <= 0) {
+					button->press -= time.unscaledDeltaTime;
+					if (button->press < 0) {
 						button->press = 0;
 						clicked_button = NULL;
 					}

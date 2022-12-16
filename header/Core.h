@@ -21,6 +21,7 @@
 #include <queue>
 #include <random>
 #include <assert.h>
+#include <thread>
 
 #include <stb/stb_image.h>
 
@@ -51,8 +52,6 @@ namespace Color {
 	const glm::vec4 Black = { 0, 0, 0, 1 };
 	const glm::vec4 White = { 1, 1, 1, 1 };
 }
-
-#define MAGIA_DEBUG
 
 #ifdef MAGIA_DEBUG
 #define MAGIA_PATH(path) "../" + path

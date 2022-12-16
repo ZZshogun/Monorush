@@ -91,9 +91,13 @@ void Game::Loop() {
 		
 		time._UpdateTime((float)glfwGetTime());
 
-		Input::ScanKey(window);
-		Input::ScanMouse(window);
-		UI::PollsEvent(window, time);
+		std::thread key_input(Input::ScanKey, window);
+		std::thread mouse_input(Input::ScanMouse, window);
+		std::thread UI_Polls(UI::PollsEvent, window, time);
+
+		key_input.join();
+		mouse_input.join();
+		UI_Polls.join();
 
 		if (ProcessLayerState(layerIndex)) {
 			UpdateLayer(layerIndex, time);

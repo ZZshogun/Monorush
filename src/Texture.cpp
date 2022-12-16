@@ -25,6 +25,8 @@ Texture::Texture(std::string name, const char* file, GLuint slot, bool absoluteP
 	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, handle);
 
+	glEnable(GL_TEXTURE_2D);
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -48,6 +50,7 @@ Texture::Texture(std::string name, const char* file, GLuint slot, bool absoluteP
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	if (log) std::cout << "CREATE Texture " << handle << " " << path << "\n";
+
 
 	stbi_image_free(bytes);
 	glBindTexture(GL_TEXTURE_2D, 0);

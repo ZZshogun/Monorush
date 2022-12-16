@@ -129,7 +129,7 @@ void MenuLayer::OnUpdate(Time& time) {
 		UI::Anchor(CENTER);
 		UI::DrawString("== MONORUSH ==", { 0, 400 }, 2, Color::Black);
 		UI::Anchor(LEFT);
-		UI::DrawString("VERSION 0.1.1A", { -950, -525 }, 0.45f, Color::Black, "Arial");
+		UI::DrawString("VERSION 0.1.2A", { -950, -525 }, 0.45f, Color::Black, "Arial");
 		UI::Anchor(RIGHT);
 		UI::DrawString("MADE BY RACHATA K.", { 950, -525 }, 0.45f, Color::Black, "Arial");
 
